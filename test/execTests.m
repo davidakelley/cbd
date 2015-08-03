@@ -7,21 +7,15 @@
 
 addpath('O:\PROJ_LIB\Presentations\Chartbook\Data\Dataset Creation\cbd');
 
+import matlab.unittest.TestSuite
+import matlab.unittest.TestRunner
+import matlab.unittest.plugins.CodeCoveragePlugin
 
 %% Run tests
-testfiles = {'datatest.m', ...
-    'expressiontest.m', ...
-    'transformationtests.m', ...
-    'summarizationtests.m', ...
-    'multiseriestests.m', ...
-    'aggregationtests.m'};
+suite = TestSuite.fromFolder(pwd);
 
-testresults = cell(length(testfiles), 1);
-
-for iTest = 1:length(testfiles)
-    testresults{iTest} = runtests(testfiles{iTest});
-end
-
-testresults = [testresults{:}];
+runner = TestRunner.withTextOutput;
+runner.addPlugin(CodeCoveragePlugin.forFolder(pwd));
+result = runner.run(suite);
 
 display(testresults);
