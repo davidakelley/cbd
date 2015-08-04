@@ -32,9 +32,14 @@ end
 endInd = nan(1, nVar);
 for iVar = 1:nVar
     foundInds = find(~isnan(data(:, iVar)), lastInd, 'last');
-    endInd(iVar) = foundInds(1);
+    if isempty(foundInds)
+        endInd(iVar) = nan;
+    else
+        endInd(iVar) = foundInds(1);
+    end
 end
 returnInds = unique(endInd);
+returnInds(isnan(returnInds)) = [];
 lastVals = data(returnInds, :);
 
 if returnTab
