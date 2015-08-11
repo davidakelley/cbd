@@ -69,12 +69,13 @@ for iloF = 1:length(lowFdates)
     if ~isempty(matchInd) 
         hiFInd(iloF) = matchInd;
     else 
-        hiFInd(iloF) = length(disagg_dates);
+        % Date before start of loF series
+        hiFInd(iloF) = nan;
     end
 end
 
 disagg_data = nan(size(disagg_dates, 1), size(data, 2));
-disagg_data(hiFInd, :) = data{:,:};
+disagg_data(hiFInd(~isnan(hiFInd)), :) = data{~isnan(hiFInd),:};
 disagg = array2table(disagg_data, 'RowNames', cellstr(datestr(disagg_dates)), ...
     'VariableNames', data.Properties.VariableNames);
 
@@ -87,7 +88,9 @@ switch upper(disaggType)
             else
                 startInd = hiFInd(iInd-1)+1;
             end
-            disagg{startInd:hiFInd(iInd),:} = disagg{hiFInd(iInd),:};
+            if ~isnan(startInd) && ~isnan(hiFInd(iInd))
+                disagg{startInd:hiFInd(iInd),:} = disagg{hiFInd(iInd),:};
+            end
         end
         
     case 'INTERP'

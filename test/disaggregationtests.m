@@ -136,7 +136,7 @@ classdef disaggregationtests < matlab.unittest.TestCase
             dateDiff = dates(2:end)- dates(1:end-1);
             testCase.verifyEqual(size(unique(dateDiff), 1), 1);
             
-            testCase.verifyEqual(sum(isnan(testVal{:,:})), 0);
+            testCase.verifyEqual(sum(isnan(testVal{:,:})), 1);
                   
             % Quarter => Weekly
             testVal = cbd.disagg(testCase.gdpVal, 'W', 'FILL');
@@ -151,14 +151,14 @@ classdef disaggregationtests < matlab.unittest.TestCase
                         
             % Annual => Weekly
             testVal = cbd.disagg(testCase.AgdpVal, 'W', 'FILL');
-            testCase.verifyLessThanOrEqual(size(unique(testVal{:,:}), 1), ...
+            testCase.verifyLessThanOrEqual(size(unique(testVal{~isnan(testVal{:,:}),:}), 1), ...
                 size(testCase.AgdpVal, 1)); 
             
             dates = datenum(testVal.Properties.RowNames);
             dateDiff = dates(2:end)- dates(1:end-1);
             testCase.verifyEqual(size(unique(dateDiff), 1), 1);
             
-            testCase.verifyEqual(sum(isnan(testVal{:,:})), 0);
+            testCase.verifyEqual(sum(isnan(testVal{:,:})), 1);
         end
         
         function testDailyDisaggFill(testCase)
@@ -172,7 +172,7 @@ classdef disaggregationtests < matlab.unittest.TestCase
             dateDiff = dates(2:end)- dates(1:end-1);
             testCase.verifyEqual(size(unique(dateDiff), 1), 2); % Weekend and day-to-day
             
-            testCase.verifyEqual(sum(isnan(testVal{:,:})), 0);
+            testCase.verifyEqual(sum(isnan(testVal{:,:})), 4);
             
             % Month => Daily
             testVal = cbd.disagg(testCase.lrVal, 'D', 'FILL');
