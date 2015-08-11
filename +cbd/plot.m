@@ -31,12 +31,22 @@ inP.addParameter('LegendPos', 'nw', @ischar);
 inP.addParameter('Colors', {}, @iscell);
 inP.addParameter('AxHandle', [], @ishandle);
 inP.addParameter('YLim', [], @isnumeric);
+inP.addParameter('startDate', [], @ischar);
+inP.addParameter('endDate', [], @ischar);
 
 inP.parse(varargin{:});
 
 opts = inP.Results;
-if iscell(data) ||ischar(data)
-    data = cbd.data(data);
+if iscell(data) || ischar(data)
+    if ~isempty(opts.startDate) && ~isempty(opts.endDate)
+        data = cbd.data(data, 'startDate', opts.startDate, 'endDate', opts.endDate);
+    elseif ~isempty(opts.startDate)
+        data = cbd.data(data, 'startDate', opts.startDate);
+    elseif ~isempty(opts.endDate)
+        data = cbd.data(data, 'endDate', opts.endDate);
+    else
+        data = cbd.data(data);
+    end
 end
 assert(istable(data), 'First input must be a table.');
 
