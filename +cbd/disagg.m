@@ -97,38 +97,20 @@ switch upper(disaggType)
         % Create same level at end of each period, smooth by using fixed
         % growth rate within a lower frequency period. 
         % % If extrapolating, continue last period's growth rate (%TODO)
+        [~, hiFper] = cbd.private.getFreq(newFreq);
+        perGap = hiFper / lowFper;      % Number of new periods per old period
+        
         grData = cbd.addition(cbd.division(cbd.diffPct(data),100),1);
         grData{1,:} = 1;
-        grDisagg = cbd.disagg(grData, newFreq, 'FILL');
-
-        dates = datenum(grDisagg.Properties.RowNames);
-        switch upper(oldFreq)
-            case 'A'
-                groupping = cbd.year(dates);
-            case 'Q'
-                groupping = [cbd.year(dates) cbd.quarter(dates)];
-            case 'M'
-                groupping = [cbd.year(dates) cbd.month(dates)];
-            case 'W'
-            %         groupping = [cbd.year(dates) weeknum(dates)];
-                error('Growth disaggregation from W not yet developed.');
-                % Matlab's weeknum function returns 2 different values for 12/30
-                % and 1/2 even if they are the same week. Write a new week function.
-            case 'D'
-                % Can't happen, would have returned already
+        grDisagg = nan(size(disagg));
+        for iLag = 0:perGap-1
+            grDisagg(hiFInd - iLag, :) = grData{:,:} .^ (1/perGap);
         end
-        [~,~,uLoc] = unique(groupping, 'rows');
-        [periodNumbers] = histcounts(uLoc, max(uLoc));
-        periodCounts = periodNumbers(uLoc)';
-        
-        grDisaggData = grDisagg{:,:} .^ (1 ./ periodCounts);
-        
-        cumGr = cumprod(grDisaggData);
+        cumGr = cumprod(grDisagg);
         cumGr(1:hiFInd(1)-1) = nan;
         disagg{hiFInd(1)+1:end,:} = cumGr(hiFInd(1)+1:end) * disagg{hiFInd(1),:};
         
     case 'NAN'
-        % Do nothing
 end
 
 end

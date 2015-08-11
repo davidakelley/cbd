@@ -14,20 +14,16 @@ function out = multiseriesFunction(dataA, dataB, fnHandle, varargin)
 
 %% Validate attributes
 if istable(dataA)
-    validateattributes(dataA, {'table'}, {'2d'});
+    validateattributes(dataA, {'table'}, {'column'});
 else
     validateattributes(dataA, {'numeric'}, {'scalar'});
 end
 if istable(dataB)
-    validateattributes(dataB, {'table'}, {'2d'});
+    validateattributes(dataB, {'table'}, {'column'});
 else
     validateattributes(dataB, {'numeric'}, {'scalar'});
 end
 validateattributes(fnHandle, {'function_handle'}, {'scalar'});
-
-if istable(dataA) && istable(dataB)
-    assert(size(dataA, 2) == size(dataB, 2), 'Tables must be same size');
-end
 
 inP = inputParser;
 inP.addParameter('ignoreNan', false, @islogical);
@@ -45,14 +41,14 @@ if istable(dataA) && istable(dataB)
         'VariableNames', {'dataseries'});
 
 elseif istable(dataA) && ~istable(dataB)
-    fnResult = fnHandle(dataA{:, :}, dataB);
+    fnResult = fnHandle(dataA{:, 1}, dataB);
     out = array2table(fnResult, 'RowNames', dataA.Properties.RowNames, ...
-        'VariableNames', dataA.Properties.VariableNames);
+        'VariableNames', {'dataseries'});
 
 elseif ~istable(dataA) && istable(dataB)
-    fnResult = fnHandle(dataA, dataB{:, :});
+    fnResult = fnHandle(dataA, dataB{:, 1});
     out = array2table(fnResult, 'RowNames', dataB.Properties.RowNames, ...
-        'VariableNames', dataB.Properties.VariableNames);
+        'VariableNames', {'dataseries'});
 
 else % Both scalars
     out = fnHandle(dataA, dataB);
