@@ -26,7 +26,7 @@ end
 
 if ischar(sDate)
     sDate = datenum(sDate);
-else
+elseif sDate < datenum(1800,1,1)
     % Treat sDate as code that counts backward
     sDate = datenum(data.Properties.RowNames{end-sDate});
 end
