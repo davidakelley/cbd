@@ -33,9 +33,14 @@ end
 beginInd = nan(1, nVar);
 for iVar = 1:nVar
     foundInds = find(~isnan(data(:, iVar)), firstInd, 'first');
-    beginInd(iVar) = foundInds(1);
+    if isempty(foundInds)
+        beginInd(iVar) = nan;
+    else
+        beginInd(iVar) = foundInds(1);
+    end
 end
 returnInds = unique(beginInd);
+returnInds(isnan(returnInds)) = [];
 firstVals = data(returnInds, :);
 
 if returnTab
