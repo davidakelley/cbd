@@ -22,7 +22,7 @@ cbdLoc = 'O:\PROJ_LIB\Presentations\Chartbook\Data\Dataset Creation\cbd';
 
 %% Check that number of input arguments match '%d's in string
 assert(size(strfind(strIn, '%d'), 2) == size(varargin, 2), 'expression:spec', ...
-    'Must include as many tables as ''%d'' inputs in string.');
+    'Must include as many tables as ''\%d'' inputs in string.');
 
 %% Treat input as either a Haver series, a scalar, or a function of those two
 argumentRegex = regexpi(strIn, '#');
