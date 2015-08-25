@@ -21,6 +21,9 @@ if nargin < 2
 end
 if nargin < 3 || any(isnan(eDate))
     [~,lastInd] = cbd.last(data);
+    if isnan(lastInd)
+        lastInd = size(data, 1);
+    end
     eDate = rNames{max(lastInd)};
 end
 if ischar(sDate)
@@ -44,8 +47,12 @@ firstData = cbd.first(windowData);
 lastData = cbd.last(windowData);
 
 %% Diff
-changed = lastData{1,:} - firstData{end,:};
-
-changed = array2table(changed, 'RowNames', rNames(eInd), 'VariableNames', vNames);
+if ~isempty(firstData) && ~isempty(lastData)
+    changed = lastData{1,:} - firstData{end,:};
+    changed = array2table(changed, 'RowNames', rNames(eInd), 'VariableNames', vNames);
+else
+    changed = data(end,:);
+    changed{end,:} = nan;
+end
 
 end
