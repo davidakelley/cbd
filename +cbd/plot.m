@@ -48,7 +48,9 @@ if iscell(data) || ischar(data)
         data = cbd.data(data);
     end
 end
-assert(istable(data), 'First input must be a table.');
+if ~istable(data)
+    data = array2table(data, 'RowNames', cellstr(num2str((1:size(data,1))')));
+end
 
 %% Interpolate
 if opts.Interpolate
