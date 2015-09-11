@@ -183,14 +183,18 @@ classdef xlsfile < handle
 %             end            
         end
 
-        function [success,theMessage] = write(obj,data,sheet,range)
+        function [success,theMessage] = write(obj,data,sheet,range,saveFile)
             % Set default values.
             Sheet1 = 1;
             if nargin < 3
                 sheet = Sheet1;
                 range = '';
+                saveFile = true;
             elseif nargin < 4
                 range = '';
+                saveFile = true;
+            elseif nargin < 5
+                saveFile = true;
             end
             
             if nargout > 0
@@ -270,7 +274,9 @@ classdef xlsfile < handle
             
             % Export data to selected region.
             set(obj.xlApp.selection,'Value',A);
-            obj.wkBook.Save
+            if saveFile
+                obj.wkBook.Save
+            end
         end
         
         function success = exportPDF(obj, pdfFile, sheet, range)
