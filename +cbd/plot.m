@@ -78,9 +78,9 @@ hold on;
 
 for iSer = 1:width(data)
     if iSer <= length(opts.Colors) && ~isempty(opts.Colors{iSer})
-        plot(dates, data{:,iSer}, 'Color', opts.Colors{iSer});
+        plot(ax1, dates, data{:,iSer}, 'Color', opts.Colors{iSer});
     else
-        plot(dates, data{:,iSer});
+        plot(ax1, dates, data{:,iSer});
     end
 end
 
@@ -110,26 +110,31 @@ if ~isempty(opts.YLim)
     ylim(opts.YLim);
 end
 
-if ~isempty(opts.Labels)
-    switch lower(opts.LegendPos)
-        case 'nw'
-            anc = [1 1];
-            buff = [10 -10];
-        case 'sw'
-            anc = [7 7];
-            buff = [10 10];
-        case 'se'
-            anc = [5 5];
-            buff = [-10 10];
-        case 'ne'
-            anc = [3 3];
-            buff = [-10 -10];
-        otherwise
-            error('Bad legend position.');
-    end
-    cbd.private.legendflex(opts.Labels, 'ref', gca, 'anchor', anc, 'buffer', buff);
+% Add legend
+if isempty(opts.Labels)
+    opts.Labels = data.Properties.VariableNames;
 end
 
+switch lower(opts.LegendPos)
+    case 'nw'
+        anc = [1 1];
+        buff = [10 -10];
+    case 'sw'
+        anc = [7 7];
+        buff = [10 10];
+    case 'se'
+        anc = [5 5];
+        buff = [-10 10];
+    case 'ne'
+        anc = [3 3];
+        buff = [-10 -10];
+    otherwise
+        error('Bad legend position.');
+end
+cbd.private.legendflex(opts.Labels, 'ref', gca, 'anchor', anc, 'buffer', buff, ...
+    'Interpreter', 'none');
+
+% Fix dates
 if ~badDates
     ax1.XLim = [dates(1) dates(end)];
     datetick('x', 'keeplimits');
