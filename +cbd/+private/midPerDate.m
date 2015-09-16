@@ -1,4 +1,4 @@
-function cbdDates = cbdDate(dates)
+function cbdDates = midPerDate(dates)
 %CBDDATE returns the middle date of a period
 %
 % dates = CBDDATE(dates) takes a column vector of dates and a
