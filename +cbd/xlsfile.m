@@ -184,6 +184,8 @@ classdef xlsfile < handle
         end
 
         function [success,theMessage] = write(obj,data,sheet,range,saveFile)
+            % Additional optional argument saveFile can be set to false to
+            % prevent the file from being saved with the write command.
             % Set default values.
             Sheet1 = 1;
             if nargin < 3
