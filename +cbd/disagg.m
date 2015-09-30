@@ -113,10 +113,7 @@ switch upper(disaggType)
             case 'M'
                 groupping = [cbd.year(dates) cbd.month(dates)];
             case 'W'
-            %         groupping = [cbd.year(dates) weeknum(dates)];
-                error('Growth disaggregation from W not yet developed.');
-                % Matlab's weeknum function returns 2 different values for 12/30
-                % and 1/2 even if they are the same week. Write a new week function.
+                groupping = weekgroup(dates);
             case 'D'
                 % Can't happen, would have returned already
         end
@@ -124,7 +121,7 @@ switch upper(disaggType)
         [periodNumbers] = histcounts(uLoc, max(uLoc));
         periodCounts = periodNumbers(uLoc)';
         
-        grDisaggData = grDisagg{:,:} .^ (1 ./ periodCounts);
+        grDisaggData = real(grDisagg{:,:} .^ (1 ./ periodCounts));
         
         cumGr = cumprod(grDisaggData);
         cumGr(1:hiFInd(1)-1) = nan;
@@ -132,6 +129,21 @@ switch upper(disaggType)
         
     case 'NAN'
         % Do nothing
+end
+
+end
+
+function groupping = weekgroup(dates)
+% Generate a list of weekly dates encompassing all daets, find the last
+% weekly date that falls in the period given.
+
+% Matlab's weeknum function returns 2 different values for 12/30
+% and 1/2 even if they are the same week, so we have to loop.
+
+wDates = cbd.private.genDates(dates(1)-7, dates(end), 'W');
+groupping = nan(size(dates));
+for iD = 1:length(dates)
+  groupping(iD) = find(wDates < dates(iD), 1, 'last');
 end
 
 end
