@@ -62,7 +62,7 @@ disagg_dates = cbd.private.genDates(...
     newFreq);
 
 % Find end of low frequency period in high frequency
-lowFdates = datenum(data.Properties.RowNames);
+lowFdates = cbd.private.tableDates(data);
 hiFInd = nan(size(lowFdates));
 for iloF = 1:length(lowFdates)
     matchInd = find(disagg_dates <= lowFdates(iloF), 1, 'last');
