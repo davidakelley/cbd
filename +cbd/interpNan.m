@@ -29,6 +29,11 @@ for iCol = 1:size(d, 2)
     valueInd = find(~nanLog);
 
     y(:,iCol) = d(:,iCol);
+    if length(valueInd) == 1
+      warning('Unable to interpolate series with only 1 non-nan value.');
+      continue;
+    end
+    
     if extrap
         y(nanInd, iCol) = interp1(valueInd, values, nanInd, interp, 'extrap');
     else

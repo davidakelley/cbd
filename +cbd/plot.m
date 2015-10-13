@@ -33,6 +33,8 @@ inP.addParameter('AxHandle', [], @ishandle);
 inP.addParameter('YLim', [], @isnumeric);
 inP.addParameter('startDate', [], @ischar);
 inP.addParameter('endDate', [], @ischar);
+inP.addParameter('Marker', 'none', @ischar);
+inP.addParameter('LineStyle', '-', @ischar);
 
 inP.parse(varargin{:});
 
@@ -78,9 +80,11 @@ hold on;
 
 for iSer = 1:width(data)
     if iSer <= length(opts.Colors) && ~isempty(opts.Colors{iSer})
-        plot(ax1, dates, data{:,iSer}, 'Color', opts.Colors{iSer});
+        plot(ax1, dates, data{:,iSer}, 'Color', opts.Colors{iSer}, ...
+          'Marker', opts.Marker, 'LineStyle', opts.LineStyle);
     else
-        plot(ax1, dates, data{:,iSer});
+        plot(ax1, dates, data{:,iSer}, ...
+          'Marker', opts.Marker, 'LineStyle', opts.LineStyle);
     end
 end
 
