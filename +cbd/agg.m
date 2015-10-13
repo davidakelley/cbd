@@ -55,10 +55,14 @@ switch upper(finalFreq)
     case 'M'
         groupping = [cbd.year(dates) cbd.month(dates)];
     case 'W'
-%         groupping = [cbd.year(dates) weeknum(dates)];
-        error('Aggregation to W not yet developed.');
+        warning('Aggregation to W not yet tested.');
         % Matlab's weeknum function returns 2 different values for 12/30
         % and 1/2 even if they are the same week. Write a new week function.
+        wDates = cbd.private.genDates(dates(1)-7, dates(end), 'W');
+        groupping = nan(size(dates));
+        for iD = 1:length(dates)
+          groupping(iD) = find(wDates < dates(iD), 1, 'last');
+        end
     case 'D'
         groupping = [cbd.year(dates) cbd.day(dates)];
 end
