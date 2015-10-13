@@ -49,7 +49,10 @@ alignData = cell(1, nargin);
 varNames = cell(1, nargin);
 
 for iTbl = 1:length(disaggTables)
-    datesIn{iTbl} = datenum(disaggTables{iTbl}.Properties.RowNames);
+%     datesIn{iTbl} = cellfun(@cbd.private.mdatenum, disaggTables{iTbl}.Properties.RowNames);
+%     datesIn{iTbl} = datenum(disaggTables{iTbl}.Properties.RowNames);
+  datesIn{iTbl} = cbd.private.tableDates(disaggTables{iTbl});
+
     dataIn{iTbl} = disaggTables{iTbl}{:,:};
     varNames{iTbl} = disaggTables{iTbl}.Properties.VariableNames;
 end
@@ -61,13 +64,14 @@ if ~strcmpi(freq{disaggIndex}, 'IRREGULAR')
     for iTbl = 1:nargin
         newDates = union(newDates, datesIn{iTbl});
     end
-    datestrs = cellstr(cbd.private.mdatestr(newDates));
+%     datenums = cbd.private.mdatestr(newDates);
+%     datestrs = cellstr(datenums);
 
     for iTbl = 1:nargin
         alignData{iTbl} = cbd.private.alignToDates(dataIn{iTbl}, datesIn{iTbl}, newDates);
     end
 
-    newData = array2table([alignData{:}], 'RowNames', datestrs, 'VariableNames', varCell);
+    newData = cbd.private.cbdTable([alignData{:}], newDates, varCell);
 else
     newData = disaggTables{1};
     newData.DatenumKey = datenum(newData.Properties.RowNames);

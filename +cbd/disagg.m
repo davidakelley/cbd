@@ -76,9 +76,9 @@ end
 
 disagg_data = nan(size(disagg_dates, 1), size(data, 2));
 disagg_data(hiFInd(~isnan(hiFInd)), :) = data{~isnan(hiFInd),:};
-tabDates = cellstr(cbd.private.mdatestr(disagg_dates));
-disagg = array2table(disagg_data, 'RowNames', tabDates, ...
-    'VariableNames', data.Properties.VariableNames);
+% tabDates = cellstr(cbd.private.mdatestr(disagg_dates));
+disagg = cbd.private.cbdTable(disagg_data, disagg_dates, ...
+    data.Properties.VariableNames);
 
 switch upper(disaggType)
     case 'FILL'

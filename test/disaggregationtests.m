@@ -23,7 +23,7 @@ classdef disaggregationtests < matlab.unittest.TestCase
         function setupAll(testCase)
             testCase.AgdpVal = cbd.data('GDPCA@FRED', 'asOf', '1/1/2015', 'startDate', '1/1/2000');
             testCase.gdpVal = cbd.data('GDPH0001@ASREPGDP');
-            testCase.bbIndexVal = cbd.data('BBSOUTLOOK@CHIDATA');
+            testCase.bbIndexVal = cbd.data('BBSOUTLOOK@CHIDATA', 'endDate', '8/31/2015');
             testCase.lrVal = cbd.data('UNRATE@FRED', 'asOf', '1/1/2015', 'startDate', '1/1/2000');
             testCase.nfciVal = cbd.data('NFCI@FRED', 'asOf', '7/1/2015');
         end

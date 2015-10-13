@@ -33,7 +33,7 @@ elseif isnumeric(dates)
     dateDiff = dates - cbd.lag(dates);
 elseif istable(dates)
     % Row names must be date strings.
-    tabDates = datenum(dates.Properties.RowNames);
+    tabDates = cbd.private.tableDates(dates);
     dateDiff = tabDates - cbd.lag(tabDates);
 end
 

@@ -70,12 +70,14 @@ else
 end
 
 %% Transform to Table
-if ~isempty(fetch_data(:,2))
-    data = array2table(fetch_data(:,2), 'VariableNames', {upper(seriesID)}, ...
-        'RowNames', cellstr(cbd.private.mdatestr(fetch_data(:,1))));
-else
-    data = table([], 'VariableNames', {upper(seriesID)});
-end
+data = cbd.private.cbdTable(fetch_data(:,2), fetch_data(:,1), {upper(seriesID)});
+ 
+% if ~isempty(fetch_data(:,2))
+%     data = array2table(fetch_data(:,2), 'VariableNames', {upper(seriesID)}, ...
+%         'RowNames', cellstr(cbd.private.mdatestr(fetch_data(:,1))));
+% else
+%     data = table([], 'VariableNames', {upper(seriesID)});
+% end
 
 dataProp = struct;
 dataProp.ID = [seriesID '@' opts.dbID];
