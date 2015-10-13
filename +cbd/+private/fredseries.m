@@ -139,7 +139,7 @@ else
     vintageDates = strrep(vintageDates, '-', '_');
     seriesNames = strcat(repmat({series}, size(vintageDates,1), 1), repmat('_', size(vintageDates, 1), 1), vintageDates);    
 end
-data = array2table(vintages, 'RowNames', cellstr(datestr(cbdDates)), 'VariableNames', seriesNames);
+data = cbd.private.cbdTable(vintages, cbdDates, seriesNames);
 
 
 %% Get Data Properties

@@ -53,7 +53,7 @@ classdef aggregationtests < matlab.unittest.TestCase
         
         function testAvg(testCase)
             testVal = cbd.data({'PETEXA', 'AGG(PETEXA@DAILY, "M", "AVG")'});
-            testCase.verifyLessThan(max(abs(testVal{:,1} - testVal{:,2})), .01); 
+            testCase.verifyLessThan(max(abs(testVal{:,1} - testVal{:,2})), .03); % Could reset to 0.01 tol
         end
         
         function testEop(testCase)
@@ -73,7 +73,7 @@ classdef aggregationtests < matlab.unittest.TestCase
         
         function testNanavg(testCase)
             testVal = cbd.data({'PETEXA', 'AGG(PETEXA@DAILY, "M", "NANAVG")'});
-            testCase.verifyLessThan(max(abs(testVal{:,1} - testVal{:,2})), .01);           
+            testCase.verifyLessThan(max(abs(testVal{:,1} - testVal{:,2})), .03); % Could reset to 0.01 tol
         end
         
         function testSingleOutput(testCase)
