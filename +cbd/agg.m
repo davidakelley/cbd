@@ -104,12 +104,12 @@ if nargin < 3
     collapseFn = @nanmean;
 end
 
-groups = unique(groupIndex, 'rows');
-collapseArray = nan(size(groups, 1), size(array, 2));
+[~, ~, iC] = unique(groupIndex, 'rows');
+collapseArray = nan(max(iC), size(array, 2));
 
-for iGr = 1:size(groups,1)
-    grIdx = all(groupIndex == repmat(groups(iGr,:), [size(groupIndex,1), 1]), 2);
-    collapseArray(iGr,:) = collapseFn(array(grIdx,:));
+for iSer = 1:size(array, 2)
+  collapseArray(:,iSer) = accumarray(iC, array(:,iSer), [max(iC) 1], collapseFn);
 end
+
 
 end

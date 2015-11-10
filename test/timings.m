@@ -15,11 +15,11 @@ fcm10 = cbd.data('FCM10@DAILY');
 
 t4a = timeit(@() cbd.merge(lr, gdph));
 t4b = timeit(@() cbd.merge(lr, fcm10));
-t5 = timeit(@() cbd.disagg(lr, 'Q', 'NAN'));
+t5 = timeit(@() cbd.agg(lr, 'Q', 'AVG'));
+t6 = timeit(@() cbd.agg(fcm10, 'M', 'NANAVG'));
 
 %% Print
-sectionBreak();
-fprintf('CBD BENCHMARKING\n%s\n', datestr(now()));
+fprintf('\nCBD BENCHMARKING\n%s\n', datestr(now()));
 sectionBreak();
 printTiming('data: LR', t1a);
 printTiming('data: GDPH', t1b);
@@ -29,10 +29,11 @@ printTiming('data: FCM10@CHIDATA', t3);
 sectionBreak();
 printTiming('merge: LR & GDPH', t4a);
 printTiming('merge: LR & FCM10', t4b);
-printTiming('disagg: M -> Q', t5);
+printTiming('agg: M -> Q', t5);
+printTiming('agg: D -> M', t6);
 
 sectionBreak();
-printTiming('Total', sum([t1a, t1b, t2, t3, t4a, t4b, t5]));
+printTiming('Total', sum([t1a, t1b, t2, t3, t4a, t4b, t5, t6]));
 
 
 function sectionBreak()
