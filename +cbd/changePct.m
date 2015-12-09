@@ -38,7 +38,7 @@ validateattributes(sDate, {'numeric'}, {'scalar', 'integer'});
 validateattributes(eDate, {'numeric'}, {'scalar', 'integer'}); 
 
 sInd = find(sDate >= datenum(rNames), 1, 'last');
-eInd = find(eDate >= datenum(rNames), 1, 'last');
+eInd = find(eDate <= datenum(rNames), 1, 'first');
 
 windowData = data(sInd:eInd,:);
 firstData = cbd.first(windowData);

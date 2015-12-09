@@ -1,4 +1,4 @@
-function [changed, startDate] = change(data, sDate, eDate)
+function [changed, startDate] = changefull(data, sDate, eDate)
 %CHANGE Returns the change over a the given period
 %
 % changed = CHANGE(data) returns the change of the data from the first
@@ -23,7 +23,8 @@ if nargin < 2
     sDate = rNames{1};
 end
 if nargin < 3 || any(isnan(eDate))
-    [~,lastInd] = cbd.last(data);
+%     [~,lastInd] = cbd.last(data);
+    lastInd = find(all(~isnan(data{:,:}), 2), 1, 'last');
     if isnan(lastInd)
         lastInd = size(data, 1);
     end
