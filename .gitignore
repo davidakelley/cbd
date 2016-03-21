@@ -8,3 +8,4 @@
 # Compiled MEX binaries (all platforms)
 *.mex*
 
++cbd/arc/*

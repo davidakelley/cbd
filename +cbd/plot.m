@@ -1,17 +1,17 @@
 function h1 = plot(data, varargin)
 %PLOT plots a cbd data set
-% 
+%
 % h1 = plot(data) plots the data in the cbd table data and returns the
 % figure handle
-% 
+%
 % h1 = plot(...) takes a number of name-value pair arguments:
 %   Title - Plot title
 %   Grid - (boolean) draw grid
 %   XLabel, YLabel - Title for X and Y axes
-%   Tripwire - date to draw vertical line at
+%   Tripwire - date to draw vertical line at a given date
 %   Interpolate - (boolean) Interpolate nans out of series
 %   Labels - Legend strings (cell array)
-%   LegendPos - (compass direction) legend placement
+%   LegendPos - (compass direction) legend placement (empty for no legend)
 %   Colors - line colors (cell array)
 %   AxHandle - axis handle to plot on (useful for subfigures)
 %   YLim - Y axis limit
@@ -19,6 +19,8 @@ function h1 = plot(data, varargin)
 % David Kelley, 2015
 
 %% Handle inputs
+ischarcell = @(x) all(cellfun(@ischar, x));
+
 inP = inputParser;
 inP.addParameter('Title', [], @ischar);
 inP.addParameter('Grid', true, @islogical);
@@ -28,125 +30,179 @@ inP.addParameter('Tripwire', [], @ischar);
 inP.addParameter('Interpolate', true, @islogical);
 inP.addParameter('Labels', {}, @iscell);
 inP.addParameter('LegendPos', 'nw', @ischar);
-inP.addParameter('Colors', {}, @iscell);
+inP.addParameter('Colors', {'b', 'r', [0 .6 0], 'k'}, @iscell);
 inP.addParameter('AxHandle', [], @ishandle);
 inP.addParameter('YLim', [], @isnumeric);
 inP.addParameter('startDate', [], @ischar);
 inP.addParameter('endDate', [], @ischar);
 inP.addParameter('Marker', 'none', @ischar);
 inP.addParameter('LineStyle', '-', @ischar);
+inP.addParameter('Type', repmat({'Line'}, [1 size(data, 2)]), ischarcell);
+inP.addParameter('Recess', false, @islogical);
 
 inP.parse(varargin{:});
 
 opts = inP.Results;
 if iscell(data) || ischar(data)
-    if ~isempty(opts.startDate) && ~isempty(opts.endDate)
-        data = cbd.data(data, 'startDate', opts.startDate, 'endDate', opts.endDate);
-    elseif ~isempty(opts.startDate)
-        data = cbd.data(data, 'startDate', opts.startDate);
-    elseif ~isempty(opts.endDate)
-        data = cbd.data(data, 'endDate', opts.endDate);
-    else
-        data = cbd.data(data);
-    end
+  if ~isempty(opts.startDate) && ~isempty(opts.endDate)
+    data = cbd.data(data, 'startDate', opts.startDate, 'endDate', opts.endDate);
+  elseif ~isempty(opts.startDate)
+    data = cbd.data(data, 'startDate', opts.startDate);
+  elseif ~isempty(opts.endDate)
+    data = cbd.data(data, 'endDate', opts.endDate);
+  else
+    data = cbd.data(data);
+  end
+else
+  if ~isempty(opts.startDate) && ~isempty(opts.endDate)
+    data = cbd.trim(data, 'startDate', opts.startDate, 'endDate', opts.endDate);
+  elseif ~isempty(opts.startDate)
+    data = cbd.trim(data, 'startDate', opts.startDate);
+  elseif ~isempty(opts.endDate)
+    data = cbd.trim(data, 'endDate', opts.endDate);
+  end
 end
 if ~istable(data)
-    data = array2table(data, 'RowNames', cellstr(num2str((1:size(data,1))')));
+  data = array2table(data, 'RowNames', cellstr(num2str((1:size(data,1))')));
 end
 
 %% Interpolate
 if opts.Interpolate
-    data = cbd.interpNan(data);
+  data = cbd.interpNan(data);
 end
 
-%% Plot data
-try
-    dates = datenum(data.Properties.RowNames);
-    badDates = false;
-catch  % Not really a cbd table
-    badDates = true;
-    dates = 1:height(data);
-end
-
+%% Set up plot
 if isempty(opts.AxHandle)
-    h1 = figure;
-    h1.Color = [1 1 1];
-    ax1 = gca;
+  h1 = figure;
+  h1.Color = [1 1 1];
+  ax1 = gca;
 else
-    ax1 = opts.AxHandle;
+  ax1 = opts.AxHandle;
 end
 
 hold on;
 
+%% Plot data
+try
+  dates = datenum(data.Properties.RowNames);
+  badDates = false;
+catch  % Not really a cbd table
+  badDates = true;
+  dates = 1:height(data);
+end
+
 for iSer = 1:width(data)
+  if strcmpi(opts.Type{iSer}, 'Bar')
+    bar(ax1, dates, data{:,iSer});
+  elseif strcmp(opts.Type{iSer}, 'Line')
     if iSer <= length(opts.Colors) && ~isempty(opts.Colors{iSer})
-        plot(ax1, dates, data{:,iSer}, 'Color', opts.Colors{iSer}, ...
-          'Marker', opts.Marker, 'LineStyle', opts.LineStyle);
+      plot(ax1, dates, data{:,iSer}, 'Color', opts.Colors{iSer}, ...
+        'Marker', opts.Marker, 'LineStyle', opts.LineStyle);
     else
-        plot(ax1, dates, data{:,iSer}, ...
-          'Marker', opts.Marker, 'LineStyle', opts.LineStyle);
+      plot(ax1, dates, data{:,iSer}, ...
+        'Marker', opts.Marker, 'LineStyle', opts.LineStyle);
     end
+  else
+    error('Unknown plot type.');
+  end
+end
+
+%% Plot recessions
+frq = cbd.private.getFreq(dates);
+
+if opts.Recess
+  if badDates
+    warning('Cannot interpret dates, not plotting recessions.');
+  end
+  recess = cbd.data(['RECESS' frq]);
+  recessMerge = cbd.merge(data, recess);
+  
+  startDate = find(cbd.private.tableDates(recessMerge) == datenum(data.Properties.RowNames(1)));
+  endDate = find(cbd.private.tableDates(recessMerge) == datenum(data.Properties.RowNames(end)));
+  recessData = recessMerge{startDate:endDate,end};
+  
+  if ~isempty(opts.YLim)
+    ylims = opts.YLim;
+  else
+    ylims = ylim;
+  end
+  recessData(recessData == -1) = ylims(1);
+  recessData(recessData == 1) = ylims(2);
+  
+  area(ax1, dates, recessData, 'BaseValue', ylims(1), ...
+    'FaceColor',[0.75 0.75 0.75], 'EdgeColor', 'none');
+  ax1.Children = ax1.Children([2:size(ax1.Children,1) 1]);
 end
 
 %% Options
 if ~isempty(opts.Title)
-    title(opts.Title);
+  title(opts.Title);
 end
 
 if ~isempty(opts.Tripwire)
-    lineInd = datenum(opts.Tripwire);
-    plot([lineInd lineInd], ylim, 'k');
+  lineInd = datenum(opts.Tripwire);
+  plot([lineInd lineInd], ylim, 'k');
 end
 
 if opts.Grid
-    grid on;
+  grid on;
 end
 
 if ~isempty(opts.XLabel)
-    xlabel(opts.XLabel);
+  xlabel(opts.XLabel);
 end
 
 if ~isempty(opts.YLabel)
-    ylabel(opts.YLabel);
+  ylabel(opts.YLabel);
 end
 
 if ~isempty(opts.YLim)
-    ylim(opts.YLim);
+  ylim(opts.YLim);
 end
 
 % Add legend
-if isempty(opts.Labels)
+if ~isempty(opts.LegendPos)
+  if isempty(opts.Labels)
     opts.Labels = data.Properties.VariableNames;
-end
-
-switch lower(opts.LegendPos)
+  end
+  
+  switch lower(opts.LegendPos)
     case 'nw'
-        anc = [1 1];
-        buff = [10 -10];
+      anc = [1 1];
+      buff = [10 -10];
     case 'sw'
-        anc = [7 7];
-        buff = [10 10];
+      anc = [7 7];
+      buff = [10 10];
     case 'se'
-        anc = [5 5];
-        buff = [-10 10];
+      anc = [5 5];
+      buff = [-10 10];
     case 'ne'
-        anc = [3 3];
-        buff = [-10 -10];
+      anc = [3 3];
+      buff = [-10 -10];
     otherwise
-        error('Bad legend position.');
-end
-cbd.private.legendflex(opts.Labels, 'ref', gca, 'anchor', anc, 'buffer', buff, ...
+      error('Bad legend position.');
+  end
+  cbd.private.legendflex(opts.Labels, 'ref', gca, 'anchor', anc, 'buffer', buff, ...
     'Interpreter', 'none');
+end
 
 % Fix dates
 if ~badDates
-    ax1.XLim = [dates(1) dates(end)];
-    datetick('x', 'keeplimits');
+%   ax1.XLim = [dates(1) dates(end)];
+  switch frq
+    case 'D', dateFormat = 'mmm-YY';
+    case 'W', dateFormat = 'mmm-YY';
+    case 'M', dateFormat = 'YYYY';
+    case 'Q', dateFormat = 'YYYY';
+    case 'A', dateFormat = 'YYYY';
+  end
+  ax1.XLim = [dates(1) dates(end)];
+  datetick('x', dateFormat, 'keeplimits');
 else
-    labels = 6;
-    labelGap = floor(height(data)/labels);
-    ax1.XTick = 1:labelGap:height(data);
-    ax1.XTickLabel = data.Properties.RowNames(1:labelGap:height(data));
-    ax1.XLim = [dates(1) dates(end)];
+  labels = 6;
+  labelGap = floor(height(data)/labels);
+  ax1.XTick = 1:labelGap:height(data);
+  ax1.XTickLabel = data.Properties.RowNames(1:labelGap:height(data));
+  ax1.XLim = [dates(1) dates(end)];
 end
 
