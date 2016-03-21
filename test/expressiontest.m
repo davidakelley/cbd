@@ -107,7 +107,7 @@ classdef expressiontest < matlab.unittest.TestCase
             
         function testBadTransformation(testCase)
             dataErr = @() cbd.expression('notFn(GDPH)');
-            testCase.verifyError(dataErr, 'expression:expression_eval:function');
+            testCase.verifyError(dataErr, 'expression_eval:function');
         end
         
         %% CHIDATA

@@ -35,45 +35,8 @@ function [data, dataProp] = data(series, varargin)
 
 % David Kelley, 2014-2015
 
-
-%% Error checking
-validateattributes(series, {'cell', 'char'}, {'row'});
-if ischar(series)
-    series = {series};
-end
-
-inP = inputParser;
-inP.addParameter('dbID', 'USECON', @ischar);
-dateValid = @(x) validateattributes(x, {'numeric', 'char'}, {'vector'});
-inP.addParameter('startDate', [], dateValid);
-inP.addParameter('endDate', [], dateValid);
-inP.addParameter('aggFreq', [], @ischar);
-inP.addParameter('ignoreNan', false, @islogical);
-inP.addParameter('asOf', [], dateValid);
-inP.addParameter('asOfStart', [], dateValid);
-inP.addParameter('asOfEnd', [], dateValid);
-
-inP.parse(varargin{:});
-opts = inP.Results;
-
-%% Pull individual series
-rawData = cell(length(series), 1);
-dataProp = cell(length(series), 1);
-for iSer = 1:length(series)
-    clean_ser = series{iSer};
-    clean_ser(clean_ser==' ') = [];
-    [rawResponse, dataProp{iSer}] = cbd.private.datapull(clean_ser, opts);
-    if ~isempty(rawResponse)
-        rawData{iSer} = rawResponse;
-    end
-end
-
-%% Combine series
-if length(rawData) > 1
-    data = cbd.merge(rawData{:});
-else 
-    data = rawData{1};
-end
+% Call expression function
+[data, dataProp] = cbd.expression(series, varargin{:});
 
 end
 
