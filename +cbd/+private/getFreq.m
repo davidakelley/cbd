@@ -40,7 +40,7 @@ end
 maxD = max(dateDiff);
 minD = min(dateDiff);
 
-if minD == 1 && (maxD == 3 || (maxD == 1 && size(dateDiff, 1) <=5))
+if minD == 1 && (maxD <= 4 || (maxD == 1 && size(dateDiff, 1) <=5))
     freq = 'D';
     pers = 251; % Business days
 elseif maxD <= 8 && minD >= 6
