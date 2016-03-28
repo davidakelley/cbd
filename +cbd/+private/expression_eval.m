@@ -44,9 +44,14 @@ if ~isempty(operatorDiv)
   % Iterate over operator and split statement based on lower-precedence
   % operators first.
   for iOp = 1:length(operators)
-    [args, opBreak] = breakOnChar(strIn, operators(iOp));
+    [args, opBreakInds] = breakOnChar(strIn, operators(iOp));
+    if length(opBreakInds) > 1
+      opBreak = opBreakInds(end-1);
+    else
+      opBreak = opBreakInds;
+    end
     
-    tabIns = {varargin(tableInRegex < opBreak(1)), varargin(tableInRegex > opBreak(1))};
+    tabIns = {varargin(tableInRegex < opBreak), varargin(tableInRegex > opBreak)};
     
     if length(args) > 2
       % Order of operations says when we have the same precedence, earlier

@@ -189,5 +189,26 @@ classdef expressiontest < matlab.unittest.TestCase
             testCase.verifyEqual(testset{end, 1}, ipDiffQ{end,1});
         end
         
+        function testOrderOfOperations(testCase)
+          % Test that the order of operations is followed.
+          testset = cbd.data('C07 * C05 - C01');
+          testCase.verifyEqual(testset{end, 1}, 34);
+          
+          testset = cbd.data('C10 / C05 - C01');
+          testCase.verifyEqual(testset{end, 1}, 1);
+          
+          testset = cbd.data('C02 + C10 / C05 - C01');
+          testCase.verifyEqual(testset{end, 1}, 3);
+          
+          testset = cbd.data('C02 + C10 / (C05 - C01)');
+          testCase.verifyEqual(testset{end, 1}, 4.5);
+        end
+        
+        function testMultiExpression(testCase)
+          % Test that multiple additions are worked out 
+          t1 = cbd.data('C1');
+          testset = cbd.expression('%d + %d + %d', t1, t1, t1);
+          testCase.verifyEqual(testset{end, 1}, 3);
+        end
     end
 end
