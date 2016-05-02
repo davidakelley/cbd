@@ -17,22 +17,43 @@ inP = inputParser;
 dateValid = @(x) validateattributes(x, {'numeric', 'char'}, {'vector'});
 inP.addParameter('startDate', firstDate, dateValid);
 inP.addParameter('endDate', lastDate, dateValid);
+inP.addParameter('startCount', 0, @isnumeric);
+inP.addParameter('endCount', 0, @isnumeric);
 
 inP.parse(varargin{:});
 opts = inP.Results;
 
+if ~any(strcmpi('startDate', inP.UsingDefaults)) && ~any(strcmpi('startCount', inP.UsingDefaults))
+  error('Cannot specify both a startDate and a startCount.');
+end
+if ~any(strcmpi('endDate', inP.UsingDefaults)) && ~any(strcmpi('endCount', inP.UsingDefaults))
+  error('Cannot specify both an endDate and an endCount.');
+end
+
+% Make dates into datenums
 if ~isnumeric(opts.startDate)
-  opts.startDate = datenum(opts.startDate);
+  startDate = datenum(opts.startDate);
+else
+  startDate = opts.startDate;
 end
-
 if ~isnumeric(opts.endDate)
-  opts.endDate = datenum(opts.endDate);
+  endDate = datenum(opts.endDate);
+else
+  endDate = opts.endDate;
 end
 
-serFrq = cbd.private.getFreq(inTable);
+%% Find appropriate end dates
+[serFrq, serPers] = cbd.private.getFreq(inTable);
 
-newDates = cellstr(datestr(cbd.private.genDates(opts.startDate, opts.endDate, serFrq)));
+startDate = startDate - opts.startCount * (365/serPers);
+endDate = endDate + opts.endCount * (365/serPers);
+datenumList = cbd.private.genDates(startDate, endDate, serFrq);
 
-newTab = cbd.merge(inTable, array2table(nan(size(newDates)), 'RowNames', newDates));
+%% Create table with new dates
+newDates = cellstr(datestr(datenumList));
+newDateTab = array2table(nan(size(newDates)), 'RowNames', newDates);
+
+newTab = cbd.merge(inTable, newDateTab);
 
 outTable = newTab(:,1:size(inTable, 2));
+
