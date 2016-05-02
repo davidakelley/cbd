@@ -1,9 +1,11 @@
 function indexed = indexed(inputTab, indexDate)
 %INDEXED Makes an index of a series by dividing the history of the series by
-%the value of the series at a given date. 
+%the value of the series at a given date.
 %
 % indexed = INDEXED(inputSeries, indexDate) creates a 100-normalized index of
-% inputSeries by the value at indexDate.
+% inputSeries by the value at indexDate. If indexDate is a string, it
+% should be a date that occurs in the series. If it is a number, it should
+% be a year that occurs within the series. 
 
 % David Kelley, 2015
 
@@ -14,18 +16,27 @@ rNames = inputTab.Properties.RowNames;
 data = inputTab{:,:};
 
 if nargin < 2
-    indexDate = rNames{1};
+  indexDate = rNames{1};
 end
 
-validateattributes(indexDate, {'char'}, {'vector'});
+validateattributes(indexDate, {'char', 'numeric'}, {'vector'});
 
 %% Computation
-indexRow = find(datenum(indexDate) == datenum(rNames));
-assert(length(indexRow) == 1, 'index:noDate', ...
+if ischar(indexDate)
+  indexDatenum = datenum(indexDate);
+  
+  indexRow = find(indexDatenum == datenum(rNames));
+  assert(length(indexRow) == 1, 'index:noDate', ...
     'Index date not found.');
-indexVal = data(indexRow, :);
+  indexVal = data(indexRow, :);
+  normalizing = 100 ./ indexVal;
+else
+  % indexDate is a year (numeric)
+  yearData = data(year(datenum(rNames)) == indexDate);
+  normalizing = 100 ./ nanmean(yearData);
+end
 
-indexedData = 100 * data ./ repmat(indexVal, [size(data, 1) 1]);
+indexedData = data .* normalizing; 
 
 indexed = inputTab;
 indexed{:,:} = indexedData;
