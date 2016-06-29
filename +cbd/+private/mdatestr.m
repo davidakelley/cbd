@@ -12,7 +12,7 @@ end
 if iscell(D)
     S = cell(size(D));
     for i = 1:numel(D)
-        S{i} = mdatestr(D{i});
+        S{i} = cbd.private.mdatestr(D{i});
     end
     return;
 end
