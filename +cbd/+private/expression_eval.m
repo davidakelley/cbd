@@ -197,6 +197,7 @@ else
   else
     [output, seriesProp] = cbd.private.haverseries(seriesName, opts);
   end
+  seriesProp.value = output;
 end
 end
 
