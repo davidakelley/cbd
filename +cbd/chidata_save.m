@@ -81,7 +81,7 @@ if ~exist('exception', 'var') || isempty(exception)
     minWid = min(size(oldData, 2), size(data,2));
     equalArray = arrayfun(@isequal, oldData{1:minLen, 1:minWid}, data{1:minLen, 1:minWid});
     nanArray = arrayfun(@isnan, oldData{1:minLen, 1:minWid}) | arrayfun(@isnan, data{1:minLen, 1:minWid});
-    promptOverwrite(~all(equalArray | nanArray), 'New data revises old data.');
+    promptOverwrite(~all(equalArray | nanArray), ['New data revises old data. (' sectionName ')']);
 end
 
 %% Write data
