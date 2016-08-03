@@ -38,6 +38,6 @@ end
 validdates = rNames >= sDate & rNames <= eDate;
 validdata = data(validdates, :);
 
-[~, iMin] = min(validdata{:,:}, [], 1);
+minVals = min(validdata{:,:}, [], 1);
 
-minned = validdata(iMin, :);
+minned = array2table(minVals, 'VariableNames', data.Properties.VariableNames);

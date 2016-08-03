@@ -6,6 +6,9 @@
 % Note that the integration with cbd.data is tested in each function here
 % as well.
 %
+% This test file is for the summarization functions: mean, median, max,
+% min, last, first, change, changePct.
+% 
 % See also: execTests.m
 
 % David Kelley, 2015
@@ -13,11 +16,13 @@
 classdef summarizationtests < matlab.unittest.TestCase
   properties
     gdph
+    prices
   end
   
   methods(TestMethodSetup)
     function setupOnce(testCase)
       testCase.gdph = cbd.data('GDPH0001@ASREPGDP');
+      testCase.prices = cbd.data({'YRYR%(JCXF1401@ASREPGDP)', 'YRYR%(JC1001@ASREPGDP)'});
     end
   end
   
@@ -40,20 +45,29 @@ classdef summarizationtests < matlab.unittest.TestCase
     function testMax(testCase)
       testVal = cbd.max(testCase.gdph);
       testCase.verifyEqual(testVal{1,1}, 9026.9, 'AbsTol', 0.1);
+      testCase.verifySize(testVal, [1 1]);
       
-      testVal = cbd.max(cbd.data('GDPH1001@ASREPGDP'));
-      testCase.verifyEqual(testVal{1,1}, 13415.3, 'AbsTol', 0.1);
+      testVal = cbd.max(testCase.prices);
+      testCase.verifyEqual(testVal{1,2}, 11.52, 'AbsTol', 0.1);
+      testCase.verifySize(testVal, [1 2]);
       
       testVal = cbd.data('MAX(GDPH1001@ASREPGDP)');
       testCase.verifyEqual(testVal{1,1}, 13415.3, 'AbsTol', 0.1);
+      testCase.verifySize(testVal, [1 1]);
     end
     
     function testMin(testCase)
       testVal = cbd.min(testCase.gdph);
       testCase.verifyEqual(testVal{1,1}, 2254.4, 'AbsTol', 0.1);
+      testCase.verifySize(testVal, [1 1]);
+      
+      testVal = cbd.min(testCase.prices);
+      testCase.verifyEqual(testVal{1,2}, -2.26, 'AbsTol', 0.1);
+      testCase.verifySize(testVal, [1 2]);
       
       testVal = cbd.data('MIN(GDPH0001@ASREPGDP)');
       testCase.verifyEqual(testVal{1,1}, 2254.4, 'AbsTol', 0.1);
+      testCase.verifySize(testVal, [1 1]);
     end
     
     function testMean(testCase)

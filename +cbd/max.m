@@ -38,6 +38,6 @@ end
 validdates = rNames >= sDate & rNames <= eDate;
 validdata = data(validdates, :);
 
-[~, iMax] = max(validdata{:,:}, [], 1);
+maxVals = max(validdata{:,:}, [], 1);
 
-maxed = validdata(iMax, :);
+maxed = array2table(maxVals, 'VariableNames', data.Properties.VariableNames);
