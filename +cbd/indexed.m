@@ -29,14 +29,14 @@ if ischar(indexDate)
   assert(length(indexRow) == 1, 'index:noDate', ...
     'Index date not found.');
   indexVal = data(indexRow, :);
-  normalizing = 100 ./ indexVal;
+  normalizing = repmat(100, [1 size(data, 2)]) ./ indexVal;
 else
   % indexDate is a year (numeric)
-  yearData = data(year(datenum(rNames)) == indexDate);
-  normalizing = 100 ./ nanmean(yearData);
+  yearData = data(year(datenum(rNames)) == indexDate, :);
+  normalizing = repmat(100, [1 size(data, 2)]) ./ nanmean(yearData);
 end
 
-indexedData = data .* normalizing; 
+indexedData = data .* repmat(normalizing, [size(data, 1) 1]);
 
 indexed = inputTab;
 indexed{:,:} = indexedData;
