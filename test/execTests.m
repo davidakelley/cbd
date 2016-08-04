@@ -3,7 +3,9 @@
 
 % David Kelley, 2015
 
-baseDir = 'O:\PROJ_LIB\Presentations\Chartbook\Data\Dataset Creation\cbd';
+thisFile = mfilename('fullpath');
+baseDir = thisFile(1:subsref(strfind(thisFile, 'cbd'), struct('type', '()', 'subs', {{1}}))+2);
+
 addpath(baseDir);
 
 import matlab.unittest.TestSuite

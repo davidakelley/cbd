@@ -1,6 +1,5 @@
 function timings()
 
-% addpath('O:\PROJ_LIB\Presentations\Chartbook\Data\Dataset Creation\cbd');
 maxLen = 20;
 
 %% Timing
