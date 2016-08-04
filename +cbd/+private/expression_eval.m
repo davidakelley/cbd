@@ -18,7 +18,9 @@ function [output, seriesProp] = expression_eval(strIn, opts, varargin)
 
 % David Kelley, 2015
 
-cbdLoc = 'O:\PROJ_LIB\Presentations\Chartbook\Data\Dataset Creation\cbd';
+thisFile = mfilename('fullpath');
+cbdLoc = thisFile(1:subsref(strfind(thisFile, 'cbd'), ...
+  struct('type', '()', 'subs', {{2}}))-3);
 
 %% Check that number of input arguments match '%d's in string
 assert(size(strfind(strIn, '%d'), 2) == size(varargin, 2), 'expression_eval:spec', ...
