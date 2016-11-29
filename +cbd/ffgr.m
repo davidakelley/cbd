@@ -15,10 +15,10 @@ outData = mergeData(:,1:end-1);
 
 for iSer = 1:size(outData, 2)
     iData = outData{:,iSer};
-    firstLev = find(~isnan(iData), 1, 'first');
+    lastLev = find(~isnan(iData), 1, 'last');
     
-    for iLvl = firstLev-1:-1:1
-        iData(iLvl) = iData(iLvl+1) / fwd_gr(iLvl+1);
+    for iLvl = lastLev+1:size(iData, 1)
+        iData(iLvl) = iData(iLvl-1) * fwd_gr(iLvl);
     end
     
     outData{:,iSer} = iData;

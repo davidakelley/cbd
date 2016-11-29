@@ -9,7 +9,7 @@ function lDiffed = difal(data, nPer)
 
 
 %% Check inputs
-validateattributes(data, {'table'}, {'column'});
+validateattributes(data, {'table'}, {'2d'});
 rNames = data.Properties.RowNames;
 dates = datenum(rNames);
 vName = data.Properties.VariableNames;

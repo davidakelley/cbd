@@ -14,6 +14,10 @@ for iF = 1:length(files)
     readData = readtable([chidataDir files{iF} '_prop.csv'], 'ReadRowNames', true);
     seriesNames = readData.Properties.VariableNames;
     descripInd = find(strcmpi(readData.Properties.RowNames, 'Description'), 1);
-    descrips = readData{descripInd,:};
+    if ~isempty(descripInd)
+      descrips = readData{descripInd,:};
+    else
+      descrips = repmat({''}, [1 length(seriesNames)]);
+    end
     series = [series; [seriesNames' descrips'] ]; %#ok<AGROW>
 end
