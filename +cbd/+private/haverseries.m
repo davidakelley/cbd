@@ -35,11 +35,18 @@ try
     lisc = true;
     hav = haver(['R:\_appl\Haver\DATA\' opts.dbID '.dat']);
 catch ex
-    if strcmpi(ex.identifier, 'datafeed:haver')
+    % Try again to see if its a network error.
+    pause(1)
+    try 
+      hav = haver(['R:\_appl\Haver\DATA\' opts.dbID '.dat']);
+    catch
+      % Database really doesn't exist
+      if strcmpi(ex.identifier, 'datafeed:haver')
         lisc = false;
-    else
-        display('If license error, fix HaverSeries.fetch function!');
+      else
+%         display('If license error, fix HaverSeries.fetch function!');
         rethrow(ex);
+      end
     end
 end
 
