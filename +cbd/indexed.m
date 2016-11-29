@@ -32,7 +32,7 @@ if ischar(indexDate)
   normalizing = repmat(100, [1 size(data, 2)]) ./ indexVal;
 else
   % indexDate is a year (numeric)
-  yearData = data(year(datenum(rNames)) == indexDate, :);
+  yearData = data(cbd.year(datenum(rNames)) == indexDate, :);
   normalizing = repmat(100, [1 size(data, 2)]) ./ nanmean(yearData);
 end
 
