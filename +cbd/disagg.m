@@ -90,7 +90,8 @@ switch upper(disaggType)
         startInd = hiFInd(iInd-1)+1;
       end
       if ~isnan(startInd) && ~isnan(hiFInd(iInd))
-        disagg{startInd:hiFInd(iInd),:} = disagg{hiFInd(iInd),:};
+        disagg{startInd:hiFInd(iInd),:} = ...
+          repmat(disagg{hiFInd(iInd),:}, [hiFInd(iInd) - startInd + 1 1]);
       end
     end
     
