@@ -46,6 +46,20 @@ if ~isempty(operatorDiv)
   % Iterate over operator and split statement based on lower-precedence
   % operators first.
   for iOp = 1:length(operators)
+    % Special case: negative operator at the beginning of string
+    if iOp == 2 && operatorDiv(1) == 1
+      % Strip out the negative sign and multiply by -1. 
+      [positiveOutput, positiveSeriesProp] = cbd.private.expression_eval(strIn(2:end), opts, varargin{:});
+      output = cbd.multiplication(-1, positiveOutput);
+      negativeMultProp = struct;
+      negativeMultProp.ID = [];
+      negativeMultProp.dbInfo = [];
+      negativeMultProp.value = -1;
+      seriesProp = cbd.private.combineProp('multiplication', negativeMultProp, positiveSeriesProp);
+      return
+    end
+    
+    % Other cases: break into two operands, call function
     [args, opBreakInds] = breakOnChar(strIn, operators(iOp));
     if length(opBreakInds) > 1
       opBreak = opBreakInds(end-1);

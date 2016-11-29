@@ -182,7 +182,16 @@ classdef datatest < matlab.unittest.TestCase
       
       testset = cbd.data('FFED@DAILY#startDate:"1/1/2015"#endDate:"1/1/2014"');
       testCase.verifyEmpty(testset);
-      
     end
+    
+        
+    function testNegativeFirst(testCase)
+      % Make sure something like cbd.data('-LR') can be understood
+      negLR = cbd.data('-LR');
+      posLR = cbd.data('LR');
+      
+      testCase.verifyEqual(negLR{:,:}, -1 * posLR{:,:});
+    end
+    
   end
 end
