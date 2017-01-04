@@ -13,7 +13,8 @@ if ~exist([chidataDir sectionName '_prop.csv'], 'file')
     return
 end
 
-propTable = readtable([chidataDir sectionName '_prop.csv'], 'ReadRowNames', true);
+propTable = readtable([chidataDir sectionName '_prop.csv'], ...
+  'ReadRowNames', true, 'ReadVariableNames', true);
 propCell = [propTable.Properties.VariableNames; table2cell(propTable)];
 
 propNums = str2double(propCell);

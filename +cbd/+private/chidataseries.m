@@ -69,7 +69,13 @@ end
 function data = readChidataSeries(series, fname, chidataDir)
     % Read the data from the section file, returns the whole history
     try
-        readData = readtable([chidataDir fname '_data.csv'], 'ReadRowNames', true);
+      if verLessThan('matlab', '9.1')
+        readData = readtable([chidataDir fname '_data.csv'], ...
+          'ReadRowNames', true);
+      else
+        readData = readtable([chidataDir fname '_data.csv'], ...
+          'ReadRowNames', true, 'DatetimeType', 'text');
+      end
     catch
         error('chidataseries:noFile', 'Data file not found.');
     end
