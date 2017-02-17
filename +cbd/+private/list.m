@@ -11,13 +11,18 @@ seriesList = readtable([chidataDir 'index.csv']);
 series = {};
 files = unique(seriesList{:,2});
 for iF = 1:length(files)
+  if verLessThan('matlab', '9.1')
     readData = readtable([chidataDir files{iF} '_prop.csv'], 'ReadRowNames', true);
-    seriesNames = readData.Properties.VariableNames;
-    descripInd = find(strcmpi(readData.Properties.RowNames, 'Description'), 1);
-    if ~isempty(descripInd)
-      descrips = readData{descripInd,:};
-    else
-      descrips = repmat({''}, [1 length(seriesNames)]);
-    end
-    series = [series; [seriesNames' descrips'] ]; %#ok<AGROW>
+  else
+    readData = readtable([chidataDir files{iF} '_prop.csv'], 'ReadRowNames', true, 'ReadVariableNames', true);
+  end
+  
+  seriesNames = readData.Properties.VariableNames;
+  descripInd = find(strcmpi(readData.Properties.RowNames, 'Description'), 1);
+  if ~isempty(descripInd)
+    descrips = readData{descripInd,:};
+  else
+    descrips = repmat({''}, [1 length(seriesNames)]);
+  end
+  series = [series; [seriesNames' descrips'] ]; %#ok<AGROW>
 end
