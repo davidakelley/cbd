@@ -70,10 +70,11 @@ if lisc
     
     fetch_data = fetch(hav, seriesID, cbd.private.mdatestr(opts.startDate), cbd.private.mdatestr(opts.endDate));
 else
-    data = cbd.private.haverpull_stata(seriesID, startDate, endDate);
-    % Convert Stata dates to Matlab dates
-    freq = cbd.getFreq(data(:,1));
-    fetch_data(:,1) = cbd.endOfPer(data(:,1), freq);
+  error('haverpull_stata depricated.');
+  % data = cbd.private.haverpull_stata(seriesID, startDate, endDate);
+  % Convert Stata dates to Matlab dates
+  % freq = cbd.getFreq(data(:,1));
+  % fetch_data(:,1) = cbd.endOfPer(data(:,1), freq);
 end
 
 %% Transform to Table
