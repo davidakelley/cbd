@@ -188,7 +188,7 @@ elseif ~isempty(str2double(strIn)) && ~isnan(str2double(strIn))
   seriesProp.dbInfo = [];
   seriesProp.value = output;
   
-elseif contains(strIn, '"')
+elseif ~isempty(strfind(strIn, '"'))  % contains(strIn, '"')
   % String input argument
   cleanStr = strtrim(strIn);
   assert(strcmp(cleanStr(1), '"') & strcmp(cleanStr(end), '"'), ...
