@@ -220,5 +220,25 @@ classdef expressiontest < matlab.unittest.TestCase
       negPosLR.Properties.VariableNames = negLR.Properties.VariableNames;
       testCase.verifyEqual(negLR, negPosLR);
     end
+    
+    function testMultiArgFunc(testCase)
+      % Make sure we can handle expressions where there's multiple arguments
+      % passed to one function (this was a problem initially).
+      fisherTogether = cbd.data('FISHERPRICE(JFNS, FNS, JFR, FR)');
+      dataSeparate = cellfun(@(x) cbd.data(x), {'JFNS', 'FNS', 'JFR', 'FR'}, 'Uniform', false);
+      fisherSeparate = cbd.expression('FISHERPRICE(%d, %d, %d, %d)', dataSeparate{:});
+      
+      testCase.verifyEqual(fisherTogether, fisherSeparate);
+    end    
+    
+    function testMultiArgFuncMixed(testCase)
+      % Make sure we can handle expressions where there's mixed tables and data
+      % pulls in one function.
+      fisherTogether = cbd.data('FISHERPRICE(JFNS, FNS, JFR, FR)');
+      dataSeparate = cellfun(@(x) cbd.data(x), {'JFNS', 'JFR'}, 'Uniform', false);
+      fisherSeparate = cbd.expression('FISHERPRICE(%d, FNS, %d, FR)', dataSeparate{:});
+      
+      testCase.verifyEqual(fisherTogether, fisherSeparate);
+    end 
   end
 end

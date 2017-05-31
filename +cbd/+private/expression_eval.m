@@ -24,7 +24,7 @@ cbdLoc = thisFile(1:subsref(strfind(thisFile, 'cbd'), ...
 
 %% Check that number of input arguments match '%d's in string
 assert(size(strfind(strIn, '%d'), 2) == size(varargin, 2), 'expression_eval:spec', ...
-  'Must include as many tables as ''\%d'' inputs in string.');
+  'Must include as many tables as ''%%d'' inputs in string.');
 
 %% Treat input as either a Haver series, a scalar, or a function of those two
 argumentRegex = regexpi(strIn, '#');
@@ -129,14 +129,16 @@ elseif ~isempty(fnRegex)
   % Strip out function and arguments
   fnNameIn = strIn(1:openParens(1)-1);
   argStr = strIn(openParens(1)+1:end);
-  [args, argBreak] = breakOnChar(argStr, ',');
-  argBreak = argBreak + openParens(1)+1;
-  tabIns = {varargin(tableInRegex < argBreak(1)), varargin(tableInRegex > argBreak(1))};
+  [args, argBreakPostParen] = breakOnChar(argStr, ',');
+  argBreaks = argBreakPostParen + openParens(1)+1;
+  tabIns = arrayfun(@(breakStart, breakStop) ...
+    varargin(tableInRegex >= breakStart & tableInRegex < breakStop), ...
+    [1 argBreaks(1:end-1)], argBreaks, 'Uniform', false);
   
   arguments = cell(length(args),1);
   seriesProps = cell(length(args),1);
   for iArg = 1:length(args)
-    if  iArg <= length(tabIns)
+    if iArg <= length(tabIns)
       iArguments = tabIns{iArg};
     else
       iArguments = {};
@@ -186,7 +188,7 @@ elseif ~isempty(str2double(strIn)) && ~isnan(str2double(strIn))
   seriesProp.dbInfo = [];
   seriesProp.value = output;
   
-elseif ~isempty(strfind(strIn, '"'))
+elseif contains(strIn, '"')
   % String input argument
   cleanStr = strtrim(strIn);
   assert(strcmp(cleanStr(1), '"') & strcmp(cleanStr(end), '"'), ...
@@ -230,7 +232,7 @@ breakIndsDiff = [breakInds(1) (breakInds(2:end) - breakInds(1:end-1))];
 args = mat2cell(argStr, 1, breakIndsDiff);
 
 for iArg = 1:length(args)
-  if args{iArg}(1) == breakChar;
+  if args{iArg}(1) == breakChar
     args{iArg} = args{iArg}(2:end);
   end
 end
