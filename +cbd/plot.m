@@ -133,7 +133,14 @@ if any(opts.Recess)
     if badDates
       warning('Cannot interpret dates, not plotting recessions.');
     end
-    recess = cbd.data(['RECESS' frq]);
+    if strcmpi(frq, {'Q', 'M'})
+      recess = cbd.data(['RECESS' frq]);
+    elseif strcmpi(frq, 'A')
+      recess = cbd.data('AGG(RECESSQ, "A", "ANY")');
+    else
+      recess = cbd.disagg(cbd.data('RECESSM'), frq, 'FILL');
+    end
+    
     recessMerge = cbd.merge(data, recess);
 
     startDate = find(cbd.private.tableDates(recessMerge) == datenum(data.Properties.RowNames(1)));
