@@ -42,6 +42,7 @@ inP.addParameter('startDate', [], @ischar);
 inP.addParameter('endDate', [], @ischar);
 inP.addParameter('Marker', 'none', @ischar);
 inP.addParameter('LineStyle', '-', @ischar);
+inP.addParameter('DateFormat', '', @ischar);
 inP.addParameter('Type', repmat({'Line'}, [1 size(data, 2)]), ischarcell);
 recessValid = @(x) islogical(x) | isnumeric(x);
 inP.addParameter('Recess', false, recessValid);
@@ -232,12 +233,16 @@ end
 % Fix dates
 if ~badDates
 %   ax1.XLim = [dates(1) dates(end)];
-  switch frq
-    case 'D', dateFormat = 'mmm-YY';
-    case 'W', dateFormat = 'mmm-YY';
-    case 'M', dateFormat = 'YYYY';
-    case 'Q', dateFormat = 'YYYY';
-    case 'A', dateFormat = 'YYYY';
+  if isempty(opts.DateFormat)
+    switch frq
+      case 'D', dateFormat = 'mmm-YY';
+      case 'W', dateFormat = 'mmm-YY';
+      case 'M', dateFormat = 'YYYY';
+      case 'Q', dateFormat = 'YYYY';
+      case 'A', dateFormat = 'YYYY';
+    end
+  else
+    dateFormat = opts.DateFormat;
   end
   ax1.XLim = [dates(1) dates(end)];
   datetick('x', dateFormat, 'keeplimits');
