@@ -1,12 +1,12 @@
 function outData = fflvl(series, fillLevels)
-%BFLVL Extends a series backward by using the level of another series
+%FFLVL Extends a series forward by using the level of another series
 
-% outData = bfgr(series, backfillLevels) extends SERIES as far back as
-% backfillLevels goes by usng the level of that series.
+% outData = fflvl(series, fillLevels) extends SERIES forward with 
+% fillLevels by usng the level of that series.
 
 % David Kelley, 2015
 
-%% Add back levels off of growth rates
+%% Add levels 
 mergeData = cbd.merge(series, fillLevels);
 back_data = mergeData{:,end};
 
