@@ -210,6 +210,8 @@ else
   
   if strcmpi(opts.dbID, 'FRED')
     [output, seriesProp] = cbd.private.fredseries(seriesName, opts);
+  elseif strcmpi(opts.dbID, 'BLOOMBERG')
+    [output, seriesProp] = cbd.private.bloombergseries(seriesName, opts);
   elseif strcmpi(opts.dbID, 'CHIDATA')
     [output, seriesProp] = cbd.private.chidataseries(seriesName, opts);
   else
