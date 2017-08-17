@@ -8,11 +8,13 @@ function saSeries = sa(nsaSeries)
 
 % David Kelley, 2017
 
-dates = cbd.private.tableDates(nsaSeries);
 
 saSeries = nsaSeries;
 
 for iS = 1:size(saSeries, 2)
-  xOut = cbd.private.sax13.x13([dates nsaSeries{:,iS}], 'quiet', '-n');  
-  saSeries{:,:} = xOut.d11.d11;
+  usePeriods = ~isnan(nsaSeries{:,iS});
+  dates = cbd.private.tableDates(nsaSeries(usePeriods, iS));
+
+  xOut = cbd.private.sax13.x13([dates nsaSeries{usePeriods, iS}], 'quiet', '-n');  
+  saSeries{usePeriods,iS} = xOut.d11.d11;
 end
