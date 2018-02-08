@@ -4,7 +4,7 @@ function outData = ffdiff(series, backfillLevels)
 % outData = ffdiff(series, fillLevels) extends SERIES as far forward as
 % fillLevels goes by usng the differences of that series.
 
-% David Kelley, 2015
+% David Kelley, 2018
 
 %% Add back levels off of growth rates
 mergeData = cbd.merge(series, backfillLevels);

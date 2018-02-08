@@ -47,7 +47,7 @@ if strcmpi(newFreq, 'IRREGULAR')
 end
 
 %% Compute
-if ~strcmpi(oldFreq, 'IRREGULAR');
+if ~strcmpi(oldFreq, 'IRREGULAR')
   % Make sure to fill out all of old first period (ie, get Jan-Mar and not
   % just Mar if start with Q1)
   newStartDate = cbd.private.startOfPer(data.Properties.RowNames{1}, oldFreq);
@@ -103,7 +103,9 @@ switch upper(disaggType)
     % growth rate within a lower frequency period.
     % % If extrapolating, continue last period's growth rate (%TODO)
     grData = cbd.addition(cbd.division(cbd.diffPct(data),100),1);
-    grData{1,:} = 1;
+    
+    [~, firstInd] = cbd.first(grData);
+    grData{firstInd-1,:} = 1;
     grDisagg = cbd.disagg(grData, newFreq, 'FILL');
     
     dates = datenum(grDisagg.Properties.RowNames);
@@ -124,10 +126,11 @@ switch upper(disaggType)
     periodCounts = periodNumbers(uLoc)';
     
     grDisaggData = real(grDisagg{:,:} .^ (1 ./ periodCounts));
+    grDisaggData(isnan(grDisaggData)) = 1;
     
     cumGr = cumprod(grDisaggData);
-    cumGr(1:hiFInd(1)-1) = nan;
-    disagg{hiFInd(1)+1:end,:} = cumGr(hiFInd(1)+1:end) * disagg{hiFInd(1),:};
+    cumGr(1:hiFInd(firstInd-1)-1) = nan;
+    disagg{hiFInd(1)+1:end,:} = cumGr(hiFInd(1)+1:end) * disagg{hiFInd(firstInd-1),:};
     
 %   case 'SPLINE'
 %     disaggData =  

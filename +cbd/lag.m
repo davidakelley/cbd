@@ -32,7 +32,7 @@ if nPer > 0
     lagged = [nan(nPer, nVar); data(1:end-nPer, :);];
 elseif nPer < 0
     nPer = -nPer;
-    lagged = [data(nPer+1:end); nan(nPer, nVar)];
+    lagged = [data(nPer+1:end,:); nan(nPer, nVar)];
 else
     lagged = data;
 end

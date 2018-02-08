@@ -11,7 +11,7 @@ function date = endOfMonth(year,month)
 
 if nargin == 1
   [year1,month1] = datevec(year);
-  date = endOfMonth(year1,month1);
+  date = cbd.private.endOfMonth(year1,month1);
   return
 end
 
