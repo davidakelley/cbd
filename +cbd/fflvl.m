@@ -8,13 +8,13 @@ function outData = fflvl(series, fillLevels)
 
 %% Add levels 
 mergeData = cbd.merge(series, fillLevels);
-back_data = mergeData{:,end};
+forward_data = mergeData{:,end};
 
 outData = mergeData(:,1:end-1);
 
 for iSer = 1:size(outData, 2)
     iData = outData{:,iSer};
-    firstLev = find(~isnan(iData), 1, 'first');
+    lastLev = find(~isnan(iData), 1, 'last');
     
-    outData{1:firstLev-1,iSer} = back_data(1:firstLev-1);
+    outData{lastLev+1:end,iSer} = forward_data(lastLev+1:end);
 end
