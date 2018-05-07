@@ -56,74 +56,74 @@ There are also a date functions to get the year, quarter, or month (using those 
 
 To Do:
 ======
-[x] Make FRED function to take Haver transformations and nested Haver transformations
-[x] Write tests for data function
-[x] Data properties
-	[x] Make data function to output structure of data properties
-	[x] Determine method of combining data properties structures given multi-series functions
-[x] Write and test single-series data transformations
-	[x] lag
-	[x] diff
-	[x] difa
-	[x] diffl
-	[x] diff%
-	[x] difa%
-	[x] difal
-	[x] yryr
-	[x] yryr%
-	[x] yryrl
-	[x] difv
-	[x] difv%
-	[x] difvl
-	[x] movv
-	[x] mova
-	[x] movt
-[x] Multi-series functions
-	[x] addition
-	[x] subtraction 
-	[x] multiplication
-	[x] division
-	[x] Accept integer intpus
-[x] Other transformations
-	[x] interpNan
-	[x] stddm
-[x] Summarization functions
-	[x] last
-	[x] first
-	[x] max
-	[x] min
-	[x] mean
-	[x] median
-	[x] change%
-	[x] change
-[.] Misc functions
-	[.] merge
-		[x] Disaggregate before merge?
-		[] Join-style merges (inner, outer, left, right)
-[.] aggregations in data pulling
-	[.] agg
-	[x] disagg
-[x] higher frequency data
+- [x] Make FRED function to take Haver transformations and nested Haver transformations
+- [x] Write tests for data function
+- [x] Data properties
+	- [x] Make data function to output structure of data properties
+	- [x] Determine method of combining data properties structures given multi-series functions
+- [x] Write and test single-series data transformations
+	- [x] lag
+	- [x] diff
+	- [x] difa
+	- [x] diffl
+	- [x] diff%
+	- [x] difa%
+	- [x] difal
+	- [x] yryr
+	- [x] yryr%
+	- [x] yryrl
+	- [x] difv
+	- [x] difv%
+	- [x] difvl
+	- [x] movv
+	- [x] mova
+	- [x] movt
+- [x] Multi-series functions
+	- [x] addition
+	- [x] subtraction 
+	- [x] multiplication
+	- [x] division
+	- [x] Accept integer intpus
+- [x] Other transformations
+	- [x] interpNan
+	- [x] stddm
+- [x] Summarization functions
+	- [x] last
+	- [x] first
+	- [x] max
+	- [x] min
+	- [x] mean
+	- [x] median
+	- [x] change%
+	- [x] change
+- [ ] Misc functions
+	- [ ] merge
+		- [x] Disaggregate before merge?
+		- [ ] Join-style merges (inner, outer, left, right)
+- [ ] aggregations in data pulling
+	- [ ] agg
+	- [x] disagg
+- [x] higher frequency data
 
-[.] cbd.data
-	[x] FRED API integration to know if a series pull is due to a bad name	
-	[x] Check if transformations exist explicitly
-	[x] Allow non-series strings to be entered as arguments with "double quotes.
-	[X] Enable multi-series functions to be called as operators. 
+- [ ] cbd.data
+	- [x] FRED API integration to know if a series pull is due to a bad name	
+	- [x] Check if transformations exist explicitly
+	- [x] Allow non-series strings to be entered as arguments with "double quotes.
+	- [X] Enable multi-series functions to be called as operators. 
 	
-[x] Create "CHIDATA" database and standard save format
-	[x] chidataseries function
-	[x] standardize Excel files
+- [x] Create "CHIDATA" database and standard save format
+	- [x] chidataseries function
+	- [x] standardize Excel files
 	
-[x] Remove financial toolbox calls
+- [x] Remove financial toolbox calls
 
-[] Speed up merge et. al. using new datestr and datenum functions
+- [ ] Speed up merge et. al. using new datestr and datenum functions
 
-[] Add readtable to xlsfile
+- [ ] Add readtable to xlsfile
 
-[] array2cbdTable function 
-[ ] cbd.expression function 
-	[ ] Should takes fprintf style string along with cbd.data style functions and varargin to compute cbd functions on existing Matlab objects.
-	[] Potentially a replacement for datapull function in cbd.data
+- [ ] array2cbdTable function 
+- [ ] cbd.expression function 
+	- [ ] Should takes fprintf style string along with cbd.data style functions and varargin to compute cbd functions on existing Matlab objects.
+	- [ ] Potentially a replacement for datapull function in cbd.data
 
-[x] Enable a token to have a hash-option at the end of it. 
+- [x] Enable a token to have a hash-option at the end of it. 
