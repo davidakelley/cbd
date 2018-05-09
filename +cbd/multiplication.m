@@ -1,8 +1,15 @@
-function added = multiplication(dataA, dataB, varargin)
-% Find the product of two series
+function multiplied = multiplication(dataA, dataB, varargin)
+% MULTIPLICATION Finds the product of two series. 
+% 
+% multiplied = MULTIPLICATION(seriesA, seriesB) find the product of seriesA and seriesB. 
+% 
+% multiplied = MULTIPLICATION(series, constant)
+% multiplied = MULTIPLICATION(constant, series) multiplies a series by a constant.
+%
+% multiplied = MULTIPLICATION(constantA, constantB) multiplies the two constants together.
 
 % David Kelley, 2014
 
-added = cbd.private.multiseriesFunction(dataA, dataB, @(x,y) times(x,y));
+multiplied = cbd.private.multiseriesFunction(dataA, dataB, @(x,y) times(x,y));
 
 end

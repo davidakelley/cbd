@@ -1,7 +1,7 @@
 function outData = splice(seriesA, seriesB, type)
-%SPLICE Smooth between two series to create
+% SPLICE Smooth between two series to create
 %
-% outData = splice(seriesA, seriesB) creates a combined, spliced series
+% outData = SPLICE(seriesA, seriesB) creates a combined, spliced series
 % from the two input seriesA and seriesB. The growth rate of both series is
 % averaged and the smoothed level is returned. 
 

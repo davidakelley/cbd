@@ -1,7 +1,18 @@
 function chidata_save(sectionName, data, properties)
 %CHIDATA_SAVE Saves a data series to the CHIDATA folder
 %
+% The CHIDATA folder contains data formatted so that it can be treated as if 
+% it were its own database and pulled via cbd.data or cbd.expression. Series 
+% in CHIDATA are denoted "series@CHIDATA". 
 %
+% Each series added to CHIDATA must be put in a 'section'. A section is a 
+% collection of data that are all updated together. All series in a section 
+% must have the same frequency and are treated as having the same start and 
+% end dates (though missing values can be inputted). 
+%
+% It is recommended that the underlying section files not be modified by hand.
+% If errors occur with a CHIDATA series, delete the section files and resave 
+% them from the source data. 
 %
 % chidata_save(sectionName, data) updates the section file with the data
 % contained in data.

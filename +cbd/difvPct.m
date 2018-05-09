@@ -1,9 +1,9 @@
 function pChange = difvPct(data, nPer)
-%DIFVPCT Returns the average difference of a series
+% DIFVPCT Returns the average percent-difference of a series
 %
-% pChange = DIFVPCT(data) returns the first difference of the data
+% pChange = DIFVPCT(data) returns the first percent-difference of the data
 %
-% pChange = DIFVPCT(data, nPer) returns the nPer average difference of the data
+% pChange = DIFVPCT(data, nPer) returns the nPer average percent-difference of the data
 
 % David Kelley, 2015
 

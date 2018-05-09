@@ -1,15 +1,15 @@
-function meaned = mean(data, sDate, eDate)
-% MEAN Returns the mean value of a dataset over the given period
+function stded = std(data, sDate, eDate)
+% STD Returns the standard devation of a dataset over the given period
 %
-% meaned = MEAN(data) returns the mean value over the whole sample
+% stded = STD(data) returns the standard deviation value over the whole sample
 %
-% meaned = MEAN(data, sDate, eDate) returns the mean between the start date
-% and end date (inclusive)
+% stded = STD(data, sDate, eDate) returns the standard deviation between the 
+% start date and end date (inclusive)
 %
-% meaned = MEAN(data, sDate) or meaned = MEAN(data, [], eDate) returns the 
-% mean after or before the given date (inclusive)
+% stded = STD(data, sDate) or stded = STD(data, [], eDate) returns the 
+% standard deviation after or before the given date (inclusive)
 
-% David Kelley, 2014
+% David Kelley, 2017
 
 %% Check inputs
 validateattributes(data, {'table'}, {'2d'});
@@ -37,12 +37,12 @@ end
 validdates = rNames >= sDate & rNames <= eDate;
 validdata = data(validdates, :);
 
-mean_data = nan(1, width(validdata));
+std_data = nan(1, width(validdata));
 for iSer = 1:width(validdata)
     nonNan = validdata{:, iSer};
     nonNan(isnan(nonNan)) = [];
-    mean_data(iSer)= mean(nonNan);
+    std_data(iSer)= std(nonNan);
 end
 
-meaned = array2table(mean_data, 'VariableNames', data.Properties.VariableNames, ...
+stded = array2table(std_data, 'VariableNames', data.Properties.VariableNames, ...
     'RowNames', validdata.Properties.RowNames(end));

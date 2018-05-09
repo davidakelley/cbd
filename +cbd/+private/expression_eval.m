@@ -1,5 +1,5 @@
 function [output, seriesProp] = expression_eval(strIn, opts, varargin)
-%EXPRESSION Evaluate a cbd data expression with printf-style input
+% EXPRESSION_EVAL Evaluate a cbd data expression with printf-style input
 %
 % Evaluate an expression of series, functions, operators, options, and
 % other parameters, returning a table with one data series. See the cbd
@@ -14,7 +14,7 @@ function [output, seriesProp] = expression_eval(strIn, opts, varargin)
 % OUTPUTS:
 %   output - a table containing the series
 %   seriesProp - a structure containing information on the data series and
-%   underlying components including mnemonics and function names.
+%     underlying components including mnemonics and function names.
 
 % David Kelley, 2015
 
@@ -49,13 +49,15 @@ if ~isempty(operatorDiv)
     % Special case: negative operator at the beginning of string
     if iOp == 2 && operatorDiv(1) == 1
       % Strip out the negative sign and multiply by -1. 
-      [positiveOutput, positiveSeriesProp] = cbd.private.expression_eval(strIn(2:end), opts, varargin{:});
+      [positiveOutput, positiveSeriesProp] = cbd.private.expression_eval(...
+        strIn(2:end), opts, varargin{:});
       output = cbd.multiplication(-1, positiveOutput);
       negativeMultProp = struct;
       negativeMultProp.ID = [];
       negativeMultProp.dbInfo = [];
       negativeMultProp.value = -1;
-      seriesProp = cbd.private.combineProp('multiplication', negativeMultProp, positiveSeriesProp);
+      seriesProp = cbd.private.combineProp('multiplication', ...
+        negativeMultProp, positiveSeriesProp);
       return
     end
     

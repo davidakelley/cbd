@@ -1,7 +1,7 @@
 function difved = difv(data, nPer)
-%DIFV Returns the average difference of a series
+% DIFV Returns the average difference of a series
 %
-% difved = DIFV(data) returns the first difference of the data
+% difved = DIFV(data) returns the first average difference of the data
 %
 % difved = DIFV(data, nPer) returns the nPer average difference of the data
 

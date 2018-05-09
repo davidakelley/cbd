@@ -1,9 +1,9 @@
 function pChange = difaPct(data, nPer)
-%DIFAPCT Returns the annualized differenced of a data series
+% DIFAPCT Returns the annualized percent difference of a data series
 %
-% pChange = DIFAPCT(data) returns the first difference of the data
+% pChange = DIFAPCT(data) returns the annualized percent difference of the data
 %
-% pChange = DIFAPCT(data, nPer) returns the nPer difference of the data
+% pChange = DIFAPCT(data, nPer) returns the annualiezd nPer difference of the data
 
 % David Kelley, 2014
 

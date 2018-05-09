@@ -1,5 +1,5 @@
 function yChange = yryr(data, dates)
-%YRYR Computes the year-over-year percent change in a series
+% YRYR Computes the year-over-year percent change in a series
 % 
 % yChange = YRYR(data) computes the year-over-year change in a data series
 %

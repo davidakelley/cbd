@@ -1,11 +1,11 @@
 function lagged = lag(data, nPer)
-%LAG Shifts a data series by a given number of periods
+% LAG Shifts a data series by a given number of periods
 %
-% laggged = lag(data) lags data by 1 period. data can be either a
-% numeric vector or a table.
+% laggged = LAG(data) lags data by 1 period. data can be either a
+%   numeric vector or a table.
 %
-% laggged = lag(data, nPer) lags data by nPer periods. data can be either a
-% numeric vector or a table.
+% laggged = LAG(data, nPer) lags data by nPer periods. data can be either a
+%   numeric vector or a table.
 
 % David Kelley, 2014
 

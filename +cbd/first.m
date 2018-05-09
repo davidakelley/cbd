@@ -1,5 +1,5 @@
 function [firstVals,beginInd]  = first(data, firstInd)
-%FIRST Pulls the first non-nan value from a vector
+% FIRST Pulls the first non-nan value from a vector
 %
 % firstVals = FIRST(data) returns the first non-nan value of each series
 % in the data. A row of data is returned for each observation that is the

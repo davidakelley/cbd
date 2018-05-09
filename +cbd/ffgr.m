@@ -1,7 +1,7 @@
 function outData = ffgr(series, backfillLevels)
-%FFGR Extends a series forward by using the growth rate of another series
+% FFGR Extends a series forward by using the growth rate of another series
 %
-% outData = ffgr(series, fillLevels) extends SERIES as far forward as
+% outData = FFGR(series, fillLevels) extends SERIES as far forward as
 % fillLevels goes by usng the growth rate of that series.
 
 % David Kelley, 2015

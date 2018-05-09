@@ -1,5 +1,5 @@
 function yChange = yryrl(data, dates)
-%YRYRL Computes the year-over-year log change in a series
+% YRYRL Computes the year-over-year log change in a series
 % 
 % yChange = YRYRL(data) computes the year-over-year log change in a data series
 %

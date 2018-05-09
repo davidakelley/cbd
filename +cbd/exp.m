@@ -1,7 +1,7 @@
-function logged = exp(data)
-%EXP Returns the exponentiated version of a data series
+function exponentiated = exp(data)
+% EXP Returns the exponentiated version of a data series
 %
-% lDiffed = EXP(data) returns the exponental of the data
+% exponentiated = EXP(data) returns the exponental of the data
 
 % David Kelley, 2015
 
@@ -19,11 +19,11 @@ end
 nVar = size(data, 2);
 
 %% Diff
-logged = exp(data);
+exponentiated = exp(data);
 
 if returnTab
     varNames = cellfun(@horzcat, repmat({'exp'}, 1, nVar), vName, 'UniformOutput', false);
-    logged = array2table(logged, 'RowNames', rNames, 'VariableNames', varNames);
+    exponentiated = array2table(exponentiated, 'RowNames', rNames, 'VariableNames', varNames);
 end
 
 end

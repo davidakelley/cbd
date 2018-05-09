@@ -1,14 +1,17 @@
 function [changed, startDate] = changefull(data, sDate, eDate)
-%CHANGE Returns the change over a the given period
+% CHANGEFULL Returns the change the range where all data is observed
 %
-% changed = CHANGE(data) returns the change of the data from the first
+% Predominantly the same as CHANGE but trims any ragged edge data at the 
+% beginning and end of sample. 
+%
+% changed = CHANGEFULL(data) returns the change of the data from the first
 % observation to the last.
 %
-% changed = CHANGE(data, sDate) returns the change in the data from the
+% changed = CHANGEFULL(data, sDate) returns the change in the data from the
 % start date to the end of the data. If the start date is not present, it
 % takes the change from the first date prior to the start date.
 %
-% changed = CHANGE(data, sDate, eDate) returns the change in the data 
+% changed = CHANGEFULL(data, sDate, eDate) returns the change in the data 
 % between the two dates inclusively. If the end date is not present, it 
 % takes the cahnge from the first date following the end date.
 

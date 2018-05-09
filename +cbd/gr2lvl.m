@@ -1,6 +1,9 @@
 function series = gr2lvl(series, initLevel)
-%GR2LVL Takes a series of growth rates and an initial level and computes
-%the level over the period
+% GR2LVL Takes a series of growth rates and an initial level and computes
+% the level over the period. 
+%
+% data = gr2lvl(series, initialLevel) constructs a level series from the 
+%   growth rate data in series and an initial level in initialLevel.
 
 % David Kelley, 2015
 

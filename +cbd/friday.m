@@ -1,5 +1,6 @@
 function data = friday(data)
-% Adjust a weekly time series to have Friday dates. 
+% FRIDAY Adjust a weekly time series to have Friday dates. 
+% 
 % If the observation is on a Sunday-Thrusday, adjust it to the following
 % Friday. If it occurs on Saturday, adjust it to the previous Friday. 
 

@@ -1,9 +1,9 @@
 function difaed = difa(data, nPer)
-%DIFA Returns the annualized difference of a data series
+% DIFA Returns the annualized difference of a data series
 %
-% difaed = DIFA(data) returns the first difference of the data
+% difaed = DIFA(data) returns the annualized first difference of the data
 %
-% difaed = DIFA(data, nPer) returns the nPer difference of the data
+% difaed = DIFA(data, nPer) returns the annualized nPer difference of the data
 
 % David Kelley, 2015
 

@@ -1,13 +1,14 @@
 function meaned = quantile(data, percent, sDate, eDate)
-%MEAN Returns the mean value of a dataset over the given period
+% QUANTILE Returns the mean value of a dataset over the given period
 %
-% meaned = MEAN(data) returns the mean value over the whole sample
+% meaned = QUANTILE(data, percent) returns the quantile over the data. Note 
+%   that percent takes a value between 0 and 1.
 %
-% meaned = MEAN(data, sDate, eDate) returns the mean between the start date
-% and end date (inclusive)
+% meaned = QUANTILE(..., sDate, eDate) returns the mean between the start date
+%   and end date (inclusive)
 %
-% meaned = MEAN(data, sDate) or meaned = MEAN(data, [], eDate) returns the 
-% mean after or before the given date (inclusive)
+% meaned = QUANTILE(..., sDate) or QUANTILE = MEAN(..., [], eDate) returns the 
+%   mean after or before the given date (inclusive)
 
 % David Kelley, 2014
 

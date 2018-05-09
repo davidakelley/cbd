@@ -1,9 +1,9 @@
 function lDiffed = diffl(data, nPer)
-%DIFFL Returns the log-differenced version of a data series
+% DIFFL Returns the log-differenced version of a data series
 %
-% lDiffed = DIFFL(data) returns the first difference of the data
+% lDiffed = DIFFL(data) returns the first log-difference of the data
 %
-% lDiffed = DIFFL(data, nPer) returns the nPer difference of the data
+% lDiffed = DIFFL(data, nPer) returns the nPer log-difference of the data
 
 % David Kelley, 2014
 

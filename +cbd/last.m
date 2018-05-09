@@ -1,5 +1,5 @@
 function [lastVals,endInd] = last(data, lastInd)
-%LAST Pulls the last non-nan value from a vector
+% LAST Pulls the last non-nan value from a vector
 %
 % lastVals = LAST(data) returns the last non-nan value of each series
 % in the data. A row of data is returned for each observation that is the

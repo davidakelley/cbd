@@ -1,7 +1,7 @@
 function outData = bfdiff(series, backfillLevels)
-%BFGR Extends a series backward by using the differences in another series
+% BFDIFF Extends a series backward by using the differences in another series
 %
-% outData = bfdiff(series, backfillLevels) extends SERIES as far back as
+% outData = BFDIFF(series, backfillLevels) extends SERIES as far back as
 % backfillLevels goes by usng the differences of that series.
 
 % David Kelley, 2018

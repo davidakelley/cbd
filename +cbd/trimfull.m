@@ -1,5 +1,5 @@
 function data = trimfull(data)
-%TRIMFULL deletes periods at the end of a dataset that have nans in any series
+% TRIMFULL deletes periods at the end of a dataset that have nans in any series
 
 % David Kelley, 2015
 

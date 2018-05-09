@@ -1,13 +1,13 @@
 function inTable = trim(inTable, varargin)
 % TRIM Returns data between given a startDate or endDate
 %
-% trimmedData = trim(inTable, 'startDate', sDate) returns the data
+% trimmedData = TRIM(inTable, 'startDate', sDate) returns the data
 % following the start date
 %
-% trimmedData = trim(inTable, 'endDate', eDate) returns the data
+% trimmedData = TRIM(inTable, 'endDate', eDate) returns the data
 % preceeding the end date
 %
-% trimmedData = trim(inTable, 'Inclusive', true, ...) returns the smallest
+% trimmedData = TRIM(inTable, 'Inclusive', true, ...) returns the smallest
 % data range which includes the start and end dates passed.
 
 % David Kelley, 2015

@@ -1,6 +1,6 @@
 function data = trimn(data, n)
-%TRIMN deletes periods at the end of a dataset that are not observed for at
-%least n series.
+% TRIMN deletes periods at the end of a dataset that are not observed for at
+% least n series.
 
 % David Kelley, 2015
 

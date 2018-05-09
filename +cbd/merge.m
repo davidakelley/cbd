@@ -1,11 +1,12 @@
 function newData = merge(varargin)
-%MERGE Combines two tables with dates as the row labels
+% MERGE Combines two tables with dates as the row labels
 %
-% newData = MERGE(dataA, dataB, ...) merges the data tables, provided that
-% they have date strings as row labels
+% newData = MERGE(dataA, dataB, ...) merges the data tables. Tables must have
+% strings as row labels. Lower-frequency series will be disaggregated using 
+% disagg with the NAN option to place low-frequency data in the last period and
+% fill all other periods with NANs. 
 
 % David Kelley, 2014
-
 
 %% Handle inputs
 tableInd = false(size(varargin));

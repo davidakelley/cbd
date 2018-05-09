@@ -1,11 +1,13 @@
 function outTable = extend(inTable, varargin)
 % EXTEND Ensures data extends to at least startDate or endDate
 %
-% extendedData = extend(inTable, 'startDate', sDate) extends the data back
+% extendedData = EXTEND(inTable, 'startDate', sDate) extends the data back
 % with nans if it doesn't already go back to startDate.
 %
-% extendedData = extend(inTable, 'endDate', eDate) extends the data forward
+% extendedData = EXTEND(inTable, 'endDate', eDate) extends the data forward
 % with nans if it doesn't already go to endDate.
+%
+% See also: extend_last
 
 % David Kelley, 2016
 

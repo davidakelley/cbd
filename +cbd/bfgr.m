@@ -1,7 +1,7 @@
 function outData = bfgr(series, backfillLevels)
-%BFGR Extends a series backward by using the growth rate of another series
+% BFGR Extends a series backward by using the growth rate of another series
 %
-% outData = bfgr(series, backfillLevels) extends SERIES as far back as
+% outData = BFGR(series, backfillLevels) extends SERIES as far back as
 % backfillLevels goes by usng the growth rate of that series.
 
 % David Kelley, 2015

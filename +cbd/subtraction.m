@@ -1,8 +1,16 @@
-function added = subtraction(dataA, dataB, varargin)
-% Find the difference of two series
+function subtrated = subtraction(dataA, dataB, varargin)
+% SUBTRACTION Finds the difference of two series. 
+% 
+% subtrated = subtraction(seriesA, seriesB) subtracts seriesB from seriesA.
+% 
+% subtrated = subtraction(series, constant) subtracts a constant from a series. 
+% 
+% subtrated = subtraction(constant, series) subtracts a series from a constant.
+%
+% subtrated = subtraction(constantA, constantB) subtracts constantA from constantB.
 
 % David Kelley, 2014
 
-added = cbd.private.multiseriesFunction(dataA, dataB, @(x,y) minus(x,y));
+subtrated = cbd.private.multiseriesFunction(dataA, dataB, @(x,y) minus(x,y));
 
 end

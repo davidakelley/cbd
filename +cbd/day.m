@@ -1,9 +1,9 @@
 function day = day(d)
-%DAY Get the day of month
+% DAY Get the day within a month
 %
-% day = month(day) Returns the day of the month of the serial date d.
+% day = DAY(day) Returns the day of the month of the serial date d.
 %
-% See also YEAR, QUARTER
+% See also year, quarter, month
 
 % David Kelley, 2014
 

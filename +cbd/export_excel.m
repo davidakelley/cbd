@@ -1,9 +1,9 @@
 function export_excel(cbdData, filename, sheetname)
-%EXPORT_EXCEL Exports a cbd table to an Excel file
+% EXPORT_EXCEL Exports a cbd table to an Excel file
 % 
-% export_excel(cbdData, filename) writes cbdData to filename
+% EXPORT_EXCEL(cbdData, filename) writes cbdData to filename
 %
-% export_excel(cbdData, filename, sheetname) writes to the sheet sheetname
+% EXPORT_EXCEL(cbdData, filename, sheetname) writes to the sheet sheetname
 
 % David Kelley, 2015
 

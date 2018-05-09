@@ -1,5 +1,5 @@
 function avg = movv(data, wind)
-%MOVV Calculates the moving average over a given window
+% MOVV Calculates the moving average over a given window
 %
 % avg = MOVV(data, wind) calculates the moving average of data over the
 % past wind periods.

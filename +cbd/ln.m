@@ -1,7 +1,7 @@
 function logged = ln(data)
-%LN Returns the log version of a data series
+% LN Returns the log version of a data series
 %
-% lDiffed = LN(data) returns the log of the data
+% logged = LN(data) returns the log of the data
 
 % David Kelley, 2015
 

@@ -1,13 +1,13 @@
 function minned = min(data, sDate, eDate)
-%MIN Returns the minnimum values of a dataset over the given period
+% MIN Returns the minnimum values of a dataset over the given period
 %
-% minned = min(data) returns the observations for which the minimum value
+% minned = MIN(data) returns the observations for which the minimum value
 % was recorded over the whole sample
 %
-% minned = min(data, sDate, eDate) returns the min between the start date
+% minned = MIN(data, sDate, eDate) returns the min between the start date
 % and end date (inclusive)
 %
-% minned = min(data, sDate) or minned = min(data, [], eDate) returns the 
+% minned = MIN(data, sDate) or minned = MIN(data, [], eDate) returns the 
 % min after or before the given date (inclusive)
 
 % David Kelley, 2014

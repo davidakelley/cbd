@@ -1,7 +1,7 @@
 function outData = fflvl(series, fillLevels)
-%FFLVL Extends a series forward by using the level of another series
+% FFLVL Extends a series forward by using the level of another series
 
-% outData = fflvl(series, fillLevels) extends SERIES forward with 
+% outData = FFLVL(series, fillLevels) extends SERIES forward with 
 % fillLevels by usng the level of that series.
 
 % David Kelley, 2015

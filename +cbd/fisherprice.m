@@ -1,6 +1,9 @@
 function priceI = fisherprice(varargin)
-% Takes pairs of price-quantity data and constructs a Fisher price index
-% for the aggregate quantity. 
+% FISHERPRICE Takes pairs of price-quantity data and constructs a Fisher price 
+% index for the aggregate quantity. 
+%
+% price = FISHERPRICE(priceA, quantityA, priceB, quantityB, ...) takes price 
+%   and quantity pairs to construct a Fisher price index with.
 
 % David Kelley, 2016
 

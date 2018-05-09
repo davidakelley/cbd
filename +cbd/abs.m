@@ -1,5 +1,5 @@
 function absData = abs(data)
-%ABS Takes the absolute value of a series
+% ABS Takes the absolute value of a series
 %
 % absData = ABS(data) returns theabsolute value of data.
 

@@ -1,5 +1,5 @@
 function medianed = median(data, sDate, eDate)
-%MEDIAN Returns the median value of a dataset over the given period
+% MEDIAN Returns the median value of a dataset over the given period
 %
 % medianed = MEDIAN(data) returns the median value over the whole sample
 %

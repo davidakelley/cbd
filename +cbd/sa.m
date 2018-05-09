@@ -1,13 +1,9 @@
 function saSeries = sa(nsaSeries)
 % Seasonally adjust a series using the X13ARIMA-SEATS package.
 %
-% Input:
-%   nsaSeries - a table of not seasonally adjusted series
-% Output
-%   saSeries - a table of seasonally adjusted series
+% saSeries = sa(nsaSeries) seasonally adjusts nsaSeries. 
 
 % David Kelley, 2017
-
 
 saSeries = nsaSeries;
 

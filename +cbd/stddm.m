@@ -1,5 +1,5 @@
 function sdmData = stddm(data)
-%STDDM Demeans and stardardizes the input data.
+% STDDM Demeans and stardardizes the input data.
 %
 % sdmData = STDDM(data) returns the standardized and demeaned version of data.
 

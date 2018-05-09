@@ -1,9 +1,9 @@
 function pChange = diffPct(data, nPer)
-%DIFFPCT Returns the differenced version of a data series
+% DIFFPCT Returns the percent-differenced version of a data series
 %
-% pChange = DIFFPCT(data) returns the first difference of the data
+% pChange = DIFFPCT(data) returns the first percent-difference of the data
 %
-% pChange = DIFFPCT(data, nPer) returns the nPer difference of the data
+% pChange = DIFFPCT(data, nPer) returns the nPer percent-difference of the data
 
 % David Kelley, 2015
 

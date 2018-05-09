@@ -1,7 +1,14 @@
 function data = gen(value, freq, varargin)
-% Generates a time series from scalar values. Input scalar values can be
+% GEN Generates a time series from scalar values. Input scalar values can be
 % either numeric of single-row tables. Specify a frequency for the final
 % series and optionally add startDate and endDate values. 
+% 
+% data = GEN(value, freq) generates a constant series with all values equal to 
+% 	value from 1921 to present.
+% 
+% data = GEN(..., 'startDate', sDate) starts the constant series at sDate.
+% 
+% data = GEN(..., 'endDate', eDate) ends the constant series at eDate.
 
 % David Kelley & Jon Yu, 2016
 

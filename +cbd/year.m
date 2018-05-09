@@ -1,8 +1,8 @@
 function y = year(d)
-%YEAR Get the year number
-%   y = year(d) Returns the year of the serial date d.
+% YEAR Get the year number
+%   y = YEAR(d) Returns the year of the serial date d.
 %
-% See also MONTH, QUARTER
+% See also quarter, month, day
 
 % David Kelley, 2014
 

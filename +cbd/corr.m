@@ -1,5 +1,5 @@
 function rho = corr(tabA, tabB)
-%CORR Finds the correlation between data series
+% CORR Finds the correlation between data series
 %
 % rho = CORR(tabA) finds the correlation matrix of all variables in a table
 %

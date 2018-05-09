@@ -1,5 +1,5 @@
 function avg = mova(data, wind)
-%MOVA Calculates the annualized moving average over a given window
+% MOVA Calculates the annualized moving average over a given window
 %
 % avg = MOVA(data, wind) calculates the moving average of data over the
 % past wind periods.

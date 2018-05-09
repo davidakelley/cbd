@@ -1,5 +1,5 @@
 function diffed = diff(data, nPer)
-%DIFF Returns the differenced version of a data series
+% DIFF Returns the differenced version of a data series
 %
 % diffed = DIFF(data) returns the first difference of the data
 %

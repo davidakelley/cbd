@@ -1,6 +1,9 @@
 function outData = ld2lvl(series, initLevel)
-%LD2LVL Takes a series of log fist differences and a series of
-%levels and creates a realtime series of levels 
+% LD2LVL Takes a series of log fist differences and an initial level and 
+% creates a series of levels. 
+%
+% data = LD2LVL(series, initialLevel) constructs a level series from the 
+%   log-difference data in series and an initial level in initialLevel.
 
 % David Kelley, 2015
 

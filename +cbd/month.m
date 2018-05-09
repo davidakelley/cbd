@@ -1,8 +1,8 @@
 function m = month(d)
-%MONTH Get the month number
+% MONTH Get the month number
 %   m = mnonth(d) Returns the month number of the serial date d.
 %
-% See also YEAR, QUARTER
+% See also year, quarter, day
 
 % David Kelley, 2014
 

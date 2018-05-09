@@ -1,5 +1,5 @@
 function maxed = max(data, sDate, eDate)
-%MAX Returns the maximum value of a dataset over the given period
+% MAX Returns the maximum value of a dataset over the given period
 %
 % maxed = MAX(data) returns the observations for which the maximum value
 % was recorded over the whole sample

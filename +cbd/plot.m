@@ -1,5 +1,5 @@
 function h1 = plot(data, varargin)
-%PLOT plots a cbd data set
+% PLOT plots a cbd data set
 %
 % h1 = plot(data) plots the data in the cbd table data and returns the
 % figure handle
@@ -7,7 +7,8 @@ function h1 = plot(data, varargin)
 % h1 = plot(...) takes a number of name-value pair arguments:
 %   Title - Plot title
 %   Grid - (boolean) draw grid
-%   XLabel, YLabel - Title for X and Y axes
+%   XLabel - Title for X axes
+%   YLabel - Title for Y axes
 %   Tripwire - date to draw vertical line at a given date
 %   Interpolate - (boolean) Interpolate nans out of series
 %   Labels - Legend strings (cell array)
@@ -15,6 +16,13 @@ function h1 = plot(data, varargin)
 %   Colors - line colors (cell array)
 %   AxHandle - axis handle to plot on (useful for subfigures)
 %   YLim - Y axis limit
+%   statrDate - first date to plot in graph
+%   endDate - last date to plot in graph
+%   Marker - (character) Matlab marker symbol for each data series 
+%   LineStyle - (character) Matlab line style for each data series
+%   DateFormat - datetick label format for X axis
+%   Type - Plot type. Can be Line or Bar
+%   Recess - Include recession shading. 
 
 % David Kelley, 2015
 

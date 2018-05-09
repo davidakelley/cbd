@@ -1,5 +1,5 @@
 function sum = movt(data, wind)
-%MOVT Calculates the moving sum over a given window
+% MOVT Calculates the moving sum over a given window
 %
 % avg = MOVT(data, wind) calculates the moving sum of data over the
 % past wind periods.

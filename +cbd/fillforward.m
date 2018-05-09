@@ -1,5 +1,5 @@
 function datatab = fillforward(datatab)
-%FILLFORWARD Extends a series forward using the last observed value
+% FILLFORWARD Extends a series forward using the last observed value
 
 % outData = FILLFORWARD(series) fills any nan value at the end of datatab
 % with the last observed value for each series

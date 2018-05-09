@@ -1,6 +1,6 @@
 function indexed = indexed(inputTab, indexDate)
-%INDEXED Makes an index of a series by dividing the history of the series by
-%the value of the series at a given date.
+% INDEXED Makes an index of a series by dividing the history of the series by
+% the value of the series at a given date.
 %
 % indexed = INDEXED(inputSeries, indexDate) creates a 100-normalized index of
 % inputSeries by the value at indexDate. If indexDate is a string, it

@@ -1,13 +1,12 @@
 function agg = agg(data, finalFreq, aggType)
-%AGG Aggregates a data series to a lower frequency
+% AGG Aggregates a data series to a lower frequency
 %
-% agg = AGG(data, finalFreq, aggType) aggregates a series to 
-% a lower frequency specified by finalFreq by the method of
-% aggType. 
+% agg = AGG(data, finalFreq, aggType) aggregates a series to a lower frequency
+% specified by finalFreq by the method of aggType. 
 %
 % INPUTS:
-%   data      - column vector of data to aggregate
-%   finalFreq - final data frequency: either A, Q, or M.
+%   data      - cbd table of data to aggregate
+%   finalFreq - final data frequency: either A, Q, M, or W.
 %   aggType   - method of aggregation:
 %       EOP - End of Period
 %       AVG - Average
@@ -15,12 +14,11 @@ function agg = agg(data, finalFreq, aggType)
 % OUTPUT:
 %   agg       - aggregated data series
 %
-% See also GETFREQ
+% See also: DISAGG
 
 % David Kelley, 2014
 
 %% Check inputs
-
 validateattributes(data, {'table'}, {'2d'});
 assert(~isempty(strfind('AQMWD', upper(finalFreq))), ...
     'haverpull:badFreq', 'Final frequency type not supported.');

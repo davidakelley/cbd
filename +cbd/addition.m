@@ -1,5 +1,12 @@
 function added = addition(dataA, dataB, varargin)
-% Find the sum of two series
+% ADDITION Finds the sum of two series. 
+% 
+% added = ADDITION(seriesA, seriesB) find the sum of seriesA and seriesB. 
+% 
+% added = ADDITION(series, constant)
+% added = ADDITION(constant, series) adds a constant to the series.
+%
+% added = ADDITION(constantA, constantB) adds the two constants together.
 
 % David Kelley, 2014
 

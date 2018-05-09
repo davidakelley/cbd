@@ -1,7 +1,7 @@
 function outData = ffdiff(series, backfillLevels)
-%FFGR Extends a series forward by using the differences in another series
+% FFDIFF Extends a series forward by using the differences in another series
 %
-% outData = ffdiff(series, fillLevels) extends SERIES as far forward as
+% outData = FFDIFF(series, fillLevels) extends SERIES as far forward as
 % fillLevels goes by usng the differences of that series.
 
 % David Kelley, 2018

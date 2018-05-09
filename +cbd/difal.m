@@ -1,9 +1,9 @@
 function lDiffed = difal(data, nPer)
-%DIFAL Returns the log-differenced version of a data series
+% DIFAL Returns the annualized log-difference of a data series
 %
-% lDiffed = DIFAL(data) returns the first difference of the data
+% lDiffed = DIFAL(data) returns the annualized first difference of the data
 %
-% lDiffed = DIFAL(data, nPer) returns the nPer difference of the data
+% lDiffed = DIFAL(data, nPer) returns the annualized nPer difference of the data
 
 % David Kelley, 2014
 

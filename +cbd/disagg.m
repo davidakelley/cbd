@@ -1,21 +1,26 @@
 function disagg = disagg(data, newFreq, disaggType, extrap)
-%DISAGG Disaggregates a data series to a higher frequency
+% DISAGG Disaggregates a data series to a higher frequency
 %
 % agg = DISAGG(data, newFreq) disaggregates the data series to a
-% lower frequency specified by newFreq.
+% lower frequency specified by newFreq. 
 %
 % agg = DISAGG(data, newFreq, disaggType) allows the specification of how
 % to fill the values in the disaggregation. The following options are
 % supported:
-%       NAN - leave as NaN.
-%       FILL - fill all new periods within the lower frequency period.
-%       INTERP - interpolate the values using cbd.interpNan
+%       NAN (default) - leave as NAN. Low-frequency values are placed in the last
+%         high-frequency period of the low-frequency period they align with.
+%       FILL - fill all high-frequency periods within the lower frequency period
+%         with the same value.
+%       INTERP - interpolate the values by linear interpolation
+%       GROWTH - interpolate so that the percent growth rate is constant within
+%         a low-frequency period and the aggregated high-frequency data would 
+%         match the input data.
 %
 % agg = DISAGG(data, newFreq, disaggType, extrap) passes the extrap
 % argument to cbd.interpNan. The last argument is ignored if a different
 % disaggType is specified.
 %
-% See also AGG, GETFREQ, GENDATES
+% See also agg
 
 % David Kelley, 2014-2015
 

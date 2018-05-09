@@ -1,8 +1,9 @@
 function q = quarter(d)
-%QUARTER Get the quarter number
-%   q = quarter(d) Returns the quarter number of the datenum d.
+% QUARTER Get the quarter number
 %
-% See also YEAR, MONTH
+%   q = QUARTER(d) Returns the quarter number of the datenum d.
+%
+% See also year, month, day
 
 % David Kelley, 2014
 

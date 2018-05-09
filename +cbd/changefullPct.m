@@ -1,5 +1,5 @@
 function pChange = changefullPct(data, sDate, eDate)
-%CHANGEPCT Returns the percent change in a window
+%CHANGEPCT  Returns the percent change the range where all data is observed
 %
 % pChange = CHANGEFULLPCT(data) returns the percent change of the data over the
 % entire sample, up to the last observation where all data are present.

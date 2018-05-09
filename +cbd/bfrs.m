@@ -1,11 +1,11 @@
 function outData = bfrs(series, relatedSeries, p)
-%BFRS Extends a series backward with a VAR(p) on a related series.
+% BFRS Extends a series backward with a VAR(p) on a related series.
 %
-% outData = bfrs(series, backfillLevels) extends SERIES as far back as
-% backfillLevels using the predictions of a VAR(3). Note that relatedSeries may be a
-% table, in which case the VAR is simply multivariate. 
+% outData = BFRS(series, backfillLevels) extends SERIES as far back as
+% backfillLevels using the predictions of a VAR(3). Note that relatedSeries 
+% include multiple series, in which case the VAR includes more than 2 series. 
 %
-% outData = bfrs(series, backfillLevels, p) uses a VAR(p) for the prediction.
+% outData = BFRS(series, backfillLevels, p) uses a VAR(p) for the prediction.
 
 % David Kelley, 2018
 

@@ -1,5 +1,5 @@
 function y = interpNan(x, interp, extrap)
-%INTERPNAN Runs the interp1 function on the NaN values in a given vector. 
+% INTERPNAN Runs the interp1 function on the NaN values in a given vector. 
 % An optional second argument passes the interpolation type to interp1.
 % An optional (boolean) thrid argument specifies whether to extrapolate
 % beyond the end data points (default false).

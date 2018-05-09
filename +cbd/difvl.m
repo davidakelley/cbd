@@ -1,9 +1,9 @@
 function lDifved = difvl(data, nPer)
-%DIFVL Returns the acerage log-difference of a series
+% DIFVL Returns the average log-difference of a series
 %
-% lDiffed = DIFFL(data) returns the first difference of the data
+% lDiffed = DIFFL(data) returns the first log-difference of the data
 %
-% lDiffed = DIFFL(data, nPer) returns the nPer average difference of the data
+% lDiffed = DIFFL(data, nPer) returns the nPer average log-difference of the data
 
 % David Kelley, 2015
 

@@ -1,7 +1,7 @@
 function outData = bflvl(series, backfillLevels)
-%BFLVL Extends a series backward by using the level of another series
+% BFLVL Extends a series backward by using the level of another series
 
-% outData = bfgr(series, backfillLevels) extends SERIES as far back as
+% outData = BFLVL(series, backfillLevels) extends SERIES as far back as
 % backfillLevels goes by usng the level of that series.
 
 % David Kelley, 2015
