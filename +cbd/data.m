@@ -17,6 +17,9 @@ function [data, dataProp] = data(series, varargin)
 %   startDate - Date string or datenum of first date to get data 
 %               e.g., '01/01/2015' (default fetches whole series)
 %   endDate   - Date string or datenum of last date to get data
+%   ignoreNan - Ignore NaN values in elementry math operations. Treats NaN
+%               values as 0 in addition and subtraction and 1 in 
+%               multiplication and division.
 %   asOf      - For FRED data, specify to pull the data as if at some date
 %               in the past (using ALFRED). 
 %   asOfStart - For FRED data, get all of the vintages between the
