@@ -10,7 +10,12 @@ function outData = ld2lvl(series, initLevel)
 %% Add back levels off of growth rates
 mergeData = cbd.merge(series, initLevel);
 startInd = find(~isnan(mergeData{:,1}), 1, 'first');
-assert(~isnan(mergeData{startInd-1, end}), 'Initial level not avaliable for date before log-differences.');
+if startInd == 1
+  startInd = 2;
+end
+
+assert(~isnan(mergeData{startInd-1, end}), ...
+  'Initial level not avaliable for date before log-differences.');
 
 outData = mergeData(:,1:end-1);
 
