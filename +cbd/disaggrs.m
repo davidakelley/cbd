@@ -21,12 +21,11 @@ function disaggData = disaggrs(lowFreqSeries, hiFreqSeries, type, p)
 %% Determine timing
 assert(size(lowFreqSeries, 2) == 1, 'DISAGGRS only disaggregates one series at a time.');
 
+[~, hiFPers] = cbd.private.getFreq(hiFreqSeries);
+[~, loFPers] = cbd.private.getFreq(lowFreqSeries);
+
 if nargin < 4
-  [~, hiFPers] = cbd.private.getFreq(hiFreqSeries);
-  [~, loFPers] = cbd.private.getFreq(lowFreqSeries);
   p = floor(hiFPers ./ loFPers);
-else
-  warning('disaggrs not yet able to handle non-standard p values.');
 end
 if nargin < 3
   type = 'LEVEL';
@@ -42,6 +41,7 @@ if strcmpi(type, 'DIFFL')
     cbd.disagg(lowFreqSeries, hiFStr, 'GROWTH'), ...
     hiFreqSeries));
   triangle = true; 
+  accumLags = floor(hiFPers ./ loFPers) - 1;
   
 elseif strcmpi(type, 'LEVEL')
   mergeData = cbd.merge(lowFreqSeries, hiFreqSeries);
@@ -49,6 +49,7 @@ elseif strcmpi(type, 'LEVEL')
     cbd.disagg(lowFreqSeries, hiFStr, 'INTERP'), ...
     hiFreqSeries);
   triangle = false;  
+  accumLags = 0;
   
 else
   error('disaggrs:type', 'type must be either LEVEL or DIFFL');
@@ -60,6 +61,7 @@ mdlOpts.nSeries = 1 + size(hiFreqSeries, 2);
 mdlOpts.p = p;
 mdlOpts.triangle = triangle;
 mdlOpts.T = size(mergeData, 1);
+mdlOpts.accumLags = accumLags;
 
 parammap = @(theta) theta2mats(theta, mdlOpts);
 
@@ -127,11 +129,13 @@ sigmaChol(tril(true(mdlOpts.nSeries))) = sigmaVec;
 measurementErr = theta(nPhi + nConst + nSigma + (1:nMeasurementErr));
 
 % Construct state space
-nStates = mdlOpts.p * mdlOpts.nSeries + 2;
+% State dimension is the two latent states * number of lags for VAR and accumulator, plus
+% the constant, plus the accumulator.
+neededLags = max(mdlOpts.p, mdlOpts.accumLags);
+nStates = neededLags * mdlOpts.nSeries + 2;
 
 Z = [zeros(1, nStates-1) 1; 1 zeros(1, nStates-1)];
 Hchol = diag([0; measurementErr]);
-
 R = cell(mdlOpts.T, 1);
 T = cell(mdlOpts.T, 1);
   
@@ -142,19 +146,23 @@ for iT = 1:mdlOpts.T
     zeros(nStates - mdlOpts.nSeries - 1, mdlOpts.nSeries);
     sigmaChol(1,:) ./ cal];
   
+  phiWithZeros = [phi zeros(mdlOpts.nSeries, (neededLags - mdlOpts.p) * mdlOpts.nSeries)];
   if ~mdlOpts.triangle
-    T{iT} = [phi const zeros(mdlOpts.nSeries, 1); 
-      eye(mdlOpts.nSeries * (mdlOpts.p-1)) ...
-      zeros(mdlOpts.nSeries * (mdlOpts.p-1), mdlOpts.nSeries + 2);
-      zeros(1, size(phi, 2)), 1, 0;
-      [phi(1,:) const(1)]./cal (cal-1)./cal];
+    T{iT} = [phiWithZeros const zeros(mdlOpts.nSeries, 1); 
+      eye(mdlOpts.nSeries * (neededLags-1)) ...
+      zeros(mdlOpts.nSeries * (neededLags-1), mdlOpts.nSeries + 2);
+      zeros(1, size(phiWithZeros, 2)), 1, 0;
+      [phiWithZeros(1,:) const(1)]./cal (cal-1)./cal];
   else
-    accumPhi = phi(1,:) + [repmat([1 0], 1, mdlOpts.p-1) zeros(1, mdlOpts.nSeries)];
+    addLagsMat = [repmat([1 zeros(1,mdlOpts.nSeries-1)], 1, mdlOpts.accumLags) ...
+      zeros(1, (neededLags - mdlOpts.accumLags) * mdlOpts.nSeries)];
     
-    T{iT} = [phi const zeros(mdlOpts.nSeries, 1); 
-      eye(mdlOpts.nSeries * (mdlOpts.p-1)) ...
-      zeros(mdlOpts.nSeries * (mdlOpts.p-1), mdlOpts.nSeries + 2);
-      zeros(1, size(phi, 2)), 1, 0;
+    accumPhi = phiWithZeros (1,:) + addLagsMat;
+    
+    T{iT} = [phiWithZeros const zeros(mdlOpts.nSeries, 1); 
+      eye(mdlOpts.nSeries * (neededLags-1)) ...
+      zeros(mdlOpts.nSeries * (neededLags-1), mdlOpts.nSeries + 2);
+      zeros(1, size(phiWithZeros, 2)), 1, 0;
       [accumPhi const(1)]./cal (cal-1)./cal];    
   end
 end
