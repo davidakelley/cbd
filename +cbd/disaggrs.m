@@ -34,7 +34,14 @@ end
 
 hiFStr = cbd.private.getFreq(hiFreqSeries);
 
-if strcmpi(type, 'DIFFL')
+if strcmpi(type, 'LN')
+  mergeData = cbd.merge(cbd.ln(lowFreqSeries), cbd.ln(hiFreqSeries));
+  roughDisaggData = cbd.ln(cbd.merge(...
+    cbd.disagg(lowFreqSeries, hiFStr, 'INTERP'), ...
+    hiFreqSeries));
+  triangle = false; 
+  
+elseif strcmpi(type, 'DIFFL')
   % DIFFL multiplies by 100, correct for that:
   mergeData = cbd.merge(cbd.expression('DIFFL(%d)/100', lowFreqSeries), ...
     cbd.expression('DIFFL(%d)/100', hiFreqSeries));
@@ -51,7 +58,7 @@ elseif strcmpi(type, 'LEVEL')
   triangle = false;  
   
 else
-  error('disaggrs:type', 'type must be either LEVEL or DIFFL');
+  error('disaggrs:type', 'type must be either LEVEL, LN or DIFFL');
 end
   
 %% Build state space model
@@ -78,14 +85,19 @@ theta0 = [phi0(:); sigmaChol0(tril(true(size(sigmaChol0)))); measurementErr0];
 %% Estimate
 warning off 'econ:statespace:estimate:SingularCov'
 warning off 'MATLAB:nearlySingularMatrix'
-mdlEst = mdl.estimate(mergeData{:,:}, theta0, 'Display', 'off');
+Options = optimoptions(@fminunc,'UseParallel',true,'MaxFunctionEvaluations',5000);
+mdlEst = mdl.estimate(mergeData{:,:}, theta0, 'Options', Options, 'Display', 'off');
 warning on 'econ:statespace:estimate:SingularCov'
 warning on 'MATLAB:nearlySingularMatrix'
 
 %% Get smoothed estimate
 fitted = mdlEst.smooth(mergeData{:,:});
 
-if strcmpi(type, 'DIFFL')
+if strcmpi(type, 'LN')
+  disaggData = cbd.exp(mergeData(:,1));
+  disaggData{:,:} = cbd.exp(fitted(:,1));
+  
+elseif strcmpi(type, 'DIFFL')
   % We can match the log-levels because of the way we set up the accumulator. 
   %
   % Go from log-differences back to levels so that the log-levels of the disaggregated
