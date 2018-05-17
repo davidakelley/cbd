@@ -691,10 +691,10 @@ function x = x13(varargin)
         else
             if useX12
                 if is64
-                    success = InstallMissingCensusProgram('x12_64');
+                    success = cbd.private.sax13.InstallMissingCensusProgram('x12_64');
                     prog = 'x12a64.exe';
                 else
-                    success = InstallMissingCensusProgram('x12_32');
+                    success = cbd.private.sax13.InstallMissingCensusProgram('x12_32');
                     prog = 'x12a.exe';
                 end
                 if ~success
@@ -708,11 +708,11 @@ function x = x13(varargin)
                 end
             else
                 if ~useHTML
-                    success = InstallMissingCensusProgram('x13prog');
+                    success = cbd.private.sax13.InstallMissingCensusProgram('x13prog');
                     prog    = 'x13as.exe';
                     theZIP  = 'x13as_V1.1_B26.zip';
                 else
-                    success = InstallMissingCensusProgram('x13proghtml');
+                    success = cbd.private.sax13.InstallMissingCensusProgram('x13proghtml');
                     prog    = 'x13ashtml.exe';
                     theZIP  = 'x13ashtml_V1.1_B26.zip';
                 end
