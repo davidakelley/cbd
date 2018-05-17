@@ -8,4 +8,5 @@
 # Compiled MEX binaries (all platforms)
 *.mex*
 
-+cbd/arc/*
+# sax13 has some binary files we don't want to track:
++cbd/+private/+sax13/exe/
