@@ -38,7 +38,8 @@ inP.addParameter('Title', [], @ischar);
 inP.addParameter('Grid', true, @islogical);
 inP.addParameter('XLabel', [], @ischar);
 inP.addParameter('YLabel', [], @ischar);
-inP.addParameter('Tripwire', [], @ischar);
+tripwireValid = @(x) ischar(x) | iscell(x);
+inP.addParameter('Tripwire', [], tripwireValid);
 inP.addParameter('Interpolate', true, @islogical);
 inP.addParameter('Labels', {}, @iscell);
 inP.addParameter('LegendPos', 'nw', @ischar);
@@ -182,8 +183,13 @@ if ~isempty(opts.Title)
 end
 
 if ~isempty(opts.Tripwire)
-  lineInd = datenum(opts.Tripwire);
-  plot([lineInd lineInd], ylim, 'k');
+  if ischar(opts.Tripwire)
+    opts.Tripwire = {opts.Tripwire};
+  end
+  for iTrip = 1:length(opts.Tripwire)
+    lineInd = datenum(opts.Tripwire{iTrip});
+    plot([lineInd lineInd], ylim, 'k');
+  end
 end
 
 if opts.Grid
