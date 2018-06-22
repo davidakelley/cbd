@@ -186,10 +186,15 @@ if ~isempty(opts.Tripwire)
   if ischar(opts.Tripwire)
     opts.Tripwire = {opts.Tripwire};
   end
+  
+  xlims = ax1.XLim;
+  ylims = ax1.YLim;
   for iTrip = 1:length(opts.Tripwire)
     lineInd = datenum(opts.Tripwire{iTrip});
     plot([lineInd lineInd], ylim, 'k');
   end
+  ax1.XLim = xlims;
+  ax1.YLim = ylims;
 end
 
 if opts.Grid

@@ -39,7 +39,8 @@ if strcmpi(type, 'LN')
     cbd.disagg(lowFreqSeries, hiFStr, 'INTERP'), ...
     hiFreqSeries));
   triangle = false; 
-  
+  accumLags = 0;
+
 elseif strcmpi(type, 'DIFFL')
   % DIFFL multiplies by 100, correct for that:
   mergeData = cbd.merge(cbd.expression('DIFFL(%d)/100', lowFreqSeries), ...
