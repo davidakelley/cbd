@@ -142,12 +142,13 @@ sigmaChol(tril(true(mdlOpts.nSeries))) = sigmaVec;
 measurementErr = theta(nPhi + nConst + nSigma + (1:nMeasurementErr));
 
 % Construct state space
-% State dimension is the two latent states * number of lags for VAR and accumulator, plus
+% State dimension is the n latent states * number of lags for VAR and accumulator, plus
 % the constant, plus the accumulator.
 neededLags = max(mdlOpts.p, mdlOpts.accumLags);
 nStates = neededLags * mdlOpts.nSeries + 2;
 
-Z = [zeros(1, nStates-1) 1; 1 zeros(1, nStates-1)];
+Z = [zeros(1, nStates-1) 1; 
+  zeros(mdlOpts.nSeries-1, 1) eye(mdlOpts.nSeries-1) zeros(mdlOpts.nSeries-1, nStates-mdlOpts.nSeries)];
 Hchol = diag([0; measurementErr]);
 R = cell(mdlOpts.T, 1);
 T = cell(mdlOpts.T, 1);
