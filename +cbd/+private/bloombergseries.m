@@ -59,6 +59,7 @@ end
 % Create Connection
 persistent blpconnection
 if isempty(blpconnection)
+  javaaddpath('C:\blp\DAPI\blpapi3.jar');
   try
     blpconnection = blp;
   catch
