@@ -31,6 +31,10 @@ if ~isfield(opts, 'endDate') || isempty(opts.endDate)
   opts.endDate = floor(now);
 end
 
+if ~isfield(opts, 'field') || isempty(opts.field)
+  opts.field = 'LAST_PRICE';
+end
+
 assert(~isempty(seriesID), 'haverseries:nullSeries', 'Series input empty');
 
 % Check that we have a clean series ID
@@ -76,8 +80,9 @@ end
 
 % Get the data
 [fetch_data, security_info] = history(blpconnection, ...
-  seriesID, {'LAST_PRICE'}, opts.startDate, opts.endDate, opts.frequency);
+  seriesID, {opts.field}, opts.startDate, opts.endDate, opts.frequency);
 assert(isequal(security_info{1}, seriesID), 'Series not retrieved.');
+assert(isnumeric(fetch_data), 'Series not retreived');
 
 %% Transform to Table
 startSeriesID = subsref(strsplit(seriesID, ' '), ...
