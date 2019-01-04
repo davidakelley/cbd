@@ -21,12 +21,12 @@ function chidata_save(sectionName, data, properties)
 % section of CHIDATA and updates (or creates) a properties file with the
 % properties given.
 
-% David Kelley, 2014
+% David Kelley, 2014-2019
 
-chidataDir = 'O:\PROJ_LIB\Presentations\Chartbook\Data\CHIDATA\';
-indexFileName = [chidataDir 'index.csv'];
-dataFileName = [chidataDir sectionName  '_data.csv'];
-propertiesFileName = [chidataDir sectionName '_prop.csv'];
+chidataDir = cbd.private.chidatadir();
+indexFileName = fullfile(chidataDir, 'index.csv');
+dataFileName = fullfile(chidataDir, [sectionName  '_data.csv']);
+propertiesFileName = fullfile(chidataDir, [sectionName '_prop.csv']);
 
 assert(istable(data));
 

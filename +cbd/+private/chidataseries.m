@@ -10,9 +10,9 @@ function [data, dataProp] = chidataseries(seriesID, opts)
 %
 % See also: chidata_save
 
-% David Kelley, 2015
+% David Kelley, 2015-2019
 
-chidataDir = 'O:\PROJ_LIB\Presentations\Chartbook\Data\CHIDATA\';
+chidataDir = cbd.private.chidatadir();
 
 if ischar(opts.startDate)
     opts.startDate = datenum(opts.startDate);
@@ -50,7 +50,7 @@ function fname = getChidataFilename(series, chidataDir)
     % Read the index file and get the name of the section containing the
     % series.
     try
-        dataDict = readtable([chidataDir 'index.csv'], 'ReadRowNames', true);
+        dataDict = readtable(fullfile(chidataDir, 'index.csv'), 'ReadRowNames', true);
     catch
         error('cbd:data:CHIDATA:dictionaryFile', 'Data dictionary file not found.');
     end
@@ -70,10 +70,10 @@ function data = readChidataSeries(series, fname, chidataDir)
     % Read the data from the section file, returns the whole history
     try
       if verLessThan('matlab', '9.1')
-        readData = readtable([chidataDir fname '_data.csv'], ...
+        readData = readtable(fullfile(chidataDir, [fname '_data.csv']), ...
           'ReadRowNames', true);
       else
-        readData = readtable([chidataDir fname '_data.csv'], ...
+        readData = readtable(fullfile(chidataDir, [fname '_data.csv']), ...
           'ReadRowNames', true, 'DatetimeType', 'text');
       end
     catch
