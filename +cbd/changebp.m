@@ -44,7 +44,7 @@ firstData = cbd.first(windowData);
 lastData = cbd.last(windowData);
 
 %% Diff
-changed = 100 * lastData{1,:} - firstData{end,:};
+changed = 100 * (lastData{1,:} - firstData{end,:});
 
 changed = array2table(changed, 'RowNames', rNames(eInd), 'VariableNames', vNames);
 
