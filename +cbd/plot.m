@@ -111,9 +111,16 @@ hold on;
 try
   dates = cbd.private.midPerDate(datenum(data.Properties.RowNames));
   badDates = false;
-catch  % Not really a cbd table
-  badDates = true;
-  dates = 1:height(data);
+catch  ex
+  if strcmpi(ex.identifier, 'endOfPer:badFreq')
+    dates = datenum(data.Properties.RowNames);
+    warning('Irregular frequency detected. Data plotted at end of period.');
+    badDates = false;
+  else
+    % Not really a cbd table
+    badDates = true;
+    dates = 1:height(data);
+  end
 end
 
 plotObjs = gobjects(width(data), 1);
@@ -259,6 +266,7 @@ if ~badDates
       case 'M', dateFormat = 'YYYY';
       case 'Q', dateFormat = 'YYYY';
       case 'A', dateFormat = 'YYYY';
+      otherwise, dateFormat = 'mmm-YY';
     end
   else
     dateFormat = opts.DateFormat;
