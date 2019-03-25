@@ -8,10 +8,10 @@ function [data, dataProp] = bloombergseries(seriesID, opts)
 
 %% Handle inputs
 if nargin < 2
-  opts = struct; 
+  opts = struct('dbID', 'BLOOMBERG'); 
 end
 
-if ~isfield(opts, 'frequency')
+if ~isfield(opts, 'frequency') || isempty(opts.frequency)
   opts.frequency = 'DAILY';
 end
 
@@ -46,7 +46,7 @@ for testcase = {seriesID, opts.dbID}
 end
 
 % We need to have spaces in some Bloomberg series
-replacementChars = {'_', ' '};
+replacementChars = {'_', ' '; '|', '/'};
 for iRep = 1:size(replacementChars, 1)
   seriesID = strrep(seriesID, replacementChars{iRep, 1}, replacementChars{iRep, 2});
 end
@@ -85,7 +85,9 @@ assert(isequal(security_info{1}, seriesID), 'Series not retrieved.');
 assert(isnumeric(fetch_data), 'Series not retreived');
 
 %% Transform to Table
-startSeriesID = subsref(strsplit(seriesID, ' '), ...
+varnames = strrep(seriesID, '/', '_');
+
+startSeriesID = subsref(strsplit(varnames, ' '), ...
   struct('type', '{}', 'subs', {{1}}));
 dataRaw = cbd.private.cbdTable(fetch_data(:,2), fetch_data(:,1), {upper(startSeriesID)});
 
