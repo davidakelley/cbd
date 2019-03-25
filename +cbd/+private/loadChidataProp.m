@@ -6,14 +6,15 @@ function properties = loadChidataProp(sectionName)
 
 % David Kelley, 2015
 
-chidataDir = 'O:\PROJ_LIB\Presentations\Chartbook\Data\CHIDATA\';
+chidataDir = cbd.private.chidatadir();
+propFile = fullfile(chidataDir, [sectionName '_prop.csv']);
 
-if ~exist([chidataDir sectionName '_prop.csv'], 'file')
+if ~exist(propFile, 'file')
     properties = [];
     return
 end
 
-propTable = readtable([chidataDir sectionName '_prop.csv'], ...
+propTable = readtable(propFile, ...
   'ReadRowNames', true, 'ReadVariableNames', true);
 propCell = [propTable.Properties.VariableNames; table2cell(propTable)];
 

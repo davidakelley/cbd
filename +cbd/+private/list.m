@@ -3,18 +3,20 @@ function series = list
 
 % David Kelley, 2015
 
-chidataDir = 'O:\PROJ_LIB\Presentations\Chartbook\Data\CHIDATA\';
+chidataDir = cbd.private.chidatadir;
 
-seriesList = readtable([chidataDir 'index.csv']);
+seriesList = readtable(fullfile(chidataDir, 'index.csv'));
 
 % Opens each file and reads the descriptions
 series = {};
 files = unique(seriesList{:,2});
 for iF = 1:length(files)
   if verLessThan('matlab', '9.1')
-    readData = readtable([chidataDir files{iF} '_prop.csv'], 'ReadRowNames', true);
+    readData = readtable(fullfile(chidataDir, [files{iF} '_prop.csv']), ...
+      'ReadRowNames', true);
   else
-    readData = readtable([chidataDir files{iF} '_prop.csv'], 'ReadRowNames', true, 'ReadVariableNames', true);
+    readData = readtable(fullfile(chidataDir, [files{iF} '_prop.csv']), ...
+      'ReadRowNames', true, 'ReadVariableNames', true);
   end
   
   seriesNames = readData.Properties.VariableNames;
