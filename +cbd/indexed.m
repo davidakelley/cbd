@@ -2,12 +2,30 @@ function indexed = indexed(inputTab, indexDate, varargin)
 % INDEXED Makes an index of a series by dividing the history of the series by
 % the value of the series at a given date.
 %
+% indexed = INDEXED(inputSeries) creates a 100-normalized index of input
+% series at the first data point 
+%
 % indexed = INDEXED(inputSeries, indexDate) creates a 100-normalized index of
 % inputSeries by the value at indexDate. If indexDate is a string, it
 % should be a date that occurs in the series. If it is a number, it should
 % be a year that occurs within the series. 
-
+%
+% indexed = INDEXED(...) can take on a name-value pair argument:
+% FindIdxDate: Can take on values [0, 1, -1]
+%        -  0:  Function will preform as if only 2 arguments were specified
+%
+%        -  1:  If the indexed date is not within the time-series,
+%               choose a date forward in time closest to the specified 
+%               date with data to do the index
+%
+%        - -1:  If the indexed date is not within the time-series, 
+%               choose a date backwards in time closest to the specified 
+%               date with data to do the index
+%
+%        - Any other numeric input will default to '0' and give a warning
+%
 % David Kelley, 2015
+% Updated by Vamsi Kurakula, 2019
 
 %% Handle Inputs
 assert(istable(inputTab), 'cbd:index:needTable', 'Table input required.');
