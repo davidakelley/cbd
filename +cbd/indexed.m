@@ -30,9 +30,11 @@ opts = inP.Results;
 %% Find Index Date
 if opts.FindIdxDate == 1
     forwardDates = rNames(datenum(rNames) > datenum(indexDate),:);
+    assert(~isempty(forwardDates), 'index:noDate', 'Index date not found.')
     indexDate = forwardDates{1,:};
 elseif opts.FindIdxDate == -1
     backDates = rNames(datenum(rNames) < datenum(indexDate),:);
+    assert(~isempty(backDates), 'index:noDate', 'Index date not found.')
     indexDate = backDates{end,:};  
 elseif opts.FindIdxDate == 0
     
