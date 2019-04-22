@@ -13,15 +13,12 @@ function indexed = indexed(inputTab, indexDate, varargin)
 % indexed = INDEXED(...) can take on a name-value pair argument:
 % FindIdxDate: Can take on values [0, 1, -1]
 %        -  0:  Function will preform as if only 2 arguments were specified
-%
 %        -  1:  If the indexed date is not within the time-series,
 %               choose a date forward in time closest to the specified 
 %               date with data to do the index
-%
 %        - -1:  If the indexed date is not within the time-series, 
 %               choose a date backwards in time closest to the specified 
 %               date with data to do the index
-%
 %        - Any other numeric input will default to '0' and give a warning
 %
 % David Kelley, 2015
