@@ -41,6 +41,7 @@ if nargout > 1
     dataProp = cbd.private.loadChidataProp(fname);
     seriesIndex = strcmpi(seriesID, {dataProp.Name});
     dataProp = dataProp(seriesIndex);
+    dataProp.provider = 'chidata';
 end
 
 end
