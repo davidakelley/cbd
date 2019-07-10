@@ -1,4 +1,4 @@
-function chidata_save(sectionName, data, properties)
+function chidata_save(sectionName, data, properties, varargin)
 %CHIDATA_SAVE Saves a data series to the CHIDATA folder
 %
 % The CHIDATA folder contains data formatted so that it can be treated as if 
@@ -29,6 +29,11 @@ dataFileName = fullfile(chidataDir, [sectionName  '_data.csv']);
 propertiesFileName = fullfile(chidataDir, [sectionName '_prop.csv']);
 
 assert(istable(data));
+
+inP = inputParser;
+inP.addParameter('revisionTolerance', 1e-12, @isnumeric);
+inP.parse(varargin{:});
+opts = inP.Results;
 
 %% Make sure index.csv has the series in it.
 indexTab = readtable(indexFileName);
@@ -94,7 +99,7 @@ if ~exist('exception', 'var') || isempty(exception)
   
   minLen = min(size(oldData, 1), size(data,1));
   minWid = min(size(oldData, 2), size(data,2));
-  equalArray = abs(oldData{1:minLen, 1:minWid} - data{1:minLen, 1:minWid}) < 1e-12;
+  equalArray = abs(oldData{1:minLen, 1:minWid} - data{1:minLen, 1:minWid}) < opts.revisionTolerance;
   nanArray = arrayfun(@isnan, oldData{1:minLen, 1:minWid}) | arrayfun(@isnan, data{1:minLen, 1:minWid});
   promptOverwrite(~all(equalArray | nanArray), ['New data revises old data. (' sectionName ')']);
 end
