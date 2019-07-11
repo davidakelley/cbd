@@ -26,7 +26,7 @@ classdef aggregationtests < matlab.unittest.TestCase
         function testAnnualAgg(testCase)
             % Quarter => annual
             testVal = cbd.data({'GDPHA', 'AGG(GDPH, "A", "AVG")'});
-            testCase.verifyLessThan(max(abs(testVal{:,1} - testVal{:,2})), .051);
+            testCase.verifyLessThan(max(abs(testVal{:,1} - testVal{:,2})), .076);
                         
             % Month => annual
             testVal = cbd.data({'JAC', 'AGG(JCBM, "A", "AVG")'});

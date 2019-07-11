@@ -8,7 +8,7 @@ classdef loadDataset_test < matlab.unittest.TestCase
   methods (Test)
     %% Haver data
     function testLoad(testCase)
-      dataset = cbd.loadDataset({'LR', 'GDPH', 'C02'});
+      dataset = cbd.loadDataset({'LR', 'GDPH', 'C02'}, 'Display', 'none');
       
       testCase.verifyGreaterThan(size(dataset, 1), 100);
       testCase.verifyEqual(size(dataset, 2), 3);
@@ -28,17 +28,17 @@ classdef loadDataset_test < matlab.unittest.TestCase
       names = {'GDP', 'GDI', 'PCE', 'HOURS', 'CU', 'HOUST', 'GOVPRICE', 'RFTO', ...
         'TRADE', 'ADVINV', 'RMTI', 'IP', 'PI', 'INFE'};
 
-      dataset = cbd.loadDataset(specs, 'Names', names);
+      dataset = cbd.loadDataset(specs, 'Names', names, 'Display', 'none');
       
       testCase.verifyGreaterThan(size(dataset, 1), 100);
-      testCase.verifyEqual(size(dataset, 2), 13);
+      testCase.verifyEqual(size(dataset, 2), 14);
     end
     
     function testNames(testCase)
       % If there's no computation to a series, we want to use the name of the series
       % (minus any database name).
       
-      dataset = cbd.loadDataset({'LR', 'C02'});      
+      dataset = cbd.loadDataset({'LR', 'C02'}, 'Display', 'none');      
       testCase.verifyTrue(all(dataset.C02==2));
     end
   end

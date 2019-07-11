@@ -360,9 +360,11 @@ classdef disaggregationtests < matlab.unittest.TestCase
             dateDiff = dates(2:end)- dates(1:end-1);
             testCase.verifyEqual(size(unique(dateDiff), 1), 1);
             
-            testCase.verifyLessThan(abs(testVal{end-1, 1} - testCase.lrVal{end,1}), 1e9);
+            testCase.verifyLessThan(abs(testVal{end-1, 1} - testCase.lrVal{end,1}), 1e-9);
 
-            testCase.verifyEqual(sum(isnan(testVal{:,:})), 4); % 1st 3 weeks of M1, last week missing too
+            % 1st 3 weeks of M1, 
+            % last week missing too? No its not
+            testCase.verifyEqual(sum(isnan(testVal{:,:})), 3); 
                   
             % Quarter => Weekly
             testVal = cbd.disagg(testCase.gdpVal, 'W', 'GROWTH');
@@ -375,7 +377,8 @@ classdef disaggregationtests < matlab.unittest.TestCase
             
             testCase.verifyLessThan(abs(testVal{end, 1} - testCase.gdpVal{end,1}), 1e9);
 
-            testCase.verifyEqual(sum(isnan(testVal{:,:})), 12); % 1st 12 weeks of Q1
+            % 1st 12 weeks of Q1
+            testCase.verifyEqual(sum(isnan(testVal{:,:})), 12); 
                         
             % Annual => Weekly
             testVal = cbd.disagg(testCase.AgdpVal, 'W', 'GROWTH');
@@ -388,7 +391,8 @@ classdef disaggregationtests < matlab.unittest.TestCase
 
             testCase.verifyLessThan(abs(testVal{end-1, 1} - testCase.AgdpVal{end,1}), 1e9);
             
-            testCase.verifyEqual(sum(isnan(testVal{:,:})), 52); % 1st 51 weeks of A1, first week of A(end)
+            % 1st 51 weeks of A1, first week of A(end)
+            testCase.verifyEqual(sum(isnan(testVal{:,:})), 51); 
         end
         
         function testDailyDisaggGrowth(testCase)
