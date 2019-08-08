@@ -6,6 +6,17 @@ function saSeries = sa(nsaSeries, varargin)
 % saSeries = sa(nsaSeries, ...) allows for inputs to specify the seasonal adjustment. A
 % number of shortcuts are available. See the list in cbd.private.x13.makespec. Individual
 % arguments can also be passed optionally as 'section:key:value' inputs.
+%
+% Note: When passing the optional 'section:key:value' inputs, square
+% brackets should be used instead of parentheses, and underscores should
+% be used instead of spaces - including spaces and parentheses causes
+% errors when parsing in expression_eval.m
+%
+% For example, if you want to remove additive outliers AND level shift
+% outliers from the seasonally adjusted series, you should enter:
+% saSeries = sa(nsaSeries, 'outlier:types:[ao_ls]', 'x11:final:[ao_ls]') 
+% instead of 
+% saSeries = sa(nsaSeries, 'outlier:types:(ao ls)', 'x11:final:(ao ls)'). 
 
 % David Kelley, 2017-2019
 
@@ -25,8 +36,13 @@ if ~isempty(varargin)
     varargin = [varargin, {reqArg}];
   end
 
+  % Replace [] and _ with () and " " 
+  options1 = strrep(varargin, '[', '(');
+  options2 = strrep(options1, ']', ')');
+  options3 = strrep(options2, '_', ' ');
+  
   % Split at the colons
-  specSplits = cellfun(@(x) strsplit(x, ':'), varargin, 'Uniform', false);
+  specSplits = cellfun(@(x) strsplit(x, ':'), options3, 'Uniform', false);
   specs = cat(2, specSplits{:});
   
   % Build spec object  
