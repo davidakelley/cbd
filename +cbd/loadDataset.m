@@ -228,14 +228,14 @@ function [newStr, seriesIndexes] = prepareExpression(strIn, serNames)
 % Replace strings of "local" series with "%d" symbols and note the indexes
 % of the series for use with cbd.expression later
 
-newStr = upper(strIn);
+newStr = strIn;
 serInds = [];
 serLocs = [];
 for iS = 1:length(serNames)
   iSname = [upper(serNames{iS}) '@LOCAL'];
   
   % Replace names of local series
-  newStr = strrep(newStr, iSname, '%d');
+  newStr = regexprep(newStr, iSname, '%d', 'ignorecase');
   
   % Find where the series was in what will be the string of %d's
   iStrInds = strfind(upper(strIn), iSname);

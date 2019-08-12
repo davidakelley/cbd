@@ -24,14 +24,15 @@ classdef loadDataset_test < matlab.unittest.TestCase
         'SA( FTO) / GOVPRICE@LOCAL', 'BFGR(BGSB/10000,TMBCA)', ...
         '((NARI+NAWIH)/EXTEND_LAST(EXTEND((NWIH+NRI)/(NWIH+NMI+NRI),"endCount",1)))/PB9411', ...
         'FFGR(SPLICE(TITH, TITH2),ADVINV@LOCAL)', 'IGTP', 'YPMH', ...
-        'UMINFE1@CHIDATA'};
+        'UMINFE1@CHIDATA', '(FFP3-FTBS3)#dbID:WEEKLY', ...
+        'CBILL@LOCAL + FTBS3@WEEKLY', 'ffp@local-FTBS3@WEEKLY'};
       names = {'GDP', 'GDI', 'PCE', 'HOURS', 'CU', 'HOUST', 'GOVPRICE', 'RFTO', ...
-        'TRADE', 'ADVINV', 'RMTI', 'IP', 'PI', 'INFE'};
+        'TRADE', 'ADVINV', 'RMTI', 'IP', 'PI', 'INFE', 'CBILL', 'FFP', 'FTBS'};
 
       dataset = cbd.loadDataset(specs, 'Names', names, 'Display', 'none');
       
       testCase.verifyGreaterThan(size(dataset, 1), 100);
-      testCase.verifyEqual(size(dataset, 2), 14);
+      testCase.verifyEqual(size(dataset, 2), 17);
     end
     
     function testNames(testCase)
