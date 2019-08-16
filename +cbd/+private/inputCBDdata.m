@@ -1,8 +1,4 @@
 function [data, rNames, vNames] = inputCBDdata(data)
-%INPUTCBDDATA takes
+% inputCBDdata is depricated. Use cbdTable instead.
 
-validateattributes(data, {'table'}, {'2d'}); 
-
-rNames = data.Properties.RowNames;
-vNames = data.Properties.VariableNames;
-data = data{:,:};
+error('inputCBDdata is depricated. Use cbdTable instead.');
