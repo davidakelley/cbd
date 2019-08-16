@@ -93,7 +93,7 @@ end
 
 %% Interpolate
 if opts.Interpolate
-  data = cbd.interpNan(data);
+  data = cbd.interp_nan(data);
 end
 
 %% Set up plot

@@ -17,7 +17,7 @@ function disagg = disagg(data, newFreq, disaggType, extrap)
 %         match the input data.
 %
 % agg = DISAGG(data, newFreq, disaggType, extrap) passes the extrap
-% argument to cbd.interpNan. The last argument is ignored if a different
+% argument to cbd.interp_nan. The last argument is ignored if a different
 % disaggType is specified.
 %
 % See also agg
@@ -101,7 +101,7 @@ switch upper(disaggType)
     end
     
   case 'INTERP'
-    disagg = cbd.interpNan(disagg, 'linear', extrap);
+    disagg = cbd.interp_nan(disagg, 'linear', extrap);
     
   case 'GROWTH'
     % Create same level at end of each period, smooth by using fixed

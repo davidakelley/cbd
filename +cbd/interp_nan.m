@@ -1,4 +1,4 @@
-function y = interpNan(x, interp, extrap)
+function y = interp_nan(x, interp, extrap)
 % INTERPNAN Runs the interp1 function on the NaN values in a given vector. 
 % An optional second argument passes the interpolation type to interp1.
 % An optional (boolean) thrid argument specifies whether to extrapolate
