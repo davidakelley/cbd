@@ -30,6 +30,8 @@ function chidata_save(sectionName, data, properties, varargin)
 %               return the natural number
 %   AggType     ~ char, the method used when aggregating the series
 %   DataType    ~ char, the type of data being stored
+% A timestamp of the modification date is also saved, along with the user who 
+% updated the data and the file they used to do so. 
 
 % David Kelley, 2014-2019
 
@@ -118,17 +120,42 @@ end
 writetable(data, dataFileName, 'WriteRowNames', true);
 
 %% Properties File
+assert(isstruct(properties))
 if nargin > 2 && ~isempty(properties)
   % Check for consistency with old properties file
   oldProp = cbd.private.loadChidataProp(sectionName);
   if ~isempty(oldProp)
-    oldProp = rmfield(oldProp, {'Name','DateTimeMod'});
+    % Remove the dynamic properties before comparing to new ones
+    % Using try-catch to avoid breaking existing directories
+    try
+      oldProp = rmfield(oldProp, {'Name','DateTimeMod','UsernameMod','FileMod'});
+    catch 
+      oldProp = rmfield(oldProp, {'Name','DateTimeMod'});
+    end
     promptOverwrite(~isequal(oldProp, properties), 'Properties changed from existing file.');
+  end
+  
+  % Find the current date and username
+  DateTimeMod = datestr(now);
+  Username = getenv('username');
+  
+  % Find the file that calls chidata_save
+  st = dbstack('-completenames');
+  [~, idx] = ismember('chidata_save', {st.name});
+  % Shift index up one on the stack trace to get calling file
+  idx = idx + 1;
+  if size(st, 2) < idx
+    promptOverwrite(true, 'Modification file could not be found.');
+    FileMod = '';
+  else
+    FileMod = st(idx).file;
   end
   
   % Create table version of properties
   for iProp = 1:length(properties)
-    properties(iProp).DateTimeMod = datestr(now);
+    properties(iProp).DateTimeMod = DateTimeMod;
+    properties(iProp).UsernameMod = Username;
+    properties(iProp).FileMod = FileMod;
   end
   propCell = squeeze(struct2cell(properties));
   assert(all(~any(cellfun(@strcmp, propCell, repmat({','}, size(propCell))))), ...
