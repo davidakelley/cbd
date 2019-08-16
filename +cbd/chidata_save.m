@@ -20,6 +20,16 @@ function chidata_save(sectionName, data, properties, varargin)
 % chidata_save(sectionName, data, properties) saves the data to a new
 % section of CHIDATA and updates (or creates) a properties file with the
 % properties given.
+%
+% The properties structure has a length equal to the number of series in
+% the data being saved and includes the following fields, which can also
+% be generated using the chidata_prop function instead:
+%   Source      ~ char, the source of the data
+%   Frequency   ~ char, the frequency of the data
+%   Magnitude   ~ double, the power to raise the series to in order to 
+%               return the natural number
+%   AggType     ~ char, the method used when aggregating the series
+%   DataType    ~ char, the type of data being stored
 
 % David Kelley, 2014-2019
 
