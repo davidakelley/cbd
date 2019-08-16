@@ -109,7 +109,7 @@ hold on;
 
 %% Plot data
 try
-  dates = cbd.private.midPerDate(datenum(data.Properties.RowNames));
+  dates = cbd.private.midOfPer(datenum(data.Properties.RowNames));
   badDates = false;
 catch  ex
   if strcmpi(ex.identifier, 'endOfPer:badFreq')
