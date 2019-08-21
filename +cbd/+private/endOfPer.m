@@ -5,6 +5,7 @@ function eopDates = endOfPer(dates, freq)
 % string freq (Y, Q, M, W, or D) to find the last date by period.
 
 % Copyright: David Kelley, 2014-2015
+% Updated  : Stephen Lee, August 2019
 
 if ischar(dates)
     dates = datenum(dates);
@@ -17,9 +18,9 @@ switch upper(freq)
         eopDates = dates;
     case 'W'
         % Assign to Saturdays. Every Friday has mod(date,7)==0
-        adj = mod(dates, 7);
-        adj(adj~=0) = 7 - adj(adj~=0);
-        eopDates = dates + adj + 1;
+        shift = mod(dates - 1, 7);
+        adj = mod(7 - shift, 7);
+        eopDates = dates + adj;
     case 'M'
         eopDates = cbd.private.endOfMonth(cbd.year(dates), cbd.month(dates));
     case 'Q'
