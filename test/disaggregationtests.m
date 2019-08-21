@@ -73,7 +73,7 @@ classdef disaggregationtests < matlab.unittest.TestCase
         function testDailyDisaggNan(testCase)
             % Weekly => Daily
             testVal = cbd.disagg(testCase.nfciVal, 'D', 'NAN');
-            testCase.verifyEqual(sum(isnan(testVal{:,:})), 8860);
+            testCase.verifyEqual(sum(isnan(testVal{:,:})), 8868);
             dates = datenum(testVal.Properties.RowNames);
             dateDiff = dates(2:end)- dates(1:end-1);
             testCase.verifyEqual(size(unique(dateDiff), 1), 2); % Weekend and day-to-day
@@ -172,7 +172,7 @@ classdef disaggregationtests < matlab.unittest.TestCase
             dateDiff = dates(2:end)- dates(1:end-1);
             testCase.verifyEqual(size(unique(dateDiff), 1), 2); % Weekend and day-to-day
             
-            testCase.verifyEqual(sum(isnan(testVal{:,:})), 4);
+            testCase.verifyEqual(sum(isnan(testVal{:,:})), 0);
             
             % Month => Daily
             testVal = cbd.disagg(testCase.lrVal, 'D', 'FILL');

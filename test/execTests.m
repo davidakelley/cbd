@@ -4,7 +4,7 @@
 % David Kelley, 2015
 
 thisFile = mfilename('fullpath');
-baseDir = thisFile(1:subsref(strfind(thisFile, 'cbd'), struct('type', '()', 'subs', {{1}}))+2);
+baseDir = fileparts(fileparts(thisFile));
 
 addpath(baseDir);
 
@@ -14,8 +14,6 @@ import matlab.unittest.plugins.CodeCoveragePlugin
 
 %% Run tests
 suite = TestSuite.fromFolder([baseDir '\test']);
-% suite = TestSuite.fromFile([baseDir '\test\disaggregationtests.m']);
-
 runner = TestRunner.withTextOutput;
 runner.addPlugin(CodeCoveragePlugin.forFolder([baseDir '\+cbd']));
 result = runner.run(suite);
