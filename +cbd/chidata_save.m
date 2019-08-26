@@ -144,7 +144,7 @@ if nargin > 2 && ~isempty(properties)
   [~, idx] = ismember('chidata_save', {st.name});
   % Shift index up one on the stack trace to get calling file
   idx = idx + 1;
-  if size(st, 2) < idx
+  if size(st, 1) < idx
     promptOverwrite(true, 'Modification file could not be found.');
     FileMod = '';
   else
