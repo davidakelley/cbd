@@ -1,103 +1,169 @@
-function [data, dataProp] = bloombergseries(seriesID, opts)
-%BLOOMBERSERIES Fetch single Bloomber series via the local connection
+function [data, props] = bloombergseries(seriesID, opts)
+%BLOOMBERGSERIES Fetch single Bloomberg series and returns it in a table
 %
-% Fetch a single series from Bloomberg and return it in a table.
-% Frequency will default to daily.
-
+% The function requires that the opts structure has all necessary fields
+% initialized (can be empty) except for dbID.
+%
+% INPUTS:
+%   seriesID        ~ char, the name of the series
+%   opts            ~ struct, the options structure with the fields:
+%       dbID        ~ char, the name of the database
+%       startDate   ~ datestr/datenum, the first date for the pull
+%       endDate     ~ datestr/datenum, the cutoff date for the pull
+%       frequency   ~ char, the specified frequency of the data
+%       field       ~ char, the field pulled from Bloomberg
+%
+% OUPTUTS:
+%   data            ~ table, the table of the series in cbd format
+%   props           ~ struct, the properties of the series
+%
 % David Kelley, 2017
+% Santiago I. Sordo-Palacios, 2019
 
-%% Handle inputs
-if nargin < 2
-  opts = struct('dbID', 'BLOOMBERG'); 
-end
+%% Parse inputs
+% Check validity of inputs
+cbd.private.assertSeries(seriesID, mfilename());
+reqFields = {'dbID', 'startDate', 'endDate', 'frequency', 'field'};
+cbd.private.assertOpts(opts, reqFields, mfilename());
 
-if ~isfield(opts, 'frequency') || isempty(opts.frequency)
-  opts.frequency = 'DAILY';
-end
+% Set defaults
+defaultStartDate = datenum('1/1/1900');
+defaultEndDate = floor(now);
+defaultFreq = 'D';
+defaultField = 'LAST_PRICE';
 
-% Get Bloomberg's full frequ
-if length(opts.frequency) == 1
-  longFreqs = {'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY'};
-  shortFreqs = 'DWMQY';
-  opts.frequency = longFreqs{strfind(shortFreqs, opts.frequency)};
-end  
-assert(~isempty(opts.frequency), 'Invalid frequency specification.');
-shortFreq = opts.frequency(1);
-
-if ~isfield(opts, 'startDate') || isempty(opts.startDate)
-  opts.startDate = datenum('1/1/1900');
-end
-if ~isfield(opts, 'endDate') || isempty(opts.endDate)
-  opts.endDate = floor(now);
-end
-
-if ~isfield(opts, 'field') || isempty(opts.field)
-  opts.field = 'LAST_PRICE';
-end
-
-assert(~isempty(seriesID), 'haverseries:nullSeries', 'Series input empty');
-
-% Check that we have a clean series ID
-illegalChar = '(\(|\),)';
-for testcase = {seriesID, opts.dbID}
-  regexOut = regexpi(testcase{1}, illegalChar);
-  assert(isempty(regexOut), 'bloombergseries:invalidInput', ...
-    'bloombergseries takes only clean inputs.');
-end
-
-% We need to have spaces in some Bloomberg series
-replacementChars = {'_', ' '; '|', '/'};
-for iRep = 1:size(replacementChars, 1)
-  seriesID = strrep(seriesID, replacementChars{iRep, 1}, replacementChars{iRep, 2});
-end
-
-% Handle input options
-if ischar(opts.startDate)
-  opts.startDate = datenum(opts.startDate);
-end
-if ischar(opts.endDate)
-  opts.endDate = datenum(opts.endDate);
-end
-
-%% Get data from Bloomberg
-% Create Connection
-persistent blpconnection
-if isempty(blpconnection)
-  javaaddpath('C:\blp\DAPI\blpapi3.jar');
-  try
-    blpconnection = blp;
-  catch
-    error('Unable to connect Bloomberg service.');
-  end
-end
-
-if ~isconnection(blpconnection)
-  % Try again to see if its a network error.
-  blpconnection = blp;
-  assert(isconnection(blpconnection), 'bloombergseries:noConnection', ...
-    'Unable to connect Bloomberg service.');
-end
+% Parse the inputs
+c = cbd.private.connectBloomberg(opts.dbID);
+s = parseSeriesID(seriesID);
+startDate = cbd.private.parseDates(opts.startDate, ...
+    'defaultDate', defaultStartDate, ...
+    'formatOut', 'datenum');
+endDate = cbd.private.parseDates(opts.endDate, ...
+    'defaultDate', defaultEndDate, ...
+    'formatOut', 'datenum');
+frequency = parseFrequency(opts.frequency, defaultFreq);
+field = parseField(opts.field, defaultField);
 
 % Get the data
-[fetch_data, security_info] = history(blpconnection, ...
-  seriesID, {opts.field}, opts.startDate, opts.endDate, opts.frequency);
-assert(isequal(security_info{1}, seriesID), 'Series not retrieved.');
-assert(isnumeric(fetch_data), 'Series not retreived');
+[fetch_data, security_info] = history( ...
+    c, s, {field}, startDate, endDate, frequency);
 
-%% Transform to Table
-varnames = strrep(seriesID, '/', '_');
+% Check the pull
+noPull = ...
+    ~isequal(security_info{1}, s) || ...
+    ~isnumeric(fetch_data) || ...
+    isempty(fetch_data);
+if noPull
+    id = 'bloombergseries:noPull';
+    msg = sprintf('Pull failed for "%s@%s" with field "%s"', ...
+        s, opts.dbID, field);
+    ME = MException(id, msg);
+    throw(ME);
+end % if-noPull
 
-startSeriesID = subsref(strsplit(varnames, ' '), ...
-  struct('type', '{}', 'subs', {{1}}));
-dataRaw = cbd.private.cbdTable(fetch_data(:,2), fetch_data(:,1), {upper(startSeriesID)});
+%% Format to cbd-style
+% Create the table
+dataCol = fetch_data(:,2);
+timeCol = fetch_data(:,1);
+seriesName = {upper(matlab.lang.makeValidName(seriesID))};
+dataRaw = cbd.private.cbdTable(dataCol, timeCol, seriesName);
 
+% Disaggregate the data
 warning off cbd:getFreq:oddDates
-data = cbd.disagg(dataRaw, shortFreq, 'NAN');
+data = cbd.disagg(dataRaw, frequency(1), 'NAN');
 warning on cbd:getFreq:oddDates
 
-dataProp = struct;
-dataProp.ID = [seriesID '@' opts.dbID];
-dataProp.dbInfo = 'BLOOMBERG';
-dataProp.value = [];
-dataProp.provider = 'bloomberg';
-dataProp.freq = shortFreq;
+% create the properties
+if nargout == 2
+    props = struct;
+    props.ID = [seriesID '@' opts.dbID];
+    props.dbInfo = 'BLOOMBERG';
+    props.value = [];
+    props.provider = 'bloomberg';
+    props.frequency = frequency;
+    props.field = field;
+end % if-nargin
+
+end % function-bloombergseries
+
+function seriesID = parseSeriesID(seriesID)
+%PARSESERIESID checks the validity of the seriesID and cleans for bloobmerg
+%
+% INPUTS:
+%   seriesID    ~ char, the name of the series being pull
+% OUPUTS:
+%   seriesID    ~ char, the cleaned version of the seriesID being pulled
+
+% Check for the yellow keys in SeriesID
+yellowKeys = {'GOVT', 'CORP', 'MTGE', 'M-MKT', 'Muni', ...
+    'PDF', 'EQUITY', 'COMDTY', 'INDEX', 'CURNCY', 'PORT'};
+hasYellowKey = contains(upper(seriesID), yellowKeys);
+
+if ~hasYellowKey
+    ykID = 'bloombergseries:noYellowKey';
+    ykMsg = 'No yellowKeys found in "%s" of bloombergseries';
+    warning(ykID, ykMsg, seriesID);
+end % if-nothasYellowKey
+
+% Add spaces to Bloomberg Series
+replacementChars = {'_', ' '; '|', '/'};
+for iRep = 1:size(replacementChars, 1)
+    seriesID = strrep(seriesID, ...
+        replacementChars{iRep, 1}, ...
+        replacementChars{iRep, 2});
+end
+
+end % function-parseSeriesID
+
+function freqOut = parseFrequency(freqIn, defaultFreq)
+%PARSEFREQUENCY parses the frequency input and returns cbd.disagg one
+%
+% INPUTS:
+%   frequency   ~ char, the input frequency
+%   defaultFreq ~ char, the default frequency if frequency is empty
+%
+% OUPUTS:
+%   frequency   ~ char, the output frequency expected by cbd.disagg
+
+if isempty(freqIn)
+    freqIn = defaultFreq;
+end % if isempty
+
+longFreqs = {'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY'};
+shortFreqs = {'D', 'W', 'M', 'Q', 'Y'};
+
+if length(freqIn) == 1
+    [~, loc] = ismember(freqIn, shortFreqs);
+else
+    [~, loc] = ismember(freqIn, longFreqs);
+end
+
+if isequal(loc, 0)
+    id = 'bloombergseries:invalidFrequency';
+    msg = sprintf('Invalid frequency "%s"', freqIn);
+    ME = MException(id, msg);
+    throw(ME);
+end % if-isempty
+
+freqOut = longFreqs{loc};
+
+end % function-parseFreq
+
+function bbfield = parseField(bbfield, defaultField)
+%PARSEFIELD parses the field input for bloomberg
+%
+% INPUTS:
+%   field           ~ char, the input field
+%   defaultField    ~ char, the default field if field is empty
+%
+% OUPUTS:
+%   field           ~ char, the output field
+
+if isempty(bbfield)
+    bbfield = defaultField;
+end
+
+end % function-parseField
+
+
+

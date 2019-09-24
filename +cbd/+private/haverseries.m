@@ -1,94 +1,71 @@
-function [data, dataProp] = haverseries(seriesID, opts)
-%HAVERSERIES Fetch single Haver series
+function [data, props] = haverseries(seriesID, opts)
+%HAVERSERIES Fetch single Haver series and returns it in a table
 %
-% Fetch a single series from Haver and return it in a table. StartDate and
-% EndDate must be in datenum format.
-
+% The function requires that the opts structure has all necessary fields
+% initialized (can be empty) except for dbID.
+%
+% INPUTS:
+%   seriesID        ~ char, the name of the series
+%   opts            ~ struct, the options structure with the fields:
+%       dbID        ~ char, the name of the Haver database
+%       startDate   ~ datestr/datenum, the first date for the pull
+%       endDate     ~ datestr/datenum, the cutoff date for the pull
+%
+% OUPTUTS:
+%   data            ~ table, the table of the series in cbd format
+%   props           ~ struct, the properties of the series
+%
 % David Kelley, 2015
+% Santiago I. Sordo-Palacios, 2019
 
-%% Check for illegal charactars
-if nargin < 2
-    opts.endDate = [];
-    opts.startDate = [];
-    opts.dbID = 'USECON';
-end
+%% Parse inputs
+cbd.private.assertSeries(seriesID, mfilename());
+reqFields = {'dbID', 'startDate', 'endDate'};
+cbd.private.assertOpts(opts, reqFields, mfilename());
+c = cbd.private.connectHaver(opts.dbID);
 
-illegalChar = '(\(|\),)';
-for testcase = {seriesID, opts.dbID}
-    regexOut = regexpi(testcase{1}, illegalChar);
-    assert(isempty(regexOut), 'haverseries:invalidInput', 'HaverSeries takes only clean inputs.');
-end
-
-assert(~isempty(seriesID), 'haverseries:nullSeries', 'Series input empty');
-assert(~any(seriesID=='@'), 'haverseries:invalidInput', '@ sign in input.');
-
-if ischar(opts.startDate)
-    opts.startDate = datenum(opts.startDate);
-end
-if ischar(opts.endDate)
-    opts.endDate = datenum(opts.endDate);
-end 
-
-%% Get data from Haver database
-% Create Connection
+%% Connect to Haver
+% Pull seriesInfo from database and check output
 try
-    lisc = true;
-    hav = haver(['R:\_appl\Haver\DATA\' opts.dbID '.dat']);
-catch ex
-    % Try again to see if its a network error.
-    pause(1)
-    try 
-      hav = haver(['R:\_appl\Haver\DATA\' opts.dbID '.dat']);
-    catch
-      % Database really doesn't exist
-      if strcmpi(ex.identifier, 'datafeed:haver')
-        lisc = false;
-      else
-%         display('If license error, fix HaverSeries.fetch function!');
-        rethrow(ex);
-      end
-    end
+    seriesInfo = info(c, seriesID);
+catch ME
+    id = 'haverseries:noPull';
+    msg = sprintf('Pull failed for %s@%s', seriesID, opts.dbID);
+    newME = MException(id, msg);
+    newME = addCause(newME, ME);
+    throw(newME);
 end
 
-if ~isconnection(hav)
-    error('haverseries:invalidDB', 'Invalid database name or network error.');
-end
+% Parse date inputs
+defaultStartDate = cbd.private.parseDates(seriesInfo.StartDate, ...
+    'formatOut', 'datenum');
+startDate = cbd.private.parseDates(opts.startDate, ...
+    'formatOut', 'dd-mmm-yyyy', ...
+    'defaultDate', defaultStartDate);
 
-% Get the series info and data
-if lisc
-    try
-        seriesInfo = info(hav, seriesID);
-    catch
-        error('haverseries:noPull', ['Cannot pull ' upper(seriesID) ' from the ' upper(opts.dbID) ' database.']);
-    end
-    if isempty(opts.startDate)
-        opts.startDate = datenum(seriesInfo.StartDate);
-    end
-    if isempty(opts.endDate)
-        opts.endDate = datenum(seriesInfo.EndDate);
-    end
-    
-    fetch_data = fetch(hav, seriesID, cbd.private.mdatestr(opts.startDate), cbd.private.mdatestr(opts.endDate));
-else
-  error('haverpull_stata depricated.');
-  % data = cbd.private.haverpull_stata(seriesID, startDate, endDate);
-  % Convert Stata dates to Matlab dates
-  % freq = cbd.getFreq(data(:,1));
-  % fetch_data(:,1) = cbd.endOfPer(data(:,1), freq);
-end
+defaultEndDate = cbd.private.parseDates(seriesInfo.EndDate, ...
+    'formatOut', 'datenum');
+endDate = cbd.private.parseDates(opts.endDate, ...
+    'formatOut', 'dd-mmm-yyyy', ...
+    'defaultDate', defaultEndDate);
 
-%% Transform to Table
-data = cbd.private.cbdTable(fetch_data(:,2), fetch_data(:,1), {upper(seriesID)});
- 
-% if ~isempty(fetch_data(:,2))
-%     data = array2table(fetch_data(:,2), 'VariableNames', {upper(seriesID)}, ...
-%         'RowNames', cellstr(cbd.private.mdatestr(fetch_data(:,1))));
-% else
-%     data = table([], 'VariableNames', {upper(seriesID)});
-% end
+% Fetch the data from Haver
+fetch_data = fetch(c, seriesID, startDate, endDate);
 
-dataProp = struct;
-dataProp.ID = [seriesID '@' opts.dbID];
-dataProp.dbInfo = seriesInfo;
-dataProp.value = [];
-dataProp.provider = 'haver';
+%% Format to cbd-style
+% Create the data table
+dataCol = fetch_data(:,2);
+timeCol = fetch_data(:,1);
+seriesName = {upper(seriesID)};
+data = cbd.private.cbdTable(dataCol, timeCol, seriesName);
+
+% create the properties
+if nargout == 2
+    props = struct;
+    props.ID = [seriesID '@' opts.dbID];
+    props.dbInfo = seriesInfo;
+    props.value = [];
+    props.provider = 'haver';
+end % if-nargout
+
+end % function-haverseries
