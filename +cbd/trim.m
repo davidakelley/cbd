@@ -1,4 +1,4 @@
-function inTable = trim(inTable, varargin)
+function outTable = trim(inTable, varargin)
 % TRIM Returns data between given a startDate or endDate
 %
 % trimmedData = TRIM(inTable, 'startDate', sDate) returns the data
@@ -9,10 +9,26 @@ function inTable = trim(inTable, varargin)
 %
 % trimmedData = TRIM(inTable, 'Inclusive', true, ...) returns the smallest
 % data range which includes the start and end dates passed.
+%
+% INPUTS 
+%     inTable  -> the table you want to trim 
+%     varargin -> 'startDate'
+%                 'endDate' 
+%                 'Inclusive' 
+% OUTPUTS
+%     outTable -> the trimmed table 
 
 % David Kelley, 2015
+% Stephen Lee, 2019
 
 %% Handle inputs
+outTable = table();
+if isempty(inTable)
+    message = 'Input table is empty. Nothing to trim'; 
+    warning('trim:emptyTable', message);
+    return;
+end
+
 firstDate = datenum(inTable.Properties.RowNames{1});
 lastDate = datenum(inTable.Properties.RowNames{end});
 
@@ -44,14 +60,25 @@ else
   eInd = find(dates >= opts.endDate, 1, 'first');
 end
 
-sInd(sInd > size(dates,1)) = size(dates,1);
-eInd(eInd < 1) = 1;
+% check for non-existant params i.e. eInd and sInd are empty
 eInd(isempty(eInd)) = size(dates,1);
 sInd(isempty(sInd)) = 1;
 
+% check if start date is after the lastDate 
+% or if the end date is before the firstDate
+if (sInd > size(dates,1)) || (eInd < 1)
+    message = 'startDate is after lastDate or endDate is before firstDate.'; 
+    warning('trim:startLastMismatch', message);
+    return;
+end
+
+if opts.startDate > opts.endDate
+    message = 'startDate is after endDate'; 
+    warning('trim:startLastMismatch', message);
+    return;
+end
+
 dates = cbd.private.tableDates(inTable);
-inTable = inTable(sInd:eInd,:);
-inTable.Properties.UserData = dates(sInd:eInd,:);
-
-
+outTable = inTable(sInd:eInd,:);
+outTable.Properties.UserData = dates(sInd:eInd,:);
 
