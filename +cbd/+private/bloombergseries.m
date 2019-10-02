@@ -23,18 +23,18 @@ function [data, props] = bloombergseries(seriesID, opts)
 %% Parse inputs
 % Check validity of inputs
 cbd.private.assertSeries(seriesID, mfilename());
-reqFields = {'dbID', 'startDate', 'endDate', 'frequency', 'field'};
+reqFields = {'dbID', 'startDate', 'endDate', 'frequency', 'bbfield'};
 cbd.private.assertOpts(opts, reqFields, mfilename());
 
 % Set defaults
 defaultStartDate = datenum('1/1/1900');
 defaultEndDate = floor(now);
 defaultFreq = 'D';
-defaultField = 'LAST_PRICE';
+defBbfield = 'LAST_PRICE';
 
 % Parse the inputs
 c = cbd.private.connectBloomberg(opts.dbID);
-s = parseSeriesID(seriesID);
+sec = parseSeriesID(seriesID);
 startDate = cbd.private.parseDates(opts.startDate, ...
     'defaultDate', defaultStartDate, ...
     'formatOut', 'datenum');
@@ -42,21 +42,21 @@ endDate = cbd.private.parseDates(opts.endDate, ...
     'defaultDate', defaultEndDate, ...
     'formatOut', 'datenum');
 frequency = parseFrequency(opts.frequency, defaultFreq);
-field = parseField(opts.field, defaultField);
+bbfield = parseBbfield(opts.bbfield, defBbfield);
 
 % Get the data
 [fetch_data, security_info] = history( ...
-    c, s, {field}, startDate, endDate, frequency);
+    c, sec, {bbfield}, startDate, endDate, frequency);
 
 % Check the pull
 noPull = ...
-    ~isequal(security_info{1}, s) || ...
+    ~isequal(security_info{1}, sec) || ...
     ~isnumeric(fetch_data) || ...
     isempty(fetch_data);
 if noPull
     id = 'bloombergseries:noPull';
-    msg = sprintf('Pull failed for "%s@%s" with field "%s"', ...
-        s, opts.dbID, field);
+    msg = sprintf('Pull failed for "%s@%s" with bbfield "%s"', ...
+        seriesID, opts.dbID, bbfield);
     ME = MException(id, msg);
     throw(ME);
 end % if-noPull
@@ -81,7 +81,7 @@ if nargout == 2
     props.value = [];
     props.provider = 'bloomberg';
     props.frequency = frequency;
-    props.field = field;
+    props.bbfield = bbfield;
 end % if-nargin
 
 end % function-bloombergseries
@@ -149,21 +149,21 @@ freqOut = longFreqs{loc};
 
 end % function-parseFreq
 
-function bbfield = parseField(bbfield, defaultField)
+function bbfield = parseBbfield(bbfield, defBbfield)
 %PARSEFIELD parses the field input for bloomberg
 %
 % INPUTS:
-%   field           ~ char, the input field
-%   defaultField    ~ char, the default field if field is empty
+%   bbfield         ~ char, the input field
+%   defBbfield      ~ char, the default field if field is empty
 %
 % OUPUTS:
-%   field           ~ char, the output field
+%   bbfield         ~ char, the output field
 
 if isempty(bbfield)
-    bbfield = defaultField;
+    bbfield = defBbfield;
 end
 
-end % function-parseField
+end % function-parseBbfield
 
 
 

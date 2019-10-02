@@ -20,8 +20,8 @@ classdef (Sealed) bloombergseries < sourceseries
         XinvalidFreq    = {'INVALID' ,'I'}; % Invalid frequencies
         XshortFreq      = {'D', 'W', 'M', 'Q', 'Y'}; % short frequencies
         XlongFreq       = {'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY'};
-        XexpectedField  = 'LAST_PRICE'; % The default field
-        XotherField     = 'PX_BID';  % Another field to Test pull
+        XepectedBbfield = 'LAST_PRICE'; % The default field
+        XotherBbfield   = 'PX_BID';  % Another field to Test pull
     end % properties-constant
     
     methods (TestClassSetup)
@@ -29,7 +29,7 @@ classdef (Sealed) bloombergseries < sourceseries
         function bloombergOpts(tc)
             %sets up the  test class setup for bloombergseries
             tc.opts.dbID = tc.dbID;
-            tc.opts.field = '';
+            tc.opts.bbfield = '';
             tc.opts.frequency = '';
         end % function
         
@@ -132,48 +132,48 @@ classdef (Sealed) bloombergseries < sourceseries
         end % function
         
         %------------------------------------------------------------------
-        % Tests for field
-        function missField(tc)
-            % Test pull with a missing field field
-            tc.opts = rmfield(tc.opts, 'field');
+        % Tests for bbfield
+        function missBbfield(tc)
+            % Test pull with a missing field bbfield
+            tc.opts = rmfield(tc.opts, 'bbfield');
             actualErr = @() tc.testfun(tc.seriesID, tc.opts);
-            expectedErr = 'bloombergseries:missfield';
+            expectedErr = 'bloombergseries:missbbfield';
             tc.verifyError(actualErr, expectedErr);
         end % function
         
-        function nullField(tc)
+        function nullBbfield(tc)
             % Test pull with a blank field
-            tc.opts.field = '';
+            tc.opts.bbfield = '';
             [data, prop] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyGreaterThan(size(data, 1), 100);
             tc.verifyEqual(size(data, 2), 1);
-            tc.verifyEqual(prop.field, tc.XexpectedField);
+            tc.verifyEqual(prop.bbfield, tc.XepectedBbfield);
         end % function
         
-        function invalidField(tc)
+        function invalidBbfield(tc)
             % Test pull with invalid field
-            tc.opts.field = 'INVALIDFIELD';
+            tc.opts.bbfield = 'INVALIDBBFIELD';
             actualErr = @() tc.testfun(tc.seriesID, tc.opts);
-            expectedErr = 'bloombergseries:noPull'; %note ~':invalidField'
+            expectedErr = 'bloombergseries:noPull'; %note ~':invalidBbfield'
             tc.verifyError(actualErr, expectedErr);
         end % function
         
-        function expectedField(tc)
-            % Test pull with the expected Field
-            tc.opts.field = tc.XexpectedField;
+        function expectedBbfield(tc)
+            % Test pull with the expected Bbfield
+            tc.opts.bbfield = tc.XepectedBbfield;
             [data, prop] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyGreaterThan(size(data, 1), 100);
             tc.verifyEqual(size(data, 2), 1);
-            tc.verifyEqual(prop.field, tc.XexpectedField);
+            tc.verifyEqual(prop.bbfield, tc.XepectedBbfield);
         end % function
         
-        function otherField(tc)
+        function otherBbfield(tc)
             % Test pull with different field
-            tc.opts.field = tc.XotherField;
+            tc.opts.bbfield = tc.XotherBbfield;
             [data, prop] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyGreaterThan(size(data, 1), 100);
             tc.verifyEqual(size(data, 2), 1);
-            tc.verifyEqual(prop.field, tc.XotherField);
+            tc.verifyEqual(prop.bbfield, tc.XotherBbfield);
         end % function
         
     end % methods-test

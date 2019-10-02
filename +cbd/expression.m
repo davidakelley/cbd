@@ -69,7 +69,7 @@ inP.addParameter('asOf', [], dateValid);
 inP.addParameter('asOfStart', [], dateValid);
 inP.addParameter('asOfEnd', [], dateValid);
 inP.addParameter('frequency', [], dateValid);
-inP.addParameter('field', [], dateValid);
+inP.addParameter('bbfield', [], dateValid);
 
 inP.parse(varargin{:});
 opts = inP.Results;
