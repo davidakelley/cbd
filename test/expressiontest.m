@@ -1,244 +1,506 @@
-%% Test suite for cbd.data function
-%
-% See also: execTests.m
-
-% David Kelley, 2015
-
 classdef expressiontest < matlab.unittest.TestCase
-  methods (Test)
-    %% Haver data
-    function testSeries(testCase)
-      % Pull one series
-      dataset = cbd.expression('GDPH');
-      testCase.verifyGreaterThan(size(dataset, 1), 100);
-      testCase.verifyEqual(size(dataset,2), 1);
-    end
+    %EXPRESSIONTEST is the test suite for cbd.expression and
+    %by extension of cbd.private.expression_eval
+    %
+    % USAGE
+    %   >> runtests('expressiontest')
+    %
+    % SEE ALSO: SOURCESERIES
+    %
+    % David Kelley, 2015
+    % Santiago Sordo-Palacios, 2019
     
-    function testTwoSeries(testCase)
-      % Pull two series
-      dataset = cbd.expression({'GDPH', 'CH'});
-      testCase.verifyEqual(size(dataset,2), 2);
-    end
+    properties
+        idA = 'GDPH'
+        dbA = 'USECON';
+        seriesA char
+        optsA = struct();
+        dataA table
+        funA = @(x,y) cbd.source.haverseries(x,y)
+        
+        idB = 'GDP';
+        dbB = 'FRED';
+        seriesB char
+        optsB = struct();
+        dataB table
+        funB = @(x,y) cbd.source.fredseries(x,y)
+        
+        startDate = '01-Jan-2000';
+        endDate = '31-Dec-2000';
+        typeErr = 'MATLAB:invalidType';
+        validationErr = 'MATLAB:InputParser:ArgumentFailedValidation';
+    end % properties
     
-    function testDatabase(testCase)
-      % Pull from database (explicitly)
-      dataset = cbd.expression('GDPH@USECON');
-      testCase.verifyGreaterThan(size(dataset, 1), 100);
-      
-      dataset = cbd.expression('FRBCNAIM', 'dbID', 'SURVEYS');
-      testCase.verifyGreaterThan(size(dataset, 1), 100);
-      
-      dataset = cbd.expression('FRBCNAIM@SURVEYS');
-      testCase.verifyGreaterThan(size(dataset, 1), 100);
-      
-      dataset = cbd.expression('GDPH0001@ASREPGDP');
-      testCase.verifyEqual(size(dataset, 1), 164);
-    end
+    methods (TestClassSetup)
+        
+        function baseOpts(tc)
+            % options for data series A
+            tc.seriesA = [tc.idA '@' tc.dbA];
+            tc.optsA.dbID = tc.dbA;
+            tc.optsA.startDate = [];
+            tc.optsA.endDate = [];
+            
+            % options for data series B
+            tc.seriesB = [tc.idB '@' tc.dbB];
+            tc.optsB.dbID = tc.dbB;
+            tc.optsB.startDate = [];
+            tc.optsB.endDate = [];
+            tc.optsB.asOf = [];
+            tc.optsB.asOfStart = [];
+            tc.optsB.asOfEnd = [];
+        end % function
+        
+        function offWarn(tc) %#ok<MANU>
+            warning('off', 'fredseries:useHaver');
+        end % function
+        
+        function getData(tc)
+            tc.dataA = tc.funA(tc.idA, tc.optsA);
+            tc.dataB = tc.funB(tc.idB, tc.optsB);
+        end % function
+        
+    end % methods
     
-    function testBadSeries(testCase)
-      % Bad data series
-      dataErr = @() cbd.expression('ASDFQWERTY');
-      testCase.verifyError(dataErr, 'haverseries:noPull');
-    end
+    methods (TestClassTeardown)
+        function onWarn(tc) %#ok<MANU>
+            warning('on', 'fredseries:useHaver');
+        end % function
+    end % methods
     
-    function testEmptySeries(testCase)
-      dataset = cbd.expression('JX0001@ASREPGDP', 'startDate', '01/01/2000');
-      testCase.verifyEmpty(dataset);
-    end
-    
-    %% FRED data
-    function testFredOneSeries(testCase)
-      % Pull one series
-      dataset = cbd.expression('INDPRO@FRED');
-      testCase.verifyGreaterThan(size(dataset, 1), 100);
-      testCase.verifyEqual(size(dataset,2), 1);
-    end
-    
-    function testFredMultiSeries(testCase)
-      % Pull multiple series
-      dataset = cbd.expression({'INDPRO', 'UNRATE'}, 'dbID', 'FRED');
-      testCase.verifyGreaterThan(size(dataset, 1), 100);
-      testCase.verifyEqual(size(dataset, 2), 2);
-    end
-    
-    function testHaverFred(testCase)
-      % Both Haver and FRED data
-      dataset = cbd.expression({'LR', 'UNRATE@FRED'});
-      testCase.verifyEqual(dataset.LR, dataset.UNRATE);
-    end
-    
-    function testFredBadSeries(testCase)
-      % Bad data series
-      dataErr = @() cbd.expression('ASDFQWERTY@FRED');
-      testCase.verifyError(dataErr, 'fredseries:fredError');
-    end
-    
-    function testDates(testCase)
-      % Haver
-      dataset = cbd.expression('GDPH', 'startDate', '01/01/2000');
-      dates = datenum(dataset.Properties.RowNames);
-      testCase.verifyGreaterThan(dates(1), datenum('12/31/1999'));
-      
-      dataset = cbd.expression('GDPH', 'endDate', '12/31/1999');
-      dates = datenum(dataset.Properties.RowNames);
-      testCase.verifyLessThan(dates(end), datenum('01/01/2000'));
-    end
-    
-    function testFredDates(testCase)
-      dataset = cbd.expression('UNRATE@FRED', 'startDate', '01/01/2000');
-      dates = datenum(dataset.Properties.RowNames);
-      testCase.verifyGreaterThan(dates(1), datenum('12/31/1999'));
-      
-      dataset = cbd.expression('UNRATE@FRED', 'endDate', '12/31/1999');
-      dates = datenum(dataset.Properties.RowNames);
-      testCase.verifyLessThan(dates(end), datenum('01/01/2000'));
-    end
-    
-    function testFredRealtime(testCase)
-      testset = cbd.expression('UNRATE@FRED');
-      
-      dataset = cbd.expression('UNRATE@FRED', 'asOf', '12/31/1999');
-      testCase.verifyNotEqual(size(dataset, 1), size(testset, 1));
-      
-      dataset = cbd.expression('UNRATE@FRED', 'asOfStart', '6/30/2014', 'asOfEnd', today());
-      testCase.verifyGreaterThan(size(dataset, 2), 1);
-      testCase.verifyEqual(dataset{:,end}, testset{:,end});
-    end
-    
-    function testBadTransformation(testCase)
-      dataErr = @() cbd.expression('notFn(GDPH)');
-      testCase.verifyError(dataErr, 'expression_eval:function');
-    end
-    
-    %% CHIDATA
-    
-    %% Statement parsing
-    function testOperator(testCase)
-      testset = cbd.expression('FRACW + FRBW');
-      dataset = cbd.addition(cbd.data('FRACW'), cbd.data('FRBW'));
-      testCase.verifyEqual(testset{end, 1}, dataset{end,1});
-    end
-    
-    function testGrouping(testCase)
-      testset = cbd.expression('(FRACW + FRBW) / 1000');
-      dataset = cbd.division(cbd.addition(cbd.data('FRACW'), cbd.data('FRBW')), 1000);
-      testCase.verifyEqual(testset{end, 1}, dataset{end,1});
-    end
-    
-    function testOption(testCase)
-      % Discontinued series come back as nan unless explicitly stated
-      testset = cbd.expression('FRSBTAW + FRACW');
-      testCase.verifyTrue(isnan(testset{end,1}));
-      
-      testset = cbd.expression('(FRSBTAW + FRACW)#ignoreNan');
-      testCase.verifyFalse(isnan(testset{end,1}));
-      
-      % Should only apply to argument its attached to, not later
-      testset = cbd.expression('FRSBTAW + FRACW#ignoreNan');
-      testCase.verifyTrue(isnan(testset{end,1}));
-      
-      % Both arguments should be taken into account
-      testset = cbd.expression('FFED@DAILY#startDate:"12/31/2014"#endDate:"12/31/2014"');
-      testCase.verifyEqual(size(testset), ones(1, 2));
-      
-      testset = cbd.expression('FFED@DAILY#startDate:"1/1/2015"#endDate:"1/1/2014"');
-      testCase.verifyEmpty(testset);
-    end
-    
-    function testOperator1(testCase)
-      testset = cbd.data('FRACW+FRBW');
-      fracw = cbd.data('FRACW');
-      dataset = cbd.expression('%d + FRBW', fracw);
-      testCase.verifyEqual(testset{end,1}, dataset{end,1});
-    end
-    
-    function testGrouping1(testCase)
-      testset = cbd.data('(FRACW+FRBW)/1000');
-      fracw = cbd.data('FRACW');
-      dataset = cbd.expression('(%d + FRBW)/1000', fracw);
-      testCase.verifyEqual(testset{end, 1}, dataset{end,1});
-    end
-    
-    function testFunction(testCase)
-      testset = cbd.data('DIFA%(GDPH)');
-      gdph = cbd.data('GDPH');
-      dataset = cbd.expression('DIFA%(%d)', gdph);
-      testCase.verifyEqual(testset{end, 1}, dataset{end,1});
-    end
-    
-    function testOperatorMulti(testCase)
-      testset = cbd.data('FRACW+FRBW');
-      fracw = cbd.data('FRACW');
-      frbw = cbd.data('FRBW');
-      dataset = cbd.expression('%d + %d', fracw, frbw);
-      testCase.verifyEqual(testset{end,1}, dataset{end,1});
-    end
-    
-    function testGroupingMulti(testCase)
-      testset = cbd.data('(FRACW+FRBW)/1000');
-      fracw = cbd.data('FRACW');
-      frbw = cbd.data('FRBW');
-      dataset = cbd.expression('(%d + %d)/1000', fracw, frbw);
-      testCase.verifyEqual(testset{end, 1}, dataset{end,1});
-    end
-    
-    function testFunctionMulti(testCase)
-      testset = cbd.data('DIFF%(AGG(IP,"Q","AVG"))');
-      ip = cbd.data('IP');
-      ipDiffQ = cbd.expression('DIFF%(AGG(%d,"Q","AVG"))', ip);
-      testCase.verifyEqual(testset{end, 1}, ipDiffQ{end,1});
-    end
-    
-    function testOrderOfOperations(testCase)
-      % Test that the order of operations is followed.
-      testset = cbd.data('C07 * C05 - C01');
-      testCase.verifyEqual(testset{end, 1}, 34);
-      
-      testset = cbd.data('C10 / C05 - C01');
-      testCase.verifyEqual(testset{end, 1}, 1);
-      
-      testset = cbd.data('C02 + C10 / C05 - C01');
-      testCase.verifyEqual(testset{end, 1}, 3);
-      
-      testset = cbd.data('C02 + C10 / (C05 - C01)');
-      testCase.verifyEqual(testset{end, 1}, 4.5);
-    end
-    
-    function testMultiExpression(testCase)
-      % Test that multiple additions are worked out
-      t1 = cbd.data('C1');
-      testset = cbd.expression('%d + %d + %d', t1, t1, t1);
-      testCase.verifyEqual(testset{end, 1}, 3);
-    end
-    
-    function testNegativeFirst(testCase)
-      % Make sure something like cbd.data('-LR') can be understood
-      negLR = cbd.data('-LR');
-      posLR = cbd.data('LR');
-      
-      negPosLR = cbd.expression('-%d', posLR);
-      negPosLR.Properties.VariableNames = negLR.Properties.VariableNames;
-      testCase.verifyEqual(negLR, negPosLR);
-    end
-    
-    function testMultiArgFunc(testCase)
-      % Make sure we can handle expressions where there's multiple arguments
-      % passed to one function (this was a problem initially).
-      fisherTogether = cbd.data('FISHERPRICE(JFNS, FNS, JFR, FR)');
-      dataSeparate = cellfun(@(x) cbd.data(x), {'JFNS', 'FNS', 'JFR', 'FR'}, 'Uniform', false);
-      fisherSeparate = cbd.expression('FISHERPRICE(%d, %d, %d, %d)', dataSeparate{:});
-      
-      testCase.verifyEqual(fisherTogether, fisherSeparate);
-    end    
-    
-    function testMultiArgFuncMixed(testCase)
-      % Make sure we can handle expressions where there's mixed tables and data
-      % pulls in one function.
-      fisherTogether = cbd.data('FISHERPRICE(JFNS, FNS, JFR, FR)');
-      dataSeparate = cellfun(@(x) cbd.data(x), {'JFNS', 'JFR'}, 'Uniform', false);
-      fisherSeparate = cbd.expression('FISHERPRICE(%d, FNS, %d, FR)', dataSeparate{:});
-      
-      testCase.verifyEqual(fisherTogether, fisherSeparate);
-    end 
-  end
-end
+    methods (Test)
+        %% Test expression errors
+        function badSeriesInput(tc)
+            actualErr = @() cbd.expression("");
+            tc.verifyError(actualErr, tc.typeErr);
+        end % function
+        
+        function badDBInput(tc)
+            actualErr = @() cbd.expression(tc.seriesA, 'dbId', "");
+            tc.verifyError(actualErr, tc.validationErr);
+        end % function
+        
+        function badStartDateInput(tc)
+            actualErr = @() cbd.expression(tc.seriesA, 'startDate', "");
+            tc.verifyError(actualErr, tc.typeErr);
+        end % function
+        
+        function badEndDateInput(tc)
+            actualErr = @() cbd.expression(tc.seriesA, 'endDate', "");
+            tc.verifyError(actualErr, tc.typeErr);
+        end % function
+        
+        function badIgnoreNanInput(tc)
+            actualErr = @() cbd.expression(tc.seriesA, 'ignoreNan', "");
+            tc.verifyError(actualErr, tc.validationErr);
+        end % function
+        
+        function badAsOf(tc)
+            actualErr = @() cbd.expression(tc.seriesA, 'asOf', "");
+            tc.verifyError(actualErr, tc.typeErr);
+        end % function
+        
+        function badAsOfStart(tc)
+            actualErr = @() cbd.expression(tc.seriesA, 'asOfStart', "");
+            tc.verifyError(actualErr, tc.typeErr);
+        end % function
+        
+        function badAsOfEnd(tc)
+            actualErr = @() cbd.expression(tc.seriesA, 'asOfEnd', "");
+            tc.verifyError(actualErr, tc.typeErr);
+        end % function
+        
+        function badFrequency(tc)
+            actualErr = @() cbd.expression(tc.seriesA, 'frequency', "");
+            tc.verifyError(actualErr, tc.typeErr);
+        end % function
+        
+        function badBbfield(tc)
+            actualErr = @() cbd.expression(tc.seriesA, 'bbfield', "");
+            tc.verifyError(actualErr, tc.typeErr);
+        end % function
+        
+        %% Test expression_eval errors
+        function specTooManyD(tc)
+            expectedErr = 'expression_eval:spec';
+            testStr = '%d%d';
+            actualErr = @() cbd.expression(testStr, tc.dataA);
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        function specTooFewD(tc)
+            expectedErr = 'expression_eval:spec';
+            testStr = '%d';
+            actualErr = @() ...
+                cbd.expression(testStr, tc.dataA, tc.dataB);
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        function extraParenStart(tc)
+            expectedErr = 'expression_eval:parens';
+            testStr = ['(' tc.seriesA];
+            actualErr = @() cbd.expression(testStr);
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        function extraParenEnd(tc)
+            expectedErr = 'expression_eval:parens';
+            testStr = [tc.seriesA ')'];
+            actualErr = @() cbd.expression(testStr);
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        function badFunction(tc)
+            expectedErr = 'expression_eval:function';
+            testStr = ['BADFUN(' tc.seriesA ')'];
+            actualErr = @() cbd.expression(testStr);
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        function mismatchedStringStart(tc)
+            expectedErr = 'expression_eval:mismatchedString';
+            testStr = ['"' tc.seriesA];
+            actualErr = @() cbd.expression(testStr);
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        function mismatchedStringEnd(tc)
+            expectedErr = 'expression_eval:mismatchedString';
+            testStr = [tc.seriesA '"'];
+            actualErr = @() cbd.expression(testStr);
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        function stringInput(tc)
+            % TODO: there is nothing testing the
+            % expression_eval:stringInput
+        end % function
+        
+        function invalidInput(tc)
+            % TODO: this brings up an interesting point with blank inputs
+            expectedErr = 'expression_eval:invalidInput';
+            testCell = {'@@', 'X@X@X'};
+            for iStr = 1:length(testCell)
+                actualErr = @() cbd.expression(testCell{iStr});
+                tc.verifyError(actualErr, expectedErr);
+            end % for-iStr
+        end % function
+        
+        %% Test sourceseries errors
+        % Note: these tests are equivalent to those in haverseries
+        function nullSeries(tc)
+            % Bad data series
+            expectedErr = 'haverseries:nullSeries';
+            actualErr = @() cbd.expression(' ');
+            tc.verifyError(actualErr, expectedErr);
+        end
+        
+        function noPull(tc)
+            % Bad data series
+            expectedErr = 'haverseries:noPull';
+            actualErr = @() cbd.expression('VALIDBUTBADSERIES');
+            tc.verifyError(actualErr, expectedErr);
+        end
+        
+        function invalidDB(tc)
+            % Invalid database
+            expectedErr = 'haverseries:invaliddbID';
+            actualErr = @() cbd.expression('VALID@INVALIDDBID');
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        %% Test basic usage
+        function oneTable(tc)
+            expected = tc.dataA;
+            testStr = '%d';
+            actual = cbd.expression(testStr, tc.dataA);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function oneHaver(tc)
+            % Pull one series from Haver
+            expected = tc.dataA;
+            actual = cbd.expression(tc.seriesA);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function oneFRED(tc)
+            % Pull one series from FRED
+            expected = tc.dataB;
+            actual = cbd.expression(tc.seriesB);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function multTables(tc)
+            expected = cbd.merge(tc.dataA, tc.dataB);
+            testStr = 'MERGE(%d, %d)';
+            actual = cbd.expression(testStr, ...
+                tc.dataA, tc.dataB);
+            tc.verifyEqual(actual, expected);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function multPulls(tc)
+            % Pull two series and merge them
+            expected = cbd.merge(tc.dataA, tc.dataB);
+            actual = cbd.expression({tc.seriesA, tc.seriesB});
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function multMixed(tc)
+            expected = cbd.merge(tc.dataA, tc.dataB);
+            testStr = ['MERGE(%d,' tc.seriesB ')'];
+            actual = cbd.expression(testStr, tc.dataA);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        %% Test basic operations
+        function addition(tc)
+            expected = cbd.addition(tc.dataA, tc.dataB);
+            testStr = [tc.seriesA '+' tc.seriesB];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function subtraction(tc)
+            expected = cbd.subtraction(tc.dataA, tc.dataB);
+            testStr = [tc.seriesA '-' tc.seriesB];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function multiplication(tc)
+            expected = cbd.multiplication(tc.dataA, tc.dataB);
+            testStr = [tc.seriesA '*' tc.seriesB];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function negative(tc)
+            expected = cbd.multiplication(-1, tc.dataA);
+            testStr = ['-' tc.seriesA];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function division(tc)
+            expected = cbd.division(tc.dataA, tc.dataB);
+            testStr = [tc.seriesA '/' tc.seriesB];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function parens(tc)
+            expected = tc.dataA;
+            testStr = ['(' tc.seriesA ')'];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        %% Test order of operations
+        function operationsA(tc)
+            expected = 34;
+            testStr = 'C07 * C05 - C01';
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual{end, 1}, expected);
+        end % function
+        
+        function operationsB(tc)
+            expected = 1;
+            testStr = 'C10 / C05 - C01';
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual{end, 1}, expected);
+        end % function
+        
+        function operationsC(tc)
+            expected = 3;
+            testStr = 'C02 + C10 / C05 - C01';
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual{end, 1}, expected);
+        end % function
+        
+        function operationsD(tc)
+            expected = 4.5;
+            testStr = 'C02 + C10 / (C05 - C01)';
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual{end, 1}, expected);
+        end % function
+        
+        %% Test order with varied inputs
+        function orderTables(tc)
+            expected = cbd.division( ...
+                cbd.addition(tc.dataA, tc.dataB), 1000);
+            testStr = '(%d+%d)/1000';
+            actual = cbd.expression(testStr, tc.dataA, tc.dataB);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function orderPulls(tc)
+            expected = cbd.division( ...
+                cbd.addition(tc.dataA, tc.dataB), 1000);
+            testStr = ['(' tc.seriesA '+' tc.seriesB ')/1000'];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function orderMixed(tc)
+            expected = cbd.division( ...
+                cbd.addition(tc.dataA, tc.dataB), 1000);
+            testStr = ['(%d+' tc.seriesB ')/1000'];
+            actual = cbd.expression(testStr, tc.dataA);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        %% Test function calls
+        function changePct(tc)
+            expected = cbd.changePct(tc.dataA);
+            testStr = ['changePct(' tc.seriesA ')'];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function changePctSign(tc)
+            expected = cbd.changePct(tc.dataA);
+            testStr = ['change%(' tc.seriesA ')'];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function changepct(tc)
+            expected = cbd.changePct(tc.dataA);
+            testStr = ['changepct(' tc.seriesA ')'];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function changePCT(tc)
+            expected = cbd.changePct(tc.dataA);
+            testStr = ['changePCT(' tc.seriesA ')'];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        %% Specified dbID
+        function vararginDB(tc)
+            % Pull multiple series
+            expected = tc.dataB;
+            actual = cbd.expression(tc.idB, 'dbID', 'FRED');
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function hashDB(tc)
+            expected = tc.dataB;
+            testStr = [tc.idB '#dbID:"' tc.dbB '"'];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        %% Specified dates
+        function vararginStartDate(tc)
+            tc.optsA.startDate = tc.startDate;
+            expected = tc.funA(tc.idA, tc.optsA);
+            actual = cbd.expression(tc.seriesA, 'startDate', tc.startDate);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function hashStartDate(tc)
+            tc.optsA.startDate = tc.startDate;
+            expected = tc.funA(tc.idA, tc.optsA);
+            testStr = [tc.seriesA '#startDate:"' tc.startDate '"'];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function vararginEndDate(tc)
+            tc.optsA.endDate = tc.endDate;
+            expected = tc.funA(tc.idA, tc.optsA);
+            actual = cbd.expression(tc.seriesA, 'endDate', tc.endDate);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function hashEndDate(tc)
+            tc.optsA.endDate = tc.endDate;
+            expected = tc.funA(tc.idA, tc.optsA);
+            testStr = [tc.seriesA '#endDate:"' tc.endDate '"'];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function vararginBothDates(tc)
+            tc.optsA.startDate = tc.startDate;
+            tc.optsA.endDate = tc.endDate;
+            expected = tc.funA(tc.idA, tc.optsA);
+            actual = cbd.expression(tc.seriesA, ...
+                'startDate', tc.startDate, ...
+                'endDate', tc.endDate);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        function hashBothDates(tc)
+            tc.optsA.startDate = tc.startDate;
+            tc.optsA.endDate = tc.endDate;
+            expected = tc.funA(tc.idA, tc.optsA);
+            testStr = [tc.seriesA ...
+                '#startDate:"' tc.startDate '"' ...
+                '#endDate:"' tc.endDate '"'];
+            actual = cbd.expression(testStr);
+            tc.verifyEqual(actual, expected);
+        end % function
+        
+        %% Special edge case tests in legacy format
+        % Discontinued series come back as nan unless explicitly stated
+        function noOption(tc)
+            testset = cbd.expression('FRSBTAW + FRACW');
+            tc.verifyTrue(isnan(testset{end,1}));
+        end % function
+        
+        function groupedOption(tc)
+            testset = cbd.expression('(FRSBTAW + FRACW)#ignoreNan');
+            tc.verifyFalse(isnan(testset{end,1}));
+        end % function
+       
+        function singleOption(tc)
+            % Should only apply to argument its attached to, not later
+            testset = cbd.expression('FRSBTAW + FRACW#ignoreNan');
+            tc.verifyTrue(isnan(testset{end,1}));
+        end % function
+        
+        function functionMult(tc)
+            testset = cbd.expression('DIFF%(AGG(IP,"Q","AVG"))');
+            ip = cbd.expression('IP');
+            ipDiffQ = cbd.expression('DIFF%(AGG(%d,"Q","AVG"))', ip);
+            tc.verifyEqual(testset{end, 1}, ipDiffQ{end,1});
+        end % function
+        
+        function expressionMult(tc)
+            % Test that multiple additions are worked out
+            t1 = cbd.expression('C1');
+            testset = cbd.expression('%d + %d + %d', t1, t1, t1);
+            tc.verifyEqual(testset{end, 1}, 3);
+        end % function
+        
+        function argFuncMult(tc)
+            % Make sure we can handle expressions where there's multiple
+            % arguments passed to one function.
+            fisherTogether = cbd.expression( ...
+                'FISHERPRICE(JFNS, FNS, JFR, FR)');
+            dataSeparate = cellfun(@(x) cbd.expression(x), ...
+                {'JFNS', 'FNS', 'JFR', 'FR'}, 'Uniform', false);
+            fisherSeparate = cbd.expression( ...
+                'FISHERPRICE(%d, %d, %d, %d)', dataSeparate{:});
+            tc.verifyEqual(fisherTogether, fisherSeparate);
+        end % function
+        
+        function ArgFuncMultMixed(tc)
+            % Make sure we can handle expressions where there's mixed
+            % tables and data pulls in one function.
+            fisherTogether = cbd.expression( ...
+                'FISHERPRICE(JFNS, FNS, JFR, FR)');
+            dataSeparate = cellfun(@(x) cbd.expression(x), ...
+                {'JFNS', 'JFR'}, 'Uniform', false);
+            fisherSeparate = cbd.expression( ...
+                'FISHERPRICE(%d, FNS, %d, FR)', dataSeparate{:});
+            tc.verifyEqual(fisherTogether, fisherSeparate);
+        end % function
+        
+    end % methods
+end % classdef
