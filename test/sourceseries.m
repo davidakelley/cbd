@@ -31,6 +31,7 @@ classdef sourceseries < matlab.unittest.TestCase
         startDate       = '01/01/2000'; % the tested startDate
         endDate         = '12/31/2000'; % the tested endDate
         ceilingDate     = '01/01/2001'; % the ceiling for endDate
+        inputFmt        = 'MM/dd/yyyy'; % the input datestr format
         relativeTol     = 0.05;         % the relative tolerance for speed
     end % properties
     
@@ -166,6 +167,15 @@ classdef sourceseries < matlab.unittest.TestCase
             tc.verifyGreaterThan(dateNums(1), datenum(tc.floorDate));
         end % function
         
+        function datetimeStartDate(tc)
+            % Test pull with datenum startDate
+            tc.opts.startDate = datetime(tc.startDate, ...
+                'InputFormat', tc.inputFmt);
+            data = tc.testfun(tc.seriesID, tc.opts);
+            dateNums = datenum(data.Properties.RowNames);
+            tc.verifyGreaterThan(dateNums(1), datenum(tc.floorDate));
+        end % function
+        
         %------------------------------------------------------------------
         % Test for endDate
         
@@ -204,6 +214,15 @@ classdef sourceseries < matlab.unittest.TestCase
         function datenumEndDate(tc)
             % Test pull with datenum startDate
             tc.opts.endDate = datenum(tc.endDate);
+            data = tc.testfun(tc.seriesID, tc.opts);
+            dateNums = datenum(data.Properties.RowNames);
+            tc.verifyLessThan(dateNums(1), datenum(tc.ceilingDate));
+        end % function
+        
+        function datetimeEndtDate(tc)
+            % Test pull with datenum startDate
+            tc.opts.endDate = datetime(tc.endDate, ...
+                'InputFormat', tc.inputFmt);
             data = tc.testfun(tc.seriesID, tc.opts);
             dateNums = datenum(data.Properties.RowNames);
             tc.verifyLessThan(dateNums(1), datenum(tc.ceilingDate));

@@ -60,7 +60,7 @@ end
 % Input parser
 inP = inputParser;
 inP.addParameter('dbID', 'USECON', @ischar);
-dateValid = @(x) validateattributes(x, {'numeric', 'char'}, {'vector'});
+dateValid = @(x) validateattributes(x, {'numeric', 'char', 'datetime'}, {'vector'});
 inP.addParameter('startDate', [], dateValid);
 inP.addParameter('endDate', [], dateValid);
 % inP.addParameter('aggFreq', [], @ischar);
