@@ -14,6 +14,7 @@ classdef (Sealed) fredseries < sourceseries
         seriesID    = 'UNRATE';
         dbID        = 'FRED';
         testfun     = @(x,y) cbd.private.fredseries(x,y);
+        benchmark   = 0.50646; %v1.2.0
     end % properties
     
     properties (Constant)

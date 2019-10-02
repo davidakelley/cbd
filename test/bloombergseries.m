@@ -10,7 +10,8 @@ classdef (Sealed) bloombergseries < sourceseries
         source      = 'bloombergseries';
         seriesID    = 'C_US_EQUITY';
         dbID        = 'BLOOMBERG';
-        testfun      = @(x, y) cbd.private.bloombergseries(x, y);
+        testfun     = @(x, y) cbd.private.bloombergseries(x, y);
+        benchmark   = 7.5766; %v1.2.0
     end % properties
     
     properties (Constant)

@@ -20,6 +20,7 @@ classdef sourceseries < matlab.unittest.TestCase
         seriesID    char                % the main series tested
         dbID        char                % the main database tested
         testfun     function_handle     % the private function to test
+        benchmark   double              % the benchmark time for speed
     end % properties
     
     properties (Constant)
@@ -30,6 +31,7 @@ classdef sourceseries < matlab.unittest.TestCase
         startDate       = '01/01/2000'; % the tested startDate
         endDate         = '12/31/2000'; % the tested endDate
         ceilingDate     = '01/01/2001'; % the ceiling for endDate
+        relativeTol     = 0.05;         % the relative tolerance for speed
     end % properties
     
     properties
@@ -246,6 +248,18 @@ classdef sourceseries < matlab.unittest.TestCase
             [~, props] = tc.testfun(tc.seriesID, tc.opts);
             expectedProv = erase(tc.source, 'series');
             tc.verifyEqual(props.provider, expectedProv);
+        end % function
+        
+        %------------------------------------------------------------------
+        function speedTest(tc)
+            % Check that changes to cbd have not impacted performance
+            import matlab.unittest.constraints.IsEqualTo
+            import matlab.unittest.constraints.RelativeTolerance
+            speedFun = @() tc.testfun(tc.seriesID, tc.opts);
+            thisTime = timeit(speedFun);
+            tc.verifyThat(thisTime, ...
+                IsEqualTo(tc.benchmark, ...
+                'Within', RelativeTolerance(tc.relativeTol)))
         end % function
         
     end % methods-test

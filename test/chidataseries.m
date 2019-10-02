@@ -4,9 +4,6 @@ classdef chidataseries < sourceseries
     % USAGE
     %   >> runtests('chidataseries')
     %
-    % METHODS
-    %   sourceseries  ~ parent, see sourceseries for parent's methods
-    %
     % Santiago I. Sordo Palacios, 2019
     
     properties
@@ -15,6 +12,7 @@ classdef chidataseries < sourceseries
         seriesID    = 'SERIES'
         dbID        = 'CHIDATA';
         testfun     = @(x,y) cbd.private.chidataseries(x,y);
+        benchmark   = 0.24087; %v1.2.0
     end % properties
     
     properties (Constant)
@@ -127,10 +125,9 @@ classdef chidataseries < sourceseries
         function fileModProp(tc)
             [~, props] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyTrue(isfield(props.dbInfo, 'FileMod'));
-        end % function
-        
+        end % function        
     end % methods
-    
+
 end % classdef
 
 

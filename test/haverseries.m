@@ -14,6 +14,7 @@ classdef (Sealed) haverseries < sourceseries
         seriesID    = 'GDPH';
         dbID        = 'USECON';
         testfun     = @(x,y) cbd.private.haverseries(x,y);
+        benchmark   = 0.31258; %v1.2.0
     end % properties
     
     properties (Constant)
