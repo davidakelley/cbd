@@ -31,14 +31,14 @@ indexName = 'index.csv';
 dataExt = '_data.csv';
 
 %% Parse inputs
-cbd.private.assertSeries(seriesID, mfilename());
+cbd.source.assertSeries(seriesID, mfilename());
 reqFields = {'dbID', 'startDate', 'endDate'};
-cbd.private.assertOpts(opts, reqFields, mfilename());
+cbd.source.assertOpts(opts, reqFields, mfilename());
 % TODO: better handling of the following:
 assert(isequal(opts.dbID, 'CHIDATA'), 'chidataseries:invaliddbID', ... 
     'dbID "%s" in chidataseries is not CHIDATA', opts.dbID);
-startDate = cbd.private.parseDates(opts.startDate);
-endDate = cbd.private.parseDates(opts.endDate);
+startDate = cbd.source.parseDates(opts.startDate);
+endDate = cbd.source.parseDates(opts.endDate);
 
 %% Get file name, read the data
 sectionName = getChidataFilename(seriesID, chidataDir, indexName);
@@ -57,7 +57,7 @@ end % if-elseif
 
 %% Get properties
 if nargout == 2
-    allProps = cbd.private.loadChidataProp(sectionName);
+    allProps = cbd.source.loadChidataProp(sectionName);
     seriesIndex = strcmpi(seriesID, {allProps.Name});
     props = struct;
     props.ID = [seriesID '@' opts.dbID];

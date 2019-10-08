@@ -1,4 +1,4 @@
-classdef sourceseries < matlab.unittest.TestCase
+classdef (Abstract) sourceseries < matlab.unittest.TestCase
     %SOURCESERIES is the parent class for the cbd.private.(source) tests
     %
     % DESCRIPTION

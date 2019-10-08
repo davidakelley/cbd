@@ -19,10 +19,10 @@ function [data, props] = haverseries(seriesID, opts)
 % Santiago I. Sordo-Palacios, 2019
 
 %% Parse inputs
-cbd.private.assertSeries(seriesID, mfilename());
+cbd.source.assertSeries(seriesID, mfilename());
 reqFields = {'dbID', 'startDate', 'endDate'};
-cbd.private.assertOpts(opts, reqFields, mfilename());
-c = cbd.private.connectHaver(opts.dbID);
+cbd.source.assertOpts(opts, reqFields, mfilename());
+c = cbd.source.connectHaver(opts.dbID);
 
 %% Connect to Haver
 % Pull seriesInfo from database and check output
@@ -37,15 +37,15 @@ catch ME
 end
 
 % Parse date inputs
-defaultStartDate = cbd.private.parseDates(seriesInfo.StartDate, ...
+defaultStartDate = cbd.source.parseDates(seriesInfo.StartDate, ...
     'formatOut', 'datenum');
-startDate = cbd.private.parseDates(opts.startDate, ...
+startDate = cbd.source.parseDates(opts.startDate, ...
     'formatOut', 'dd-mmm-yyyy', ...
     'defaultDate', defaultStartDate);
 
-defaultEndDate = cbd.private.parseDates(seriesInfo.EndDate, ...
+defaultEndDate = cbd.source.parseDates(seriesInfo.EndDate, ...
     'formatOut', 'datenum');
-endDate = cbd.private.parseDates(opts.endDate, ...
+endDate = cbd.source.parseDates(opts.endDate, ...
     'formatOut', 'dd-mmm-yyyy', ...
     'defaultDate', defaultEndDate);
 

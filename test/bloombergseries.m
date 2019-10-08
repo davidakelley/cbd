@@ -1,5 +1,5 @@
 classdef (Sealed) bloombergseries < sourceseries
-    %BLOOMBERGSERIES is the test suite for cbd.private.bloombergseries()
+    %BLOOMBERGSERIES is the test suite for cbd.source.bloombergseries()
     %
     % USAGE
     %   >> runtests('bloombergseries')
@@ -10,7 +10,7 @@ classdef (Sealed) bloombergseries < sourceseries
         source      = 'bloombergseries';
         seriesID    = 'C_US_EQUITY';
         dbID        = 'BLOOMBERG';
-        testfun     = @(x, y) cbd.private.bloombergseries(x, y);
+        testfun     = @(x, y) cbd.source.bloombergseries(x, y);
         benchmark   = 7.5766; %v1.2.0
     end % properties
     

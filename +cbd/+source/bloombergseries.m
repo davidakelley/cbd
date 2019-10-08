@@ -22,9 +22,9 @@ function [data, props] = bloombergseries(seriesID, opts)
 
 %% Parse inputs
 % Check validity of inputs
-cbd.private.assertSeries(seriesID, mfilename());
+cbd.source.assertSeries(seriesID, mfilename());
 reqFields = {'dbID', 'startDate', 'endDate', 'frequency', 'bbfield'};
-cbd.private.assertOpts(opts, reqFields, mfilename());
+cbd.source.assertOpts(opts, reqFields, mfilename());
 
 % Set defaults
 defaultStartDate = datenum('1/1/1900');
@@ -33,12 +33,12 @@ defaultFreq = 'D';
 defBbfield = 'LAST_PRICE';
 
 % Parse the inputs
-c = cbd.private.connectBloomberg(opts.dbID);
+c = cbd.source.connectBloomberg(opts.dbID);
 sec = parseSeriesID(seriesID);
-startDate = cbd.private.parseDates(opts.startDate, ...
+startDate = cbd.source.parseDates(opts.startDate, ...
     'defaultDate', defaultStartDate, ...
     'formatOut', 'datenum');
-endDate = cbd.private.parseDates(opts.endDate, ...
+endDate = cbd.source.parseDates(opts.endDate, ...
     'defaultDate', defaultEndDate, ...
     'formatOut', 'datenum');
 frequency = parseFrequency(opts.frequency, defaultFreq);

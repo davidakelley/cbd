@@ -11,7 +11,7 @@ classdef chidataseries < sourceseries
         source      = 'chidataseries';
         seriesID    = 'SERIES'
         dbID        = 'CHIDATA';
-        testfun     = @(x,y) cbd.private.chidataseries(x,y);
+        testfun     = @(x,y) cbd.source.chidataseries(x,y);
         benchmark   = 0.24087; %v1.2.0
     end % properties
     

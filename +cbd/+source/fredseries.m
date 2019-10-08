@@ -36,17 +36,17 @@ function [data, dataProp] = fredseries(seriesID, opts)
 % Santiago I. Sordo-Palacios, 2019
 
 %% Parse inputs
-cbd.private.assertSeries(seriesID, mfilename());
+cbd.source.assertSeries(seriesID, mfilename());
 reqFields = {'dbID', 'startDate', 'endDate', ...
     'asOf', 'asOfStart', 'asOfEnd'};
-cbd.private.assertOpts(opts, reqFields, mfilename());
-[apiKey, fredURL] = cbd.private.connectFRED(opts.dbID);
+cbd.source.assertOpts(opts, reqFields, mfilename());
+[apiKey, fredURL] = cbd.source.connectFRED(opts.dbID);
 
 % Parse date inputs
 formatOut = 'YYYY-mm-DD';
-startDate = cbd.private.parseDates(opts.startDate, ...
+startDate = cbd.source.parseDates(opts.startDate, ...
     'formatOut', formatOut);
-endDate = cbd.private.parseDates(opts.endDate, ...
+endDate = cbd.source.parseDates(opts.endDate, ...
     'formatOut', formatOut);
 [asOfStart, asOfEnd] = parseAsOf( ...
     opts.asOf, opts.asOfStart, opts.asOfEnd, formatOut);
@@ -74,10 +74,10 @@ if ~isempty(endDate)
     requestURL = [requestURL '&observation_end=' endDate];
 end
 
-urlResponse = cbd.private.urlread2(requestURL);
+urlResponse = cbd.source.urlread2(requestURL);
 
 %% Parse data
-structResp = cbd.private.parse_json(urlResponse);
+structResp = cbd.source.parse_json(urlResponse);
 
 noPull = isfield(structResp, 'error_message');
 if noPull
@@ -175,7 +175,7 @@ if nargout == 2
     end
     
     urlResponse = urlread(requestURL);
-    fredProp = cbd.private.parse_json(urlResponse);
+    fredProp = cbd.source.parse_json(urlResponse);
     
     dataProp = struct;
     dataProp.ID = [seriesID '@FRED'];
@@ -213,7 +213,7 @@ elseif isempty(asOfEnd)
 end
 
 % datestr into FRED format
-asOfStart = cbd.private.parseDates(asOfStart, 'formatOut', formatOut);
-asOfEnd = cbd.private.parseDates(asOfEnd, 'formatOut', formatOut);
+asOfStart = cbd.source.parseDates(asOfStart, 'formatOut', formatOut);
+asOfEnd = cbd.source.parseDates(asOfEnd, 'formatOut', formatOut);
 
 end % function-parseAsOf

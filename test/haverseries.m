@@ -13,7 +13,7 @@ classdef (Sealed) haverseries < sourceseries
         source      = 'haverseries';
         seriesID    = 'GDPH';
         dbID        = 'USECON';
-        testfun     = @(x,y) cbd.private.haverseries(x,y);
+        testfun     = @(x,y) cbd.source.haverseries(x,y);
         benchmark   = 0.31258; %v1.2.0
     end % properties
     

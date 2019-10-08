@@ -1,5 +1,5 @@
 classdef (Sealed) fredseries < sourceseries
-    %FREDSERIES is the test suite for cbd.private.fredseries()
+    %FREDSERIES is the test suite for cbd.source.fredseries()
     %
     % USAGE
     %   >> runtests('fredseries')
@@ -13,7 +13,7 @@ classdef (Sealed) fredseries < sourceseries
         source      = 'fredseries';
         seriesID    = 'UNRATE';
         dbID        = 'FRED';
-        testfun     = @(x,y) cbd.private.fredseries(x,y);
+        testfun     = @(x,y) cbd.source.fredseries(x,y);
         benchmark   = 0.50646; %v1.2.0
     end % properties
     
@@ -39,7 +39,7 @@ classdef (Sealed) fredseries < sourceseries
             tc.opts.asOf = [];
             tc.opts.asOfStart = [];
             tc.opts.asOfEnd = [];
-            [tc.apiKey, tc.fredURL] = cbd.private.connectFRED();
+            [tc.apiKey, tc.fredURL] = cbd.source.connectFRED();
         end % function
         
         function offWarning(tc) %#ok<MANU>
