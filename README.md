@@ -1,22 +1,4 @@
-# `cbd` Package Documentation
-* David Kelley, 2014-2015
-* [GitLab Repository](https://gitlab1.economic.research/matlab-tools/cbd)
-
-## Table of Contents
-* [Introduction](#introduction)
-* [Installation](#installation)
-* [Data Retrieval](#data-retrieval)
-* [CHIDATA](#chidata)
-* [Data Manipulation](#data-manipulation)
-    + [Transformations](#transformations)
-    + [Summarizations](#summarizations)
-    + [Aggregation / Disaggregation](#aggregation---disaggregation)
-    + [Binary Operations of Series](#binary-operations-of-series)
-    + [Merging tables](#merging-tables)
-    + [File Handling & Misc.](#file-handling---misc)
-    + [Calendar Date Functions](#calendar-date-functions)
-    + [Trim](#trim)
-    + [Plot](#plot)
+# `cbd`: Chartbook Data
 
 ## Introduction
 
@@ -28,7 +10,7 @@
 
 For individual function reference, see the MATLAB documentation for the specific function (i.e. from MATLAB, call `help cbd.data`).
 
-The package is currently located at `O:\PROJ_LIB\Presentations\Chartbook\Data\Dataset Creation\cbd`. This is the path that should be added to any project using `cbd`. All source files are contained in the `+cbd` directory and can be accessed with `cbd.function` once the top-level folder is on the MATLAB path. 
+To use `cbd` in a project, add only the top level path. All source files are contained in the `+cbd` directory and can be accessed with `cbd.function` once the top-level folder is on the MATLAB path. 
 
 Within the `+cbd` folder, there is a `+private` folder that contains functions that are used internally. Feel free to use them; they have simply been placed there since they have no apparent user-facing purpose.
 
