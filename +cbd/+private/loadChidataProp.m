@@ -14,8 +14,9 @@ if ~exist(propFile, 'file')
     return
 end
 
-propTable = readtable(propFile, ...
-  'ReadRowNames', true, 'ReadVariableNames', true);
+propTable = readtable(propFile, 'Delimiter', ',', ...
+    'ReadRowNames', true, 'ReadVariableNames', true);
+
 propCell = [propTable.Properties.VariableNames; table2cell(propTable)];
 
 propNums = str2double(propCell);
