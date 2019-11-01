@@ -1,0 +1,9 @@
+Row,seriesB,seriesC,seriesD
+Frequency,freqB,freqC,freqD
+Magnitude,1,2,3
+AggType,aggB,aggC,aggD
+DataType,typeB,typeC,typeD
+Source,sourceB,sourceC,sourceD
+DateTimeMod,01/02/2019 12:00,01/03/2019 12:00,01/04/2019 12:00
+UsernameMod,nameB,nameC,nameD
+FileMod,fileB,fileC,fileD

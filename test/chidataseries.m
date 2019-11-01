@@ -1,8 +1,12 @@
 classdef chidataseries < sourceseries
-    %CHIDATASERIES is the test suite for cbd.private.chidataseries()
+    %CHIDATASERIES is the test suite for cbd.source.chidataseries()
     %
     % USAGE
     %   >> runtests('chidataseries')
+    %
+    % WARNING
+    %   If something is broken in the setup of this test, run the 
+    %   chidataTest to find out what is broken in those functions
     %
     % Santiago I. Sordo Palacios, 2019
     
@@ -17,7 +21,7 @@ classdef chidataseries < sourceseries
     
     properties (Constant)
         % The constant properties for the chidataseries tests
-        testDir = tempname;
+        testDir = tempname();
         indexName = 'index.csv'
         propsName = 'prop.csv';
         testName = 'test';
@@ -32,17 +36,12 @@ classdef chidataseries < sourceseries
         
         function createTestDir(tc)
             % Initialize a chidata directory and check its access
+            clear '+cbd/+chidata/dir.m'
             mkdir(tc.testDir);
-            cbd.private.chidatadir(tc.testDir);
-            thisFile = fullfile(tc.testDir, tc.indexName);
-            [~, fmsg] = fileattrib(thisFile);
-            foundFile = ~ischar(fmsg);
-            tc.fatalAssertTrue(foundFile);
-            tc.fatalAssertTrue(fmsg.UserRead);
-            tc.fatalAssertTrue(fmsg.UserWrite);
+            cbd.chidata.dir(tc.testDir);
         end % function
         
-        function createTestData(tc)
+        function setupTestDir(tc)
             % create an array of dates
             inFmt = 'MM/dd/yyyy';
             firstDate = datetime( ...
@@ -61,18 +60,9 @@ classdef chidataseries < sourceseries
             testTable.Properties.RowNames = cellstr(datestr(DATES));
             
             % get the chidata properties
-            testProps = cbd.chidata_prop(1);
-            warning('off', 'chidata_save:newFile');
-            cbd.chidata_save(tc.testName, testTable, testProps);
-            warning('on', 'chidata_save:newFile');
+            testProps = cbd.chidata.prop(1);
+            cbd.chidata.save(tc.testName, testTable, testProps);
             
-            % check that the data file exiss
-            thisFile = fullfile(tc.testDir, [tc.testName '_data.csv']);
-            [~, fmsg] = fileattrib(thisFile);
-            foundFile = ~ischar(fmsg);
-            tc.fatalAssertTrue(foundFile);
-            tc.fatalAssertTrue(fmsg.UserRead);
-            tc.fatalAssertTrue(fmsg.UserWrite);
         end % function
         
     end % method-TestMethodSetup

@@ -1,5 +1,5 @@
-function Prop = chidata_prop(nSeries, varargin)
-%CHIDATA_PROP creates the properties structured used in CHIDATA_SAVE
+function propStruct = prop(nSeries, varargin)
+%PROP creates the properties structured used in cbd.chidata.save()
 % 
 % INPUTS:
 %   nSeries     ~ double, the number of series being saved
@@ -9,13 +9,14 @@ function Prop = chidata_prop(nSeries, varargin)
 %               return the natural number
 %   AggType     ~ char, the method used when aggregating the series
 %   DataType    ~ char, the type of data being stored
+%
 % OUTPUTS:
-%   Prop        ~ struct, the properties structure needed in chidata_save
+%   propStruct  ~ struct, the properties structure craeted
 % 
 % Santiago I. Sordo Palacios, 2019
 
 %% Check the inputs
-assert(isnumeric(nSeries))
+assert(isnumeric(nSeries));
 inP = inputParser;
 inP.addParameter('Source', '', @ischar)
 inP.addParameter('Frequency', '', @ischar)
@@ -25,9 +26,11 @@ inP.addParameter('DataType', '', @ischar)
 inP.parse(varargin{:})
 
 %% Create the properties structure
-Prop = inP.Results;
-for iSeries = 2:nSeries
-    Prop(iSeries) = Prop(1);
-end
+propStruct = inP.Results;
+if nSeries > 1
+    for iSeries = 2:nSeries
+        propStruct(iSeries) = propStruct(1);
+    end % for-iSeries
+end % if-nSeries
 
-end
+end % function
