@@ -13,6 +13,8 @@ function [data, fname] = loadData(section, seriesID)
 %   data        ~ table, the data from the section/seriesID
 %   fname       ~ char, the name of the file where data is stored
 %
+% WARNING: This function should NOT be called directly by the user
+%
 % David Kelley, 2015
 % Santiago I. Sordo-Palacios, 2019
 
@@ -48,11 +50,13 @@ if nargin == 2
     if sum(seriesInd) == 1
         data = data(:, seriesInd);
     elseif sum(seriesInd) > 1
-        error('chidata:loadData:duplicate', ...
+        % NOTE: This outcome should not occur since MATLAB does not allow
+        % for multiple identical variable names
+        error('chidata:loadData:duplicateSeries', ...
             'Multiple series found using "%s" in section "%s"', ...
             seriesID, section);
     else
-        error('chidata:loadData:missing', ...
+        error('chidata:loadData:missingSeries', ...
             'Series "%s" not found in section "%s"', ...
             seriesID, section);
     end % if-elseif

@@ -1,30 +1,27 @@
-classdef chidataseries < sourceseries
+classdef (Sealed) chidataseriesTest < sourceTest
     %CHIDATASERIES is the test suite for cbd.source.chidataseries()
     %
     % USAGE
     %   >> runtests('chidataseries')
     %
-    % WARNING
-    %   If something is broken in the setup of this test, run the 
-    %   chidataTest to find out what is broken in those functions
+    % NOTE
+    % For general tests of the chidata suite, see CHIDATASUITETEST
     %
     % Santiago I. Sordo Palacios, 2019
     
     properties
         % The abstract properties from the parent class
         source      = 'chidataseries';
-        seriesID    = 'SERIES'
+        seriesID    = 'testSeries'
         dbID        = 'CHIDATA';
         testfun     = @(x,y) cbd.source.chidataseries(x,y);
         benchmark   = 0.24087; %v1.2.0
     end % properties
     
-    properties (Constant)
-        % The constant properties for the chidataseries tests
+    properties
+        % The properties for the chidataseries tests
         testDir = tempname();
-        indexName = 'index.csv'
-        propsName = 'prop.csv';
-        testName = 'test';
+        supportDir
     end % properties
     
     methods (TestClassSetup)
@@ -34,37 +31,37 @@ classdef chidataseries < sourceseries
             tc.opts.dbID = tc.dbID;
         end % function
         
+        function getSupportDir(tc)
+            % NOTE: THIS IS COPIED FROM CHIDATATEST
+            % Get the path to the CHIDATA support directory
+            thisPath = mfilename('fullpath');
+            thisFile = mfilename();
+            supportName = 'chidata_support';
+            tc.supportDir = fullfile( ...
+                strrep(thisPath, thisFile, ''), ...
+                supportName);
+        end % function
+        
         function createTestDir(tc)
-            % Initialize a chidata directory and check its access
-            clear '+cbd/+chidata/dir.m'
+            % NOTE: THIS IS COPIED FROM CHIDATATEST
+            % Creates a directory for performing tests
             mkdir(tc.testDir);
+        end % function
+        
+        function clearChidataDir(tc) %#ok<MANU>
+            % NOTE: THIS IS COPIED FROM CHIDATATEST
+            % Clears the chidataDir persistent variable
+            clear '+cbd/+chidata/dir.m'
+        end % function
+        
+        function initializeTestDir(tc)
+            % NOTE: THIS IS COPIED FROM CHIDATATEST
+            % Copies support files from supportDir to testDir and
+            % initalizes the CHIDATA directory
+            copyfile(tc.supportDir, tc.testDir)
             cbd.chidata.dir(tc.testDir);
         end % function
-        
-        function setupTestDir(tc)
-            % create an array of dates
-            inFmt = 'MM/dd/yyyy';
-            firstDate = datetime( ...
-                tc.startDate, 'InputFormat', inFmt) - calyears(4);
-            lastDate = datetime( ...
-                tc.endDate, 'InputFormat', inFmt) + calyears(4);
-            DATES = transpose(firstDate:calmonths(1):lastDate);
-            
-            % create an array of data
-            nDates = length(DATES);
-            rng(1, 'twister');
-            SERIES = randi(10, nDates, 1);
-            
-            % create a table with dates and data
-            testTable = table(SERIES);
-            testTable.Properties.RowNames = cellstr(datestr(DATES));
-            
-            % get the chidata properties
-            testProps = cbd.chidata.prop(1);
-            cbd.chidata.save(tc.testName, testTable, testProps);
-            
-        end % function
-        
+         
     end % method-TestMethodSetup
     
     methods (TestClassTeardown)

@@ -1,79 +1,58 @@
-classdef (Sealed) bloombergseries < sourceseries
+classdef (Sealed) bloombergseriesTest < sourceTest
     %BLOOMBERGSERIES is the test suite for cbd.source.bloombergseries()
     %
     % USAGE
     %   >> runtests('bloombergseries')
     %
+    % SEE ALSO: SOURCETEST
+    %
     % Santiago I. Sordo Palacios, 2019
-    
+
     properties
-        source      = 'bloombergseries';
-        seriesID    = 'C_US_EQUITY';
-        dbID        = 'BLOOMBERG';
-        testfun     = @(x, y) cbd.source.bloombergseries(x, y);
-        benchmark   = 7.5766; %v1.2.0
+        source = 'bloombergseries';
+        seriesID = 'C_US_EQUITY';
+        dbID = 'BLOOMBERG';
+        testfun = @(x, y) cbd.source.bloombergseries(x, y);
+        benchmark = 7.5766; %v1.2.0
     end % properties
-    
+
     properties (Constant)
-        jarPath         = 'C:\blp\DAPI\blpapi3.jar'; % Path to BLP jarfile
-        XexpectedFreq   = 'DAILY'; % The default frequency
-        XinvalidFreq    = {'INVALID' ,'I'}; % Invalid frequencies
-        XshortFreq      = {'D', 'W', 'M', 'Q', 'Y'}; % short frequencies
-        XlongFreq       = {'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY'};
+        XexpectedFreq = 'DAILY'; % The default frequency
+        XinvalidFreq = {'INVALID', 'I'}; % Invalid frequencies
+        XshortFreq = {'D', 'W', 'M', 'Q', 'Y'}; % short frequencies
+        XlongFreq = {'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY'};
         XepectedBbfield = 'LAST_PRICE'; % The default field
-        XotherBbfield   = 'PX_BID';  % Another field to Test pull
+        XotherBbfield = 'PX_BID'; % Another field to Test pull
     end % properties-constant
-    
+
     methods (TestClassSetup)
-        
+
         function bloombergOpts(tc)
             %sets up the  test class setup for bloombergseries
             tc.opts.dbID = tc.dbID;
             tc.opts.bbfield = '';
             tc.opts.frequency = '';
         end % function
-        
-        function offWarning(tc) %#ok<MANU>
+
+        function turnWarningsOff(tc) %#ok<MANU>
             warning('off', 'bloombergseries:noYellowKey')
         end % function
-        
-        function checkJarFile(tc)
-            % Check the existence of the BLP jar file
-            [~, fmsg] = fileattrib(tc.jarPath);
-            foundFile = ~ischar(fmsg);
-            tc.fatalAssertTrue(foundFile);
-            tc.fatalAssertTrue(fmsg.UserRead);
+
+        function checkConnectBloomberg(tc)
+            c = cbd.source.connectBloomberg();
+            tc.fatalAssertTrue(isequal(isconnection(c), 1))
         end % function
-        
-        function checkBLPConn(tc)
-            % Check the connection to BLP
-            try
-                warning('off', 'MATLAB:Java:DuplicateClass');
-                javaaddpath(tc.jarPath);
-                warning('on', 'MATLAB:Java:DuplicateClass');
-                c = blp;
-                pause(5);
-                isbloomberg = isequal(isconnection(c), 1);
-            catch
-                isbloomberg = false;
-            end % try-catch
-            tc.fatalAssertTrue(isbloomberg)
-        end % function
-        
+
     end % methods
-    
+
     methods (TestClassTeardown)
-        
-        function onWarning(tc) %#ok<MANU>
+        function turnWarningsOn(tc) %#ok<MANU>
             warning('on', 'bloombergseries:noYellowKey')
         end % function
-        
     end % methods
-    
+
     methods (Test)
-        
-        %------------------------------------------------------------------
-        % Tests for frequency
+        %% Tests for frequency
         function missFreq(tc)
             % Test pull with missing frequency
             tc.opts = rmfield(tc.opts, 'frequency');
@@ -81,14 +60,14 @@ classdef (Sealed) bloombergseries < sourceseries
             expectedErr = 'bloombergseries:missfrequency';
             tc.verifyError(actualErr, expectedErr);
         end % function
-        
+
         function nullFreq(tc)
             % Test pull with empty frequency
             tc.opts.frequency = '';
             [~, dataProp] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyEqual(dataProp.frequency, tc.XexpectedFreq);
         end % function
-        
+
         function invalidFreq(tc)
             expectedErr = 'bloombergseries:invalidFrequency';
             nInv = length(tc.XinvalidFreq);
@@ -98,7 +77,7 @@ classdef (Sealed) bloombergseries < sourceseries
                 tc.verifyError(actualErr, expectedErr);
             end % for-iChar
         end % function
-        
+
         function shortFreq(tc)
             % Test pull with explicit short frequencies
             nShortFreqs = length(tc.XshortFreq);
@@ -114,7 +93,7 @@ classdef (Sealed) bloombergseries < sourceseries
                 tc.verifyEqual(props.frequency, expectedFreq);
             end % for-iFreq
         end % function
-        
+
         function longFreq(tc)
             % Test pull with explicit long frequencies
             nLongFreqs = length(tc.XlongFreq);
@@ -130,9 +109,8 @@ classdef (Sealed) bloombergseries < sourceseries
                 tc.verifyEqual(props.frequency, expectedFreq);
             end % for-iFreq
         end % function
-        
-        %------------------------------------------------------------------
-        % Tests for bbfield
+
+        %% Tests for bbfield
         function missBbfield(tc)
             % Test pull with a missing field bbfield
             tc.opts = rmfield(tc.opts, 'bbfield');
@@ -140,7 +118,7 @@ classdef (Sealed) bloombergseries < sourceseries
             expectedErr = 'bloombergseries:missbbfield';
             tc.verifyError(actualErr, expectedErr);
         end % function
-        
+
         function nullBbfield(tc)
             % Test pull with a blank field
             tc.opts.bbfield = '';
@@ -149,15 +127,18 @@ classdef (Sealed) bloombergseries < sourceseries
             tc.verifyEqual(size(data, 2), 1);
             tc.verifyEqual(prop.bbfield, tc.XepectedBbfield);
         end % function
-        
+
         function invalidBbfield(tc)
             % Test pull with invalid field
             tc.opts.bbfield = 'INVALIDBBFIELD';
             actualErr = @() tc.testfun(tc.seriesID, tc.opts);
-            expectedErr = 'bloombergseries:noPull'; %note ~':invalidBbfield'
+            % note that the following error is NOT 'invalidBbfield' 
+            % because there is no difference between a noPull and a bad 
+            % field when it comes to history()
+            expectedErr = 'bloombergseries:noPull'; 
             tc.verifyError(actualErr, expectedErr);
         end % function
-        
+
         function expectedBbfield(tc)
             % Test pull with the expected Bbfield
             tc.opts.bbfield = tc.XepectedBbfield;
@@ -166,7 +147,7 @@ classdef (Sealed) bloombergseries < sourceseries
             tc.verifyEqual(size(data, 2), 1);
             tc.verifyEqual(prop.bbfield, tc.XepectedBbfield);
         end % function
-        
+
         function otherBbfield(tc)
             % Test pull with different field
             tc.opts.bbfield = tc.XotherBbfield;
@@ -175,8 +156,7 @@ classdef (Sealed) bloombergseries < sourceseries
             tc.verifyEqual(size(data, 2), 1);
             tc.verifyEqual(prop.bbfield, tc.XotherBbfield);
         end % function
-        
-    end % methods-test
-    
-end % classdef-bloombergseries
 
+    end % methods-test
+
+end % classdef-bloombergseries

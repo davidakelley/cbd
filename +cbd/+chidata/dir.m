@@ -42,7 +42,7 @@ elseif isempty(chidataDir) && nargin == 1
     chidataDir = inputLoc;
 elseif ~isempty(chidataDir) && nargin == 1
     % If persistent and an input, prompt change of persistent to input
-    id = 'chidata:dir:changeDir';
+    id = 'chidata:dir:changeLoc';
     msg = sprintf( ...
         'Changing CHIDATA directory from "%s" to "%s"', ...
         chidataDir, inputLoc);
@@ -69,7 +69,7 @@ indexExists = isequal(exist(indexFname, 'file'), 2);
 
 %  If an idnex file does not exist, prompt user to create a new one
 if ~indexExists
-    id = 'chidata:dir:newDir';
+    id = 'chidata:dir:makeNew';
     msg = sprintf( ...
         'No index file found \nCreating new CHIDATA directory at %s',  ...
         chidataDir);

@@ -5,6 +5,8 @@ function [index, fname] = loadIndex()
 %   index       ~ table, the index of the CHIDATA directory
 %   fname       ~ char, the name of the file where the index is stored
 %
+% WARNING: This function should NOT be called directly by the user
+%
 % Santiago Sordo-Palacios, 2019
 
 % Get the chidata directory
@@ -25,7 +27,7 @@ index = readtable(fname);
 % Check the names of the variables in the index
 varNames = {'Series', 'Section'};
 assert(isequal(varNames, index.Properties.VariableNames), ...
-    'chidata:loadIndex:badVars', ...
+    'chidata:loadIndex:badHeaders', ...
     'Index file "%s" does not contain correct variables names', ...
     fname);
 

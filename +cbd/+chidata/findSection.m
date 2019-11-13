@@ -8,6 +8,8 @@ function section = findSection(seriesID, index)
 % OUPTUS:
 %   section     ~ char, the name of section containing seriesID
 %
+% WARNING: This function should NOT be called directly by the user
+%
 % David Kelley, 2015
 % Santiago Sordo-Palacios, 2019
 

@@ -15,41 +15,20 @@ if nargin == 1
         'bloombergseries dbID "%s" is not BLOOMBERG', dbID);
 end % if-nargin
 
-% Store location of the jar file
+% Add the jar file to the Java path
 jarFile = 'C:\blp\DAPI\blpapi3.jar';
-
-% Call the persistent variable
-persistent blpconn
-if isempty(blpconn)
-    
-    % Check for the existence of the jarFile
+jpath = javaclasspath('-all');
+onPath = ismember(jpath, jarFile);
+if ~onPath
     [~, fmsg] = fileattrib(jarFile);
     foundFile = ~ischar(fmsg);
     assert(foundFile, ...
         'connectBloomberg:jarNotFound', ...
         '%s cannot be found', jarFile);
-    assert(fmsg.UserRead, ...
-        'connectBloomberg:jarNotRead', ...
-        '%s cannot be read', jarFile);
-    
-    % Add the jar file to the Java path
-    jpath = javaclasspath('-all');
-    onPath = ismember(jpath, jarFile);
-    if ~onPath
-        javaaddpath(jarFile);
-    end % if-notonPath
-    
-    % Establish a conenction to BLP
-    blpconn = blp;
-    
-end % if-isempty
+    javaaddpath(jarFile);
+end % if-notonPath
 
-% Test the connection and add if it fails
-if ~isconnection(blpconn)
-    blpconn = blp;
-end 
-
-% Store as c to output
-c = blpconn;
+% Create the Bloomberg connection
+c = blp;
 
 end % function-connectBloomberg

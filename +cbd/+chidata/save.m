@@ -282,7 +282,9 @@ if oldPropsExists
     % Check if properties are udpated
     newHasDiffProps = ~isequal(oldProps, props);
     if newHasDiffProps
-        prompt('Overwriting with revised properties');
+        id = 'chidata:save:overwriteProps';
+        msg = 'Overwriting with revised properties';
+        prompt(id, msg);
     end
 end % try-catch
 
@@ -297,7 +299,9 @@ thisStack = dbstack('-completenames');
 % Shift up one index to get calling file
 loc = loc + 1;
 if size(thisStack, 1) < loc
-    prompt('The file calling cbd.chidata.save could not be found');
+    id = 'chidata:save:noCallFun';
+    msg = 'The function calling save could was not found';
+    prompt(id, msg);
     FileMod = '';
 else
     FileMod = thisStack(loc).file;

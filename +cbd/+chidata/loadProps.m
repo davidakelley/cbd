@@ -13,6 +13,8 @@ function [props, fname] = loadProps(section, seriesID)
 %   props       ~ structure, the properties from the section/seriesID
 %   fname       ~ char, the name of the file where the props are stored
 %
+% WARNING: This function should NOT be called directly by the user
+%
 % David Kelley, 2015
 % Santiago Sordo-Palacios, 2019
 
@@ -48,11 +50,13 @@ if nargin == 2
     if sum(seriesInd) == 1
         props = props(:, seriesInd);
     elseif sum(seriesInd) > 1
-        error('chidata:loadProps:duplicate', ...
+        % NOTE: This outcome should not occur since MATLAB does not allow
+        % for multiple identical variable names
+        error('chidata:loadProps:duplicateSeries', ...
             'Multiple series found using "%s" in section "%s"', ...
             seriesID, section);
     else
-        error('chidata:loadProps:missing', ...
+        error('chidata:loadProps:missingSeries', ...
             'Series "%s" not found in section "%s"', ...
             seriesID, section);
     end % if-elseif

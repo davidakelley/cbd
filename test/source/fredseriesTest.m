@@ -1,4 +1,4 @@
-classdef (Sealed) fredseries < sourceseries
+classdef (Sealed) fredseriesTest < sourceTest
     %FREDSERIES is the test suite for cbd.source.fredseries()
     %
     % USAGE
@@ -19,7 +19,6 @@ classdef (Sealed) fredseries < sourceseries
     
     properties (Constant)
         % The constant properties for the fredseries tests
-        testURL     = 'https://www.google.com'; % Internet connection test
         asOf        = '12/31/1999'; % the asOf date to test vintage
         asOfStart   = '6/30/2014'; % the asOfStart to test vintage
         asOfEnd     = today(); % the asOfEnd to test vintage data
@@ -42,51 +41,26 @@ classdef (Sealed) fredseries < sourceseries
             [tc.apiKey, tc.fredURL] = cbd.source.connectFRED();
         end % function
         
-        function offWarning(tc) %#ok<MANU>
+        function turnWarningsOff(tc) %#ok<MANU>
             warning('off', 'fredseries:useHaver');
         end % function
         
-        function checkInternet(tc)
-            % Test internet connection
-            try
-                urlread(tc.testURL); %#ok<URLRD>
-                foundInternet = true;
-            catch
-                foundInternet = false;
-            end % try-catch
-            tc.fatalAssertTrue(foundInternet);
-        end % function
-        
-        function checkFREDConn(tc)
+        function checkConnectFRED(tc)
             % Test connection to FRED
-            requestURL = [ ...
-                tc.fredURL, ...
-                'series/observations?series_id=', tc.seriesID, ...
-                '&api_key=', tc.apiKey, ...
-                '&file_type=json'];
-            try
-                urlread(requestURL); %#ok<URLRD>
-                foundFRED = true;
-            catch
-                foundFRED = false;
-            end % try-catch
+            [~, ~, foundFRED] = cbd.source.connectFRED();
             tc.fatalAssertTrue(foundFRED);
         end % function
         
     end % methods
     
     methods (TestClassTeardown)
-        
-        function onWarning(tc) %#ok<MANU>
+        function turnWarningsOn(tc) %#ok<MANU>
             warning('on', 'fredseries:useHaver')
         end % function
-        
     end % methods
     
     methods (Test)
-        
-        %------------------------------------------------------------------
-        % Tests for realtime specification
+        %% Tests for realtime specification
         function asOfSpecCaseA(tc)
             tc.opts.asOf = tc.asOf;
             tc.opts.asOfStart = tc.asOfStart;
@@ -103,8 +77,7 @@ classdef (Sealed) fredseries < sourceseries
             tc.verifyError(actualErr, expectedErr);
         end % function
         
-        %------------------------------------------------------------------
-        % Test for asOf
+        %% Test for asOf
         function missAsOf(tc)
             % Test a pull with missing asOf field
             tc.opts = rmfield(tc.opts, 'asOf');
@@ -123,8 +96,7 @@ classdef (Sealed) fredseries < sourceseries
             tc.verifyNotEqual(size(dataset, 1), size(testset, 1));
         end % function
         
-        %------------------------------------------------------------------
-        % Tests for asOfStart and asOfEnd
+        %% Tests for asOfStart and asOfEnd
         function missAsOfStart(tc)
             % Test a pull with missing asOfStart field
             tc.opts = rmfield(tc.opts, 'asOfStart');
