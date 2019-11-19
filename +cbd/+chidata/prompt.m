@@ -1,24 +1,39 @@
-function prompt(id, message)
+function prompt(id, msg, userInput)
 %PROMPT Asks for user input to allow process to proceed in CHIDATA
 %
 % INPUTS
-%   id          ~ the id to display in the warning() call
-%   messsage    ~ char, the message printed to the user
+%   id          ~ char, the id to display in the warning
+%   msg         ~ char, the message displayed in the warning
+%   userInput   ~ char, the optional override userInput
 %
 % David Kelley, 2019
 % Santiago Sordo-Palacios, 2019
 
-% Display message to user
-userInput = inputdlg(message, id, 1, {'yes'});
-userInput = userInput{:};
+% Escape filesep if it appears in the message
+if ismember(filesep, msg)
+    msg = strrep(msg, filesep, [filesep filesep]);
+end % if-ismember
+
+% Issue the warning
+fprintf('\n');
+warning(id, msg);
+
+% Request user input if none provided
+if nargin < 3
+    userInput = 'X'; % store so that while logic works
+    while ~any(strcmpi(userInput(1), {'y', 'n'}))
+        % request until an answer starts with y or n
+        userInput = input('Continue? (y/n) >> ', 's');
+    end % while-notcontains
+end % if-nargin
 
 % Respond to user input
-if ischar(userInput) && strcmpi(userInput(1), 'y')
-    disp('Continuing...');
+if strcmpi(userInput(1), 'y')
+    fprintf('Continuing... \n');
 else
     id = 'chidata:prompt:userBreak';
-    message = 'User halted execution during prompt';
-    ME = MException(id, message);
+    msg = sprintf('User halted execution with "%s"', userInput);
+    ME = MException(id, msg);
     throwAsCaller(ME);
 end % if-else
 

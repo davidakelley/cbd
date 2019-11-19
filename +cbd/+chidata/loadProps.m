@@ -35,14 +35,7 @@ propTable = readtable(fname, ...
     'ReadRowNames', true, ...
     'ReadVariableNames', true, ...
     'Delimiter', ',');
-
-% Convert to structure
-propCell = [propTable.Properties.VariableNames; table2cell(propTable)];
-propNums = str2double(propCell);
-propCell(~isnan(propNums)) = num2cell(propNums(~isnan(propNums)));
-props = cell2struct( ...
-    propCell, [{'Name'}; propTable.Properties.RowNames]);
-props = props';
+props = prop_table2struct(propTable);
 
 % Return only one series if requested
 if nargin == 2
@@ -63,3 +56,18 @@ if nargin == 2
 end % if-nargin
     
 end % function-loadProps
+
+function props = prop_table2struct(propTable)
+%PROP_TABLE2STRUCT transforms a properties table into a structure
+%
+% Santiago Sordo-Palacios, 2019
+
+% Convert to structure
+propCell = [propTable.Properties.VariableNames; table2cell(propTable)];
+propNums = str2double(propCell);
+propCell(~isnan(propNums)) = num2cell(propNums(~isnan(propNums)));
+props = cell2struct( ...
+    propCell, [{'Name'}; propTable.Properties.RowNames]);
+props = props';
+
+end % function

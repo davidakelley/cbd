@@ -1,9 +1,27 @@
 classdef saveTest < chidataSuiteTest
-    % Test the save function
-    
-    methods (Test)
+    %SAVETEST is the test suite for the cbd.chidata.save function
+    %
+    % Santiago Sordo-Palacios, 2019
 
-        % Test cbd.chidata.save
+    properties
+        section char % The sectionName argument
+        data table % The data argument
+        props struct % The properties argument
+    end % properties
+
+    methods (TestClassSetup)
+
+        function loadSaveVars(tc)
+            % Loads variables for testing in save()
+            tc.section = 'sectionA';
+            tc.data = tc.expectedSectionAData;
+            tc.props = rmfield(tc.expectedSectionAProp, tc.dynamicFields);
+        end % function
+
+    end % methods-TestClassSetup
+
+    methods (Test)
+        %% Test the handle inputs step
         function saveInvalidSectionErr(tc)
             % Test for invalid section input
             expectedErr = 'chidata:save:invalidSection';
@@ -56,7 +74,40 @@ classdef saveTest < chidataSuiteTest
                 tc.verifyError(actualErr, expectedErr)
             end % for-iField
         end % function
-
+        
+        %% Test the index step
+        function saveAddNewSection(tc)
+            % Set-up the environemtn
+            tc.initializeTestDir(tc);
+            expectedWarn = 'chidata:updateIndex:addSection';
+            
+            % Create the new section, data, and props
+            expSection = 'newSection';
+            expSeries = 'newSeries';
+            tc.data.Properties.VariableNames = {expSeries};
+            expData = tc.data;
+            expProps = tc.props;
+            
+            % Check that the right warning was issued
+            actualWarn = @ () cbd.chidata.save( ...
+                expSection, expData, expProps, 'userInput', 'y');
+            tc.verifyWarning(actualWarn, expectedWarn);
+            
+            % Check that the index was updated
+            index = cbd.chidata.loadIndex();
+            actualSection = index(expSeries);
+            tc.verifyEqual(actualSection, expSection);
+            
+            % Check that the data were saved
+            actualData = cbd.chidata.loadData(expSection, expSeries);
+            tc.verifyEqual(actualData, expData);
+            
+            % Check that the properties were updated
+            actualProps = cbd.chidata.loadProps(expSection, expSeries);
+            actualProps = rmfield(actualProps, tc.dynamicFields);
+            tc.verifyEqual(actualProps, expProps);
+        end % function
+        
     end % methods
 
 end % classdef

@@ -1,9 +1,10 @@
 classdef loadDataTest < chidataSuiteTest
-    % Test loadData
-    
-    
+    %LAODDATATEST is the test suite for cbd.chidata.loadData()
+    %
+    % Santiago Sordo-Palacios, 2019
+
     methods (Test)
-        
+
         function dataNotFound(tc)
             % Test that a data file is not found
             tc.initializeTestDir(tc);
@@ -44,9 +45,7 @@ classdef loadDataTest < chidataSuiteTest
             expectedData = tc.expectedSectionBData(:, selectedSeries);
             tc.verifyEqual(actualData, expectedData);
         end % function
-       
+
     end % methods
-    
-    
-    
+
 end % classdef

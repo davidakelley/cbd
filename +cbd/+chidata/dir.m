@@ -1,47 +1,68 @@
-function returnLoc = dir(inputLoc)
-%CHIDATADIR Initializes a chidata directory and returns its location
+function returnLoc = dir(inputLoc, varargin)
+%DIR Initializes a chidata directory and returns its location
 %
 % During the first call of the function, the location of the CHIDATA
 % directory is stored as a persistent varaible, chidataDir. During this
 % first call, the function will check for the validity of that directory
-% and whether an index file exists. If the index does not exist, the 
+% and whether an index file exists. If the index file does not exist, the
 % user will be prompted as to whether one should be created. In subsequent
 % calls to the function, the error checking is omitted and the value of
-% chidataDir is returned as returnLoc.
+% chidataDir is returned as the output argument.
 %
 % INPUTS:
-%   inputLoc    ~ char, the input location of the CHIDATA directory
+%   inputLoc    ~ char, the desired location of the CHIDATA directory
+%   userInput   ~ char, the override userInput for the prompt calls
 %
 % OUTPUTS:
-%   outputLoc   ~ char, the output location of the CHIDATA directory
+%   returnLoc   ~ char, the output location of the CHIDATA directory
 %
 % USAGE:
 %   >> cbd.chidata.dir('MYPATH') % initialize directory at 'MYPATH'
-%   >> cbd.chidata.dir() % Get the path to initialized CHIDATA directory
+%   >> cbd.chidata.dir() % Get the path to an initialized directory
 %
 % David Kelley, 2015
-% Santiago I. Sordo Palacios, 2019
+% Santiago Sordo-Palacios, 2019
 
 % Initialize persistent variable
 persistent chidataDir
-prompt = @(id, msg) cbd.chidata.prompt(id, msg);
+persistentExists = ~isempty(chidataDir);
+
+% Check whethere inputLoc is provided
+if nargin < 1 || isempty(inputLoc)
+    inputExists = false;
+else
+    inputExists = true;
+end % if-nargin
+
+% Parse the input arguments
+inP = inputParser;
+inP.addParameter('userInput', '', @ischar);
+inP.parse(varargin{:});
+userInput = inP.Results.userInput;
+
+% Anonymous function to call prompt
+if isempty(userInput)
+    prompt = @(id, msg) cbd.chidata.prompt(id, msg);
+else
+    prompt = @(id, msg) cbd.chidata.prompt(id, msg, userInput);
+end % if-nargin
 
 %% Handle the inputLoc
-if isempty(chidataDir) && nargin == 0
+if ~persistentExists && ~inputExists
     % If no persistent and no input, throw error
     id = 'chidata:dir:notInitialized';
     msg = 'You must first initialize a CHIDATA directory';
     ME = MException(id, msg);
     throw(ME);
-elseif ~isempty(chidataDir) && nargin == 0
+elseif persistentExists && ~inputExists
     % If persistent and no input, return persistent and exit
     returnLoc = chidataDir;
     return;
-elseif isempty(chidataDir) && nargin == 1
-    % If no persistent and an input, set input as persistent
+elseif ~persistentExists && inputExists
+    % If no persistent and an input, set persistent as the input
     chidataDir = inputLoc;
-elseif ~isempty(chidataDir) && nargin == 1
-    % If persistent and an input, prompt change of persistent to input
+elseif persistentExists && inputExists
+    % If persistent and an input, prompt to change from persistent to input
     id = 'chidata:dir:changeLoc';
     msg = sprintf( ...
         'Changing CHIDATA directory from "%s" to "%s"', ...
@@ -51,12 +72,6 @@ elseif ~isempty(chidataDir) && nargin == 1
 end
 
 %% Checking CHIDATA directory
-% Check that the directory is a full path
-isPath = contains(chidataDir, ':');
-assert(isPath, ...
-    'chidata:dir:notPath', ...
-    'Directory "%s" is not a full path', chidataDir);
-
 % Check the validity of the directory
 dirExists = isequal(exist(chidataDir, 'dir'), 7);
 assert(dirExists, ...
@@ -71,12 +86,10 @@ indexExists = isequal(exist(indexFname, 'file'), 2);
 if ~indexExists
     id = 'chidata:dir:makeNew';
     msg = sprintf( ...
-        'No index file found \nCreating new CHIDATA directory at %s',  ...
+        'No index file found \nCreating new CHIDATA directory at %s', ...
         chidataDir);
     prompt(id, msg)
-    fid = fopen(indexFname, 'w');
-    fprintf(fid, 'Series, Section\n');
-    fclose(fid);
+    cbd.chidata.writeIndex(indexFname);
 end
 
 % Return the location of the new chidataDir

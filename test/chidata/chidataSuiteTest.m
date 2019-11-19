@@ -10,17 +10,11 @@ classdef (Abstract) chidataSuiteTest < matlab.unittest.TestCase
         testDir char % The temporary directory used to test chidata
         supportDir char % The location of the support files for tests
 
-        expectedIndex table % The index saved as index.csv
+        expectedIndex containers.Map % The index saved as index.csv
         expectedSectionAData table % The data saved as sectionA_data.csv
         expectedSectionAProp struct % The props saved as sectionA_prop.csv
         expectedSectionBData table % The data saved as sectionB_data.csv
         expectedSectionBProp struct % The props saved as sectionB_prop.csv
-
-        badIndex table % A bad index used to test errors
-
-        section % The sectionName input argument to the save function
-        data % The data input argument to the save function
-        props % The properties input argument to the save function
 
     end % properties
 
@@ -42,11 +36,11 @@ classdef (Abstract) chidataSuiteTest < matlab.unittest.TestCase
 
         function getExpectedIndex(tc)
             % Create the expected index as a table
-            Series = {'seriesA'; 'seriesB'; 'seriesC'; ...
-                'seriesD'; 'testSeries'};
-            Section = {'sectionA'; 'sectionB'; 'sectionB'; ...
-                'sectionB'; 'testSection'};
-            tc.expectedIndex = table(Series, Section);
+            Series = {'series1'; 'series2'; 'series3'; 'series4'; ...
+                'seriesForChidataseries'};
+            Section = {'sectionA'; 'sectionB'; 'sectionB'; 'sectionB'; ...
+                'sectionForChidataseries'};
+            tc.expectedIndex = containers.Map(Series, Section);
         end % function
 
         function getExpectedSectionAData(tc)
@@ -106,28 +100,15 @@ classdef (Abstract) chidataSuiteTest < matlab.unittest.TestCase
                 'UsernameMod', {'nameB', 'nameC', 'nameD'}, ...
                 'FileMod', {'fileB', 'fileC', 'fileD'});
         end % function
-
-        function loadBadIndex(tc)
-            % Loads the bad index file for testing in findSection()
-            badIndexFname = fullfile(tc.supportDir, 'badIndex.csv');
-            tc.badIndex = readtable(badIndexFname);
-        end % function
-
-        function loadSaveVars(tc)
-            % Loads variables for testing in save()
-            tc.section = 'sectionA';
-            tc.data = tc.expectedSectionAData;
-            tc.props = rmfield(tc.expectedSectionAProp, tc.dynamicFields);
+        
+        function clearChidataDirStart(tc) %#ok<MANU>
+            % Clears the chidataDir persistent variable
+            clear '+cbd/+chidata/dir.m'
         end % function
 
     end % methods
 
     methods (TestMethodSetup)
-
-        function clearChidataDir(tc) %#ok<MANU>
-            % Clears the chidataDir persistent variable
-            clear '+cbd/+chidata/dir.m'
-        end % function
 
         function createTestDir(tc)
             % Creates a directory for performing tests
@@ -142,6 +123,11 @@ classdef (Abstract) chidataSuiteTest < matlab.unittest.TestCase
         function deleteTestDir(tc)
             % Removes the directory for performing tests
             rmdir(tc.testDir, 's');
+        end % function
+        
+        function clearChidataDir(tc) %#ok<MANU>
+            % Clears the chidataDir persistent variable
+            clear '+cbd/+chidata/dir.m'
         end % function
 
     end % methods

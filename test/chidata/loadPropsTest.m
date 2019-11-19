@@ -1,5 +1,7 @@
 classdef loadPropsTest < chidataSuiteTest
-    % Test loadData
+    %LOADPROPSTEST is the test suite for cbd.chidata.loadProps()
+    %
+    % Santiago Sordo-Palacios, 2019
 
     methods (Test)
 

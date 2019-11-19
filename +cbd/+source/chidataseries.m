@@ -39,7 +39,12 @@ startDate = cbd.source.parseDates(opts.startDate);
 endDate = cbd.source.parseDates(opts.endDate);
 
 %% Get file name, read the data
-section = cbd.chidata.findSection(seriesID, index);
+if ~isKey(index, seriesID)
+    error('chidataseries:noPull', ...
+        'Series "%s" is not found in the index', seriesID);
+else
+    section = index(seriesID);
+end % if-else
 rawData = cbd.chidata.loadData(section, seriesID);
 
 %% Trim the data

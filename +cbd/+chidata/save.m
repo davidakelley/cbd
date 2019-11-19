@@ -38,9 +38,11 @@ function saved = save(section, data, props, varargin)
 %   props       ~ struct, the properties of the data being saved. Each
 %               series must have a valid properties field. Use
 %               cbd.chidata.props(nSeries) to generate valid properties.
-%   revisionTolerance
-%               ~ double, the accepted tolerance when checking
+%   tolerance   ~ double, the accepted tolerance when checking
 %               whether the new data revises old data, optional.
+%   userInput   ~ char, the input used for any and all of the user
+%               prompts issued by the function. Using this is DANGEROUS
+%               and NOT recommended outside of the testing framework.
 %
 % OUTPUTS
 %   valid       ~ logical, true if the index, data, and props were all
@@ -60,28 +62,98 @@ function saved = save(section, data, props, varargin)
 % David Kelley, 2014-2019
 % Santiago Sordo-Palacios, 2019
 
-%% Handle inputs
-% Verify first three inputs
+%% Setup
+% Handle inputs
+dynamicFields = {'Name', 'DateTimeMod', 'UsernameMod', 'FileMod'};
+checkInputs(section, data, props, dynamicFields);
+[tolerance, prompt] = parseInputs(varargin);
+
+% Load the chidata directory
+chidataDir = cbd.chidata.dir();
+
+%% Index
+% Load the index
+[index, indexFname] = cbd.chidata.loadIndex();
+
+% Update the index
+curSeries = data.Properties.VariableNames;
+[updatedIndex, isNewSection] = ...
+    cbd.chidata.updateIndex(index, section, curSeries, prompt);
+
+%% Data 
+% Open the old data if it exists, otherwise just store the file name
+if ~isNewSection
+    [oldData, dataFname] = cbd.chidata.loadData(section);
+else
+    dataFname = fullfile(chidataDir, [section '_data.csv']);
+end % if-else
+
+% Check the old data
+if ~isNewSection
+    cbd.chidata.compareData(data, oldData, tolerance, prompt);
+end % if-oldDataExists
+
+%% Properties Step
+% Open the old data if it exists, otherwise just store the file name
+if ~isNewSection
+    [oldProps, propsFname] = cbd.chidata.loadProps(section);
+else
+    propsFname = fullfile(chidataDir, [section '_prop.csv']);
+end % if-else
+
+% Check old properties
+if ~isNewSection
+    cbd.chidata.compareProps(props, oldProps);
+end % try-catch
+
+% Write the dynamic properties to the structure
+props = addDynamicFields(props);
+
+% Make the properties table
+propTable = prop_struct2table(props, data);
+
+%% Writing step
+
+% Write index file
+cbd.chidata.writeIndex(indexFname, updatedIndex);
+
+% Write data file
+writetable(data, dataFname, 'WriteRowNames', true);
+
+% Write props file
+writetable(propTable, propsFname, 'WriteRowNames', true);
+
+% Store output argument
+saved = true;
+
+end
+
+function checkInputs(section, data, props, dynamicFields)
+%CHECKINPUTS checks the inputs to the cbd.chidata.save function
+%
+% Santiago Sordo-Palacios, 2019
+
+% Check section validity
 assert(ischar(section) && ~isempty(section), ...
     'chidata:save:invalidSection', ...
     'Section is not a character or is empty');
+
+% Check data validity
 assert(istable(data) && ~isempty(data), ...
     'chidata:save:invalidData', ...
     'Data is not a table or is empty');
+
+% Check properties validity
 assert(isstruct(props) && ~isempty(props), ...
     'chidata:save:invalidProps', ...
     'Props is not a structure or is empty');
 
 % Check for invalid fields in props
-% These fields are created dynamically in this function, so they cannot
-% be already included in the properties structure
-dynamicFields = {'Name', 'DateTimeMod', 'UsernameMod', 'FileMod'};
-if any(ismember(dynamicFields, fieldnames(props)))
-    id = 'chidata:save:invalidProps';
-    msg = 'Incoming properties structure contains dynamic fields';
-    ME = MException(id, msg);
-    throw(ME);
-end % if-ismember
+% These are fields created in the save function
+hasDynamicFields = any(ismember(dynamicFields, fieldnames(props)));
+assert(~hasDynamicFields, ...
+    'chidata:save:invalidProps', ...
+    'Incoming properties structure contains');
 
 % Check that the size of data and props are equal
 dataSize = size(data, 2);
@@ -90,256 +162,72 @@ assert(isequal(dataSize, propSize), ...
     'chidata:save:dataPropMismatch', ...
     'The number of series in data does not match number of props');
 
-% Parse the input arguments
+end % function
+
+function [tolerance, prompt] = parseInputs(inVarargin)
+%PARSEINPUTS parses the varargin inputs to the main function call
+%
+% Santiago Sordo-Palacios, 2019
+
+% Input parse
 inP = inputParser;
-inP.addParameter('revisionTolerance', 1e-12, @isnumeric);
-inP.parse(varargin{:});
-revisionTolerance = inP.Results.revisionTolerance;
+inP.addParameter('tolerance', 1e-12, @isnumeric);
+inP.addParameter('userInput', '', @ischar);
+inP.parse(inVarargin{:});
+tolerance = inP.Results.tolerance;
+userInput = inP.Results.userInput;
 
 % Anonymous function to call prompt
-prompt = @(id, msg) cbd.chidata.prompt(id, msg);
-
-% Set boolean conditions that may change throughout
-writeIndex = false;
-addedSection = false;
-addedSeriesToSection = false;
-
-% Load the chidata directory
-chidataDir = cbd.chidata.dir();
-
-%% Index Step
-% Make sure index.csv has the series in it.
-% Load the index
-[index, indexFname] = cbd.chidata.loadIndex();
-
-% Check if the section is in the index
-hasSection = ismember(section, index.Section);
-if ~hasSection
-    % Prompt if adding a new seciton to the index
-    id = 'chidata:save:addNewSection';
-    msg = sprintf('Adding a new section "%s" to the index', section);
-    prompt(id, msg);
-    addedSection = true;
-end % if
-
-% Check if seriesID is in the index
-seriesVec = data.Properties.VariableNames;
-if addedSection
-    seriesInIndex = false(length(seriesVec));
+if isempty(userInput)
+    prompt = @(id, msg) cbd.chidata.prompt(id, msg);
 else
-    seriesInIndex = ismember(seriesVec, index.Series);
-end
+    prompt = @(id, msg) cbd.chidata.prompt(id, msg, userInput);
+end % if-isempty
 
-% Prompt if adding new series to the index
-if any(~seriesInIndex) && ~all(~seriesInIndex) && ~addedSection
-    missingFromIndex = strjoin(seriesVec(~seriesInIndex), ',');
-    id = 'chidata:save:addingSeries';
-    msg = sprintf(...
-        'Adding series "%s" to section "%s"', ...
-        missingFromIndex, section);
-    addedSeriesToSection = true;
-    prompt(id, msg);
-end
+end % function
 
-% Update index if adding new series to the section
-if any(~seriesInIndex)
-    index = [index; ...
-        table(seriesVec(~seriesInIndex)',  ...
-        repmat({section}, [sum(~seriesInIndex) 1]), ...
-        'VariableNames', {'Series', 'Section'})];
-    writeIndex = true;
-end
-
-nSer = length(seriesVec);
-for iSer = 1:nSer
-    oldSection = cbd.chidata.findSection(seriesVec{iSer}, index);
-    if ~strcmpi(oldSection, section)
-        id = 'chidata:save:changingSection';
-        msg = sprintf( ...
-            'Changing section of series "%s" from "%s" to "%s"', ...
-            seriesVec{iSer}, oldSection, section);
-        prompt(id, msg);
-        index{strcmpi(seriesVec{iSer}, index.Series), 2} = {section};
-        writeIndex = true;
-    end
-end
-
-%% Data step
-% Open the old data file
-try
-    [oldData, dataFile] = cbd.chidata.loadData(section);
-    oldDataExists = true;
-catch ME
-    expectedID = strcmpi(ME.identifier, 'chidata:loadData:notFound');
-    if expectedID
-        dataFile = fullfile(chidataDir, [section '_data.csv']);
-        oldDataExists = false;
-        if ~addedSection
-            id = 'chidata:save:newDataFile';
-            msg = sprintf('Creating new data file for "%s"', section);
-            prompt(id, msg);
-        end % if-notaddedSection
-    else
-        rethrow(ME);
-    end % if-else
-end % try-catch
-
-% Compare the data with the oldData
-if oldDataExists
-    
-    % Check the end date
-    newEndsBeforeOld = lt( ...
-        datenum(data.Properties.RowNames{end}), ...
-        datenum(oldData.Properties.RowNames{end}));
-    if newEndsBeforeOld
-        id = 'chidata:save:newEndsBeforeOld';
-        msg = 'Overwriting with new data that has earlier endDate';
-        prompt(id, msg);
-    end
-    
-    % Check the start date
-    newHasDiffStart = ne( ...
-        datenum(data.Properties.RowNames{1}), ...
-        datenum(oldData.Properties.RowNames{1}));
-    if newHasDiffStart
-        id = 'chidata:save:newHasDiffStart';
-        msg = 'Overwriting with new data that has different startDate';
-        prompt(id, msg);
-    end
-    
-    % Check the overall size
-    newIsShorter = size(oldData,1) > size(data,1);
-    if newIsShorter
-        id = 'chidata:save:newIsShorter';
-        msg = 'Overwriting with new data that has a shorter history';
-        prompt(id, msg);
-    end
-    
-    % Check if removing series
-    newHasFewerSeries = size(oldData,2) > size(data,2);
-    if newHasFewerSeries
-        id = 'chidata:save:newHasFewerSeries';
-        msg = 'Overwriting with new data that has fewer series';
-        prompt(id, msg);
-    end
-    
-    % Check if adding series
-    newHasMoreSeries = size(oldData,2) < size(data,2);
-    if newHasMoreSeries && ~addedSeriesToSection
-        id = 'chidata:save:newHasMoreSeries';
-        msg = 'Adding additional series to section';
-        prompt(id, msg);
-    end
-    
-    % Check if data are being revised
-    minLen = min(size(oldData, 1), size(data,1));
-    minWid = min(size(oldData, 2), size(data,2));
-    equalArray = lt( ...
-        abs(oldData{1:minLen, 1:minWid} - data{1:minLen, 1:minWid}), ...
-        revisionTolerance);
-    nanArray = arrayfun( ...
-        @isnan, oldData{1:minLen, 1:minWid}) | ...
-        arrayfun(@isnan, data{1:minLen, 1:minWid});
-    newHasRevisions = ~all(equalArray | nanArray);
-    if newHasRevisions
-        id = 'chidata:save:newHasRevisions';
-        msg = 'Overwriting with revised data';
-        prompt(id, msg);
-    end
-    
-end % if-oldDataExists
-
-%% Properties Step
-% Open the old properties file
-try
-    [oldProps, propFile] = cbd.chidata.loadProps(section);
-    oldPropsExists = true;
-catch ME
-    expectedID = strcmpi(ME.identifier, 'chidata:loadProps:notFound');
-    if expectedID
-        propFile = fullfile(chidataDir, [section '_prop.csv']);
-        oldPropsExists = false;
-        if ~addedSection
-            id = 'chidata:save:newPropsFile';
-            msg = sprintf('Creating new properties file for "%s"', section);
-            prompt(id, msg);
-        end % if-notaddedSection
-    else
-        throw(ME);
-    end
-end % try-catch
-
-% Check old properties
-if oldPropsExists
-    % Remove dynamic fields
-    try
-        oldProps = rmfield(oldProps, dynamicFields);
-    catch
-        legacyFields = {'Name', 'DateTimeMod'};
-        oldProps = rmfield(oldProps, legacyFields);
-    end
-    
-    % Check if properties are udpated
-    newHasDiffProps = ~isequal(oldProps, props);
-    if newHasDiffProps
-        id = 'chidata:save:overwriteProps';
-        msg = 'Overwriting with revised properties';
-        prompt(id, msg);
-    end
-end % try-catch
+function props = addDynamicFields(props)
+%ADDDYNAMICFIELDS adds the dynamic fields created by the save function
+%
+% Santiago Sordo-Palacios, 2019
 
 % Find the current date and username
-DateTimeMod = datestr(now);
-Username = getenv('username');
+thisDT = datestr(now);
+thisUser = getenv('username');
 
 % Find the file that calls chidata.save
 thisStack = dbstack('-completenames');
 [~, loc] = ismember(mfilename(), {thisStack.name});
 
-% Shift up one index to get calling file
-loc = loc + 1;
+% Shift up two positions to get calling file
+loc = loc + 2;
 if size(thisStack, 1) < loc
-    id = 'chidata:save:noCallFun';
-    msg = 'The function calling save could was not found';
-    prompt(id, msg);
-    FileMod = '';
+    callFile = 'N/A';
 else
-    FileMod = thisStack(loc).file;
+    callFile = thisStack(loc).file;
 end
 
-% Write the dynamic properties to the structure
-for iProp = 1:length(props)
-    props(iProp).DateTimeMod = DateTimeMod;
-    props(iProp).UsernameMod = Username;
-    props(iProp).FileMod = FileMod;
-end
+nProps = length(props);
+DateTimeMod = cellstr(repmat(thisDT, nProps, 1));
+UsernameMod = cellstr(repmat(thisUser, nProps, 1));
+FileMod = cellstr(repmat(callFile, nProps, 1));
+
+[props.DateTimeMod] = DateTimeMod{:};
+[props.UsernameMod] = UsernameMod{:};
+[props.FileMod] = FileMod{:};
+
+end % function
+
+function propTable = prop_struct2table(props, data)
+%PROP_STRUCT2TABLE transforms a properties structure into a table
+%
+% Santiago Sordo-Palacios, 2019
 
 % Convert structure to table
 propCell = squeeze(struct2cell(props));
-goodPropNames = all(~any(cellfun( ...
-    @strcmp, propCell, repmat({','}, size(propCell)))));
-assert(goodPropNames, ...
-    'chidata:save:badPropNames', ...
-    'Property names cannot contain commas.');
 cellNames = fieldnames(props);
 propTable = cell2table(propCell, ...
     'RowNames', cellNames, ...
     'VariableNames', data.Properties.VariableNames);
 
-%% Writing step
-
-% Write the index file if updated
-if writeIndex
-    writetable(index, indexFname);
-end
-
-% Write data file
-writetable(data, dataFile, 'WriteRowNames', true);
-
-% Write props file
-writetable(propTable, propFile, 'WriteRowNames', true);
-
-% Store output
-saved = true;
-
-end
+end % function
