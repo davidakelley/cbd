@@ -1,9 +1,9 @@
-Row,seriesB,seriesC,seriesD
-Frequency,freqB,freqC,freqD
-Magnitude,1,2,3
-AggType,aggB,aggC,aggD
-DataType,typeB,typeC,typeD
-Source,sourceB,sourceC,sourceD
-DateTimeMod,01/02/2019 12:00,01/03/2019 12:00,01/04/2019 12:00
-UsernameMod,nameB,nameC,nameD
-FileMod,fileB,fileC,fileD
+Row,series2,series3,series4
+Frequency,freq2,freq3,freq4
+Magnitude,2,3,4
+AggType,agg2,agg3,agg4
+DataType,type2,type3,type4
+Source,source2,source3,source4
+DateTimeMod,time2,time3,time4
+UsernameMod,name2,name3,name4
+FileMod,file2,file3,file4

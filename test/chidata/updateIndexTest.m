@@ -4,17 +4,17 @@ classdef updateIndexTest < chidataSuiteTest
     % Santiago Sordo-Palacios, 2019
 
     properties
-        prompt = @(id, msg) cbd.chidata.prompt(id, msg, 'y');
+        prompty = @(id, msg) cbd.chidata.prompt(id, msg, 'y');
+        promptn = @(id, msg) cbd.chidata.prompt(id, msg, 'n');
         testfun function_handle
     end % properties
 
     methods (TestMethodSetup)
 
         function getTestfun(tc)
-            tc.testfun = @(section, seriesNames) ...
-                cbd.chidata.updateIndex( ...
-                tc.expectedIndex, section, seriesNames, ...
-                tc.prompt);
+            tc.testfun = @(section, seriesNames, prompt) ...
+                cbd.chidata.updateIndex(tc.expectedIndex, ...
+                section, seriesNames, prompt);
         end % function
 
     end % methods
@@ -26,7 +26,7 @@ classdef updateIndexTest < chidataSuiteTest
             section = 'newSection';
             seriesNames = {'series1'};
             expectedErr = 'chidata:updateIndex:moveSeries';
-            actualErr = @() tc.testfun(section, seriesNames);
+            actualErr = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyError(actualErr, expectedErr);
         end % function
 
@@ -35,8 +35,8 @@ classdef updateIndexTest < chidataSuiteTest
             section = 'newSection';
             seriesNames = {'newSeries1', 'newSeries2'};
             expectedWarn = 'chidata:updateIndex:addSection';
-            actualWarn = @() tc.testfun(section, seriesNames);
-            tc.verifyWarning(actualWarn, expectedWarn);
+            actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
+            tc.verifyWarning(actualWarn, expectedWarn);            
         end % function
 
         function moveSeriesCase2(tc)
@@ -45,7 +45,7 @@ classdef updateIndexTest < chidataSuiteTest
             section = 'sectionB';
             seriesNames = {'series1'};
             expectedErr = 'chidata:updateIndex:moveSeries';
-            actualErr = @() tc.testfun(section, seriesNames);
+            actualErr = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyError(actualErr, expectedErr);
         end % function
 
@@ -54,7 +54,7 @@ classdef updateIndexTest < chidataSuiteTest
             % happens to the index returned
             section = 'sectionA';
             seriesNames = {'series1'};
-            actualIndex = tc.testfun(section, seriesNames);
+            actualIndex = tc.testfun(section, seriesNames, tc.promptn);
             tc.verifyEqual(actualIndex, tc.expectedIndex);
         end % function
 
@@ -63,7 +63,7 @@ classdef updateIndexTest < chidataSuiteTest
             section = 'sectionB';
             seriesNames = {'series2'};
             expectedWarn = 'chidata:updateIndex:removeSeries';
-            actualWarn = @() tc.testfun(section, seriesNames);
+            actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyWarning(actualWarn, expectedWarn);
         end % function
 
@@ -72,7 +72,7 @@ classdef updateIndexTest < chidataSuiteTest
             section = 'sectionA';
             seriesNames = {'series1', 'newSeries'};
             expectedWarn = 'chidata:updateIndex:addSeries';
-            actualWarn = @() tc.testfun(section, seriesNames);
+            actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyWarning(actualWarn, expectedWarn);
         end % function
         
@@ -81,7 +81,7 @@ classdef updateIndexTest < chidataSuiteTest
             section = 'sectionA';
             seriesNames = {'newSeries'};
             expectedWarn = 'chidata:updateIndex:modifySeries';
-            actualWarn = @() tc.testfun(section, seriesNames);
+            actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyWarning(actualWarn, expectedWarn);
         end % function
 

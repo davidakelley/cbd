@@ -39,20 +39,11 @@ props = prop_table2struct(propTable);
 
 % Return only one series if requested
 if nargin == 2
-    seriesInd = strcmpi(seriesID, {props.Name});
-    if sum(seriesInd) == 1
-        props = props(:, seriesInd);
-    elseif sum(seriesInd) > 1
-        % NOTE: This outcome should not occur since MATLAB does not allow
-        % for multiple identical variable names
-        error('chidata:loadProps:duplicateSeries', ...
-            'Multiple series found using "%s" in section "%s"', ...
-            seriesID, section);
-    else
-        error('chidata:loadProps:missingSeries', ...
-            'Series "%s" not found in section "%s"', ...
-            seriesID, section);
-    end % if-elseif
+    [hasSeries, loc] = ismember(seriesID, {props.Name});
+    assert(hasSeries, ...
+        'chidata:loadProps:missingSeries', ...
+        'Series "%s" not found in section "%s"');
+    props = props(:, loc);
 end % if-nargin
     
 end % function-loadProps

@@ -2,16 +2,14 @@ classdef (Sealed) fredseriesTest < sourceTest
     %FREDSERIES is the test suite for cbd.source.fredseries()
     %
     % USAGE
-    %   >> runtests('fredseries')
-    %
-    % SEE ALSO: SOURCESERIES
+    %   >> runtests('fredseriesTest')
     %
     % Santiago I. Sordo Palacios, 2019
     
     properties
         % The abstract properties from the parent class
         source      = 'fredseries';
-        seriesID    = 'UNRATE';
+        seriesID    = 'GDP';
         dbID        = 'FRED';
         testfun     = @(x,y) cbd.source.fredseries(x,y);
         benchmark   = 0.50646; %v1.2.0
@@ -38,11 +36,6 @@ classdef (Sealed) fredseriesTest < sourceTest
             tc.opts.asOf = [];
             tc.opts.asOfStart = [];
             tc.opts.asOfEnd = [];
-            [tc.apiKey, tc.fredURL] = cbd.source.connectFRED();
-        end % function
-        
-        function turnWarningsOff(tc) %#ok<MANU>
-            warning('off', 'fredseries:useHaver');
         end % function
         
         function checkConnectFRED(tc)
@@ -51,12 +44,6 @@ classdef (Sealed) fredseriesTest < sourceTest
             tc.fatalAssertTrue(foundFRED);
         end % function
         
-    end % methods
-    
-    methods (TestClassTeardown)
-        function turnWarningsOn(tc) %#ok<MANU>
-            warning('on', 'fredseries:useHaver')
-        end % function
     end % methods
     
     methods (Test)

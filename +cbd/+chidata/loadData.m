@@ -39,22 +39,19 @@ data = readtable(fname, ...
     'EndOfLine', '\n', ...
     'DatetimeType', 'text');
 
+% Check that the rownames are correct
+% TODO: Should this be a prompt?
+formattedRowNames = datestr(data.Properties.RowNames, 'dd-mmm-yyyy');
+data.Properties.RowNames = cellstr(formattedRowNames);
+
 % Return only one series if requested
 if nargin == 2
-    seriesInd = strcmpi(seriesID, data.Properties.VariableNames);
-    if sum(seriesInd) == 1
-        data = data(:, seriesInd);
-    elseif sum(seriesInd) > 1
-        % NOTE: This outcome should not occur since MATLAB does not allow
-        % for multiple identical variable names
-        error('chidata:loadData:duplicateSeries', ...
-            'Multiple series found using "%s" in section "%s"', ...
-            seriesID, section);
-    else
-        error('chidata:loadData:missingSeries', ...
-            'Series "%s" not found in section "%s"', ...
-            seriesID, section);
-    end % if-elseif
+    [hasSeries, loc] = ismember(seriesID, data.Properties.VariableNames);
+    assert(hasSeries, ...
+        'chidata:loadData:missingSeries', ...
+        'Series "%s" not found in section "%s"', ...
+        seriesID, section);
+    data = data(:, loc);
 end % if-nargin
 
 end % function-loadData

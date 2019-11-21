@@ -1,5 +1,5 @@
 function [data, props] = bloombergseries(seriesID, opts)
-%BLOOMBERGSERIES Fetch single Bloomberg series and returns it in a table
+%BLOOMBERGSERIES fetches a single Bloomberg series and returns as a table
 %
 % The function requires that the opts structure has all necessary fields
 % initialized (can be empty) except for dbID.
@@ -11,7 +11,7 @@ function [data, props] = bloombergseries(seriesID, opts)
 %       startDate   ~ datestr/datenum, the first date for the pull
 %       endDate     ~ datestr/datenum, the cutoff date for the pull
 %       frequency   ~ char, the specified frequency of the data
-%       field       ~ char, the field pulled from Bloomberg
+%       bbfield     ~ char, the field pulled from Bloomberg
 %
 % OUPTUTS:
 %   data            ~ table, the table of the series in cbd format
@@ -29,8 +29,6 @@ cbd.source.assertOpts(opts, reqFields, mfilename());
 % Set defaults
 defaultStartDate = datenum('1/1/1900');
 defaultEndDate = floor(now);
-defaultFreq = 'D';
-defBbfield = 'LAST_PRICE';
 
 % Parse the inputs
 c = cbd.source.connectBloomberg(opts.dbID);
@@ -41,18 +39,14 @@ startDate = cbd.source.parseDates(opts.startDate, ...
 endDate = cbd.source.parseDates(opts.endDate, ...
     'defaultDate', defaultEndDate, ...
     'formatOut', 'datenum');
-frequency = parseFrequency(opts.frequency, defaultFreq);
-bbfield = parseBbfield(opts.bbfield, defBbfield);
+frequency = parseFrequency(opts.frequency);
+bbfield = parseBbfield(opts.bbfield);
 
 % Get the data
-[fetch_data, security_info] = history( ...
-    c, sec, {bbfield}, startDate, endDate, frequency);
+fetch_data = history(c, sec, {bbfield}, startDate, endDate, frequency);
 
-% Check the pull
-noPull = ...
-    ~isequal(security_info{1}, sec) || ...
-    ~isnumeric(fetch_data) || ...
-    isempty(fetch_data);
+% Check the fetch
+noPull = ~isnumeric(fetch_data) || isempty(fetch_data);
 if noPull
     id = 'bloombergseries:noPull';
     msg = sprintf('Pull failed for "%s@%s" with bbfield "%s"', ...
@@ -73,6 +67,13 @@ warning off cbd:getFreq:oddDates
 data = cbd.disagg(dataRaw, frequency(1), 'NAN');
 warning on cbd:getFreq:oddDates
 
+% Trim out the extraneous dates before startDate
+% NOTE: This a fix for the @blp/history bug
+actualStartDate = datenum(data.Properties.RowNames{1});
+if actualStartDate < startDate
+    data = cbd.trim(data, 'startDate', startDate);
+end % if-startDate 
+
 % create the properties
 if nargout == 2
     props = struct;
@@ -87,23 +88,12 @@ end % if-nargin
 end % function-bloombergseries
 
 function seriesID = parseSeriesID(seriesID)
-%PARSESERIESID checks the validity of the seriesID and cleans for bloobmerg
+%PARSESERIESID checks the validity of the seriesID and cleans for history
 %
 % INPUTS:
 %   seriesID    ~ char, the name of the series being pull
 % OUPUTS:
 %   seriesID    ~ char, the cleaned version of the seriesID being pulled
-
-% Check for the yellow keys in SeriesID
-yellowKeys = {'GOVT', 'CORP', 'MTGE', 'M-MKT', 'Muni', ...
-    'PDF', 'EQUITY', 'COMDTY', 'INDEX', 'CURNCY', 'PORT'};
-hasYellowKey = contains(upper(seriesID), yellowKeys);
-
-if ~hasYellowKey
-    ykID = 'bloombergseries:noYellowKey';
-    ykMsg = 'No yellowKeys found in "%s" of bloombergseries';
-    warning(ykID, ykMsg, seriesID);
-end % if-nothasYellowKey
 
 % Add spaces to Bloomberg Series
 replacementChars = {'_', ' '; '|', '/'};
@@ -115,22 +105,22 @@ end
 
 end % function-parseSeriesID
 
-function freqOut = parseFrequency(freqIn, defaultFreq)
-%PARSEFREQUENCY parses the frequency input and returns cbd.disagg one
+function freqOut = parseFrequency(freqIn)
+%PARSEFREQUENCY parses the frequency input and returns the history() one
 %
 % INPUTS:
 %   frequency   ~ char, the input frequency
-%   defaultFreq ~ char, the default frequency if frequency is empty
 %
 % OUPUTS:
 %   frequency   ~ char, the output frequency expected by cbd.disagg
 
 if isempty(freqIn)
-    freqIn = defaultFreq;
+    freqOut = 'DAILY';
+    return
 end % if isempty
 
-longFreqs = {'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY'};
-shortFreqs = {'D', 'W', 'M', 'Q', 'Y'};
+longFreqs = {'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY'};
+shortFreqs = {'D', 'W', 'M', 'Q'};
 
 if length(freqIn) == 1
     [~, loc] = ismember(freqIn, shortFreqs);
@@ -149,21 +139,17 @@ freqOut = longFreqs{loc};
 
 end % function-parseFreq
 
-function bbfield = parseBbfield(bbfield, defBbfield)
+function bbfield = parseBbfield(bbfield)
 %PARSEFIELD parses the field input for bloomberg
 %
 % INPUTS:
 %   bbfield         ~ char, the input field
-%   defBbfield      ~ char, the default field if field is empty
 %
 % OUPUTS:
 %   bbfield         ~ char, the output field
 
 if isempty(bbfield)
-    bbfield = defBbfield;
+    bbfield = 'LAST_PRICE';
 end
 
 end % function-parseBbfield
-
-
-

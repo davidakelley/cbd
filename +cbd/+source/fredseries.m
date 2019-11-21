@@ -11,27 +11,16 @@ function [data, dataProp] = fredseries(seriesID, opts)
 %   seriesID        ~ char, the name of the series
 %   opts            ~ struct, the options structure with the fields:
 %       dbID        ~ char, the name of the database
-%       startDate   ~ char/double, the first date for the pull
-%       endDate     ~ char/double, the cutoff date for the pull
-%       asOf        ~
-%       asOfStart   ~
-%       asOfEnd     ~
+%       startDate   ~ char/double/datetime, the first date for the pull
+%       endDate     ~ char/double/datetime, the cutoff date for the pull
+%       asOf        ~ char/double/datetime, the realtime start&end
+%       asOfStart   ~ char/double/datetime, the realtime start
+%       asOfEnd     ~ char/double/datetime, the realtime end
 %
 % OUPTUTS:
 %   data            ~ table, the table of the series in cbd format
 %   props           ~ struct, the properties of the series
-%
-% USAGE:
-%
-%   data = FRED(seriesID, 'asOf', date) takes a date in serial format and
-%   returns the data as it was at that time.
-%
-%   [data, dates, vintageDates] = ...
-%       FRED(seriesID, 'asOfStart', startDate, 'asOfEnd', endDate)
-%   takes a pair of dates and returns every vintage of the data
-%   between (including) those dates. The vintages are labeled by the
-%   release date (or the start of the realtime period).
-%
+% 
 % David Kelley, 2014-2015
 % Santiago I. Sordo-Palacios, 2019
 
@@ -52,54 +41,54 @@ endDate = cbd.source.parseDates(opts.endDate, ...
     opts.asOf, opts.asOfStart, opts.asOfEnd, formatOut);
 
 %% Get Fred Data
+% Built the request URL base
 requestURL = [fredURL, ...
     'series/observations?series_id=', seriesID, ...
     '&api_key=', apiKey, ...
     '&file_type=json'];
 
+% Add the realtime compoennt
 if ~isempty(asOfStart) && ~isempty(asOfEnd)
     requestURL = [requestURL '&realtime_start=' asOfStart];
     requestURL = [requestURL '&realtime_end=' asOfEnd];
-elseif isempty(asOfStart) && isempty(asOfEnd)
-    id = 'fredseries:useHaver';
-    msg = 'Not using ALFRED in FRED pull, consider using Haver instead';
-    warning(id, msg);
 end
 
+% Add a start date
 if ~isempty(startDate)
     requestURL = [requestURL '&observation_start=' startDate];
 end
 
+% Add an end date
 if ~isempty(endDate)
     requestURL = [requestURL '&observation_end=' endDate];
 end
 
-urlResponse = cbd.source.urlread2(requestURL);
-
-%% Parse data
-structResp = cbd.source.parse_json(urlResponse);
-
-noPull = isfield(structResp, 'error_message');
-if noPull
-    id = 'fredseries:noPull';
-    msg = sprintf('Pull failed for %s@%s: \n %s', ...
-        seriesID, opts.dbID, structResp.error_message);
-	ME = MException(id, msg);
-    throw(ME);
-end % if-noPull
-
-rawD = cell2mat(structResp.observations);
-
+% Fetch the data
+try
+    structResp = webread(requestURL);
+catch ME
+    if strcmpi(ME.identifier, 'MATLAB:webservices:HTTP400StatusCodeError')
+        id = 'fredseries:noPull';
+        msg = sprintf('Pull failed for %s@%s', seriesID, opts.dbID);
+        newME = MException(id, msg);
+        newME = addCause(newME, ME); 
+        throw(newME);
+    else
+        rethrow(ME);
+    end %if-else
+end %try-catch
+    
+    
+%% Parse the response
+rawD = transpose(structResp.observations);
 temp = struct2cell(rawD);
 rt_s = str2double(strrep(temp(1, :)', '-', ''));
 rt_e = str2double(strrep(temp(2, :)', '-', ''));
 dates = temp(3, :)';
 values = str2double(temp(4, :)');
-
 nObs = size(rawD, 2);
 
 %% Create vintages at dates of change
-
 [u_rt_s, ~, rt_sInd] = unique(rt_s);
 [u_rt_e, ~, ~] = unique(rt_e);
 [uDate, ~, dateInd] = unique(dates);
@@ -174,12 +163,10 @@ if nargout == 2
         requestURL = [requestURL '&realtime_end=' asOfEnd];
     end
     
-    urlResponse = urlread(requestURL);
-    fredProp = cbd.source.parse_json(urlResponse);
-    
+    fredProp = webread(requestURL);    
     dataProp = struct;
     dataProp.ID = [seriesID '@FRED'];
-    dataProp.dbInfo = fredProp.seriess{1};
+    dataProp.dbInfo = fredProp.seriess;
     dataProp.value = [];
     dataProp.provider = 'fred';
 end
@@ -189,7 +176,7 @@ end % function-freseries
 function [asOfStart, asOfEnd] = parseAsOf(asOf, asOfStart, asOfEnd, formatOut)
 %PARSEASOF parses the asOf dates in fredseries into the realtime format
 %
-% INPUTS: See CBD.PRIVATE.FREDSERIES
+% INPUTS:
 %   formatOut   ~ char, the format to output fromd datestr()
 %   
 % OUPTUS:

@@ -1,8 +1,10 @@
 function [data, props] = chidataseries(seriesID, opts)
-%CHIDATASERIES Reads a series from CHIDATA and returns a table
+%CHIDATASERIES fetches a series from CHIDATA directory and returns a table
 %
 % The function requires that the opts structure has all necessary fields
 % initialized (can be empty) except for dbID.
+%
+% See the +chidata/folder for the functions used here
 %
 % INPUTS:
 %   seriesID        ~ char, the name of the series
@@ -10,17 +12,10 @@ function [data, props] = chidataseries(seriesID, opts)
 %       dbID        ~ char, the name of the database
 %       startDate   ~ datestr/datenum, the first date for the pull
 %       endDate     ~ datestr/datenum, the cutoff date for the pull
-%       frequency   ~ char, the specified frequency of the data
-%       field       ~ char, the field pulled from Bloomberg
 %
 % OUPTUTS:
 %   data            ~ table, the table of the series in cbd format
 %   props           ~ struct, the properties of the series
-%
-% SEE ALSO:
-%   CBD.CHIDATA_SAVE
-%   CBD.CHIDATA_PROP
-%   CBD.CHIDATA_DIR
 %
 % David Kelley, 2015-2019
 % Santiago I. Sordo-Palacios, 2019
@@ -32,16 +27,18 @@ index = cbd.chidata.loadIndex();
 cbd.source.assertSeries(seriesID, mfilename());
 reqFields = {'dbID', 'startDate', 'endDate'};
 cbd.source.assertOpts(opts, reqFields, mfilename());
-% TODO: better handling of the following:
-assert(isequal(opts.dbID, 'CHIDATA'), 'chidataseries:invaliddbID', ... 
+assert(isequal(opts.dbID, 'CHIDATA'), ...
+    'chidataseries:invaliddbID', ... 
     'dbID "%s" in chidataseries is not CHIDATA', opts.dbID);
 startDate = cbd.source.parseDates(opts.startDate);
 endDate = cbd.source.parseDates(opts.endDate);
 
 %% Get file name, read the data
 if ~isKey(index, seriesID)
-    error('chidataseries:noPull', ...
-        'Series "%s" is not found in the index', seriesID);
+    id = 'chidataseries:noPull';
+    msg = sprintf('Series "%s" is not found in the index', seriesID);
+    ME = MException(id, msg);
+    throw(ME);
 else
     section = index(seriesID);
 end % if-else
@@ -65,6 +62,7 @@ if nargout == 2
     props.dbInfo = cbd.chidata.loadProps(section, seriesID);
     props.value = [];
     props.provider = 'chidata';
+    props.chidataDir = cbd.chidata.dir();
 end
 
 end

@@ -2,7 +2,7 @@ classdef (Sealed) bloombergseriesTest < sourceTest
     %BLOOMBERGSERIES is the test suite for cbd.source.bloombergseries()
     %
     % USAGE
-    %   >> runtests('bloombergseries')
+    %   >> runtests('bloombergseriesTest')
     %
     % SEE ALSO: SOURCETEST
     %
@@ -19,8 +19,8 @@ classdef (Sealed) bloombergseriesTest < sourceTest
     properties (Constant)
         XexpectedFreq = 'DAILY'; % The default frequency
         XinvalidFreq = {'INVALID', 'I'}; % Invalid frequencies
-        XshortFreq = {'D', 'W', 'M', 'Q', 'Y'}; % short frequencies
-        XlongFreq = {'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY'};
+        XshortFreq = {'D', 'W', 'M', 'Q'}; % short frequencies
+        XlongFreq = {'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY'};
         XepectedBbfield = 'LAST_PRICE'; % The default field
         XotherBbfield = 'PX_BID'; % Another field to Test pull
     end % properties-constant
@@ -34,21 +34,11 @@ classdef (Sealed) bloombergseriesTest < sourceTest
             tc.opts.frequency = '';
         end % function
 
-        function turnWarningsOff(tc) %#ok<MANU>
-            warning('off', 'bloombergseries:noYellowKey')
-        end % function
-
         function checkConnectBloomberg(tc)
             c = cbd.source.connectBloomberg();
             tc.fatalAssertTrue(isequal(isconnection(c), 1))
         end % function
 
-    end % methods
-
-    methods (TestClassTeardown)
-        function turnWarningsOn(tc) %#ok<MANU>
-            warning('on', 'bloombergseries:noYellowKey')
-        end % function
     end % methods
 
     methods (Test)

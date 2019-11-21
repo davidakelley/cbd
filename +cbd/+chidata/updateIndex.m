@@ -2,13 +2,13 @@ function [updatedIndex, isNewSection] = updateIndex(index, thisSection, curSerie
 %UPDATEINDEX is the helper function to update an index container
 %
 % INPUTS:
-%   index       ~ containers.Map, the index from cbd.chidata.loadIndex
-%   section     ~ char, the name of the section being updated
-%   seriesNames ~ cell, the names from data.Properties.VariableNames
-%   prompt      ~ function handle, the function handle for user prompts
+%   index           ~ containers.Map, the index from cbd.chidata.loadIndex
+%   section         ~ char, the name of the section being updated
+%   seriesNames     ~ cell, the names from data.Properties.VariableNames
+%   prompt          ~ function handle, the function handle for user prompts
 %
 % OUTPUTS:
-%   updatedIndex~ containers.Map, the updated index
+%   updatedIndex    ~ containers.Map, the updated index
 %
 % Santiago Sordo-Palacios, 2019
 
@@ -65,19 +65,23 @@ if ~isNewSection
         prompt(id, msg);
         seriesToAdd = curSeries(~curInOld);
         updatedIndex = addToIndex(index, thisSection, seriesToAdd);
-    elseif ~all(curInOld) && ~all(oldInCur) && ~all(isNewSeries)
+    elseif ~all(curInOld) && ~all(oldInCur)
+        if ~all(isNewSeries)
         error('chidata:updateIndex:moveSeries', ...
             'The section "%s" cannot contain series already defined', ...
             thisSection);
-    elseif ~all(curInOld) && ~all(oldInCur) && all(isNewSeries)
+        elseif all(isNewSeries)
             id = 'chidata:updateIndex:modifySeries';
-            msg = sprintf('Adding and removing series from section "%s"', ...
+            msg = sprintf( ...
+                'Adding and removing series from section "%s"', ...
                 thisSection);
             prompt(id, msg);
             seriesToRemove = oldSeries(~oldInCur);
             updatedIndex = remove(index, seriesToRemove);
             seriesToAdd = curSeries(~curInOld);
-            updatedIndex = addToIndex(updatedIndex, thisSection, seriesToAdd);
+            updatedIndex = addToIndex( ...
+                updatedIndex, thisSection, seriesToAdd);
+        end % if-elseif  
     end % if-elseif
 end % if-notNewSection
 

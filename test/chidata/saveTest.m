@@ -49,7 +49,7 @@ classdef saveTest < chidataSuiteTest
 
         function saveDataPropMismatchCase1(tc)
             expectedErr = 'chidata:save:dataPropMismatch';
-            tc.data.seriesB = tc.data.seriesA;
+            tc.data.seriesB = tc.data.series1;
             actualErr = @() ...
                 cbd.chidata.save(tc.section, tc.data, tc.props);
             tc.verifyError(actualErr, expectedErr);

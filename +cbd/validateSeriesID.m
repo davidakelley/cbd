@@ -1,5 +1,5 @@
-function [valid, Struct] = checkSeries(series)
-% CHECKSERIES checks if a series is a valid cbd pull
+function [valid, Struct] = validateSeriesID(series)
+% VALIDATESERIESID checks if a series is a valid cbd pull
 %
 % [valid, Struct] = checkSeries(series)
 %

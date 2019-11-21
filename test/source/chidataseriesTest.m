@@ -2,10 +2,10 @@ classdef (Sealed) chidataseriesTest < sourceTest
     %CHIDATASERIES is the test suite for cbd.source.chidataseries()
     %
     % USAGE
-    %   >> runtests('chidataseries')
+    %   >> runtests('chidataseriesTest')
     %
-    % NOTE
-    % For general tests of the chidata suite, see CHIDATASUITETEST
+    % NOTE:
+    %   For general tests of the chidata suite, see CHIDATASUITETEST
     %
     % Santiago I. Sordo Palacios, 2019
 
@@ -35,8 +35,8 @@ classdef (Sealed) chidataseriesTest < sourceTest
             % Set-up the CHIDATA directory
             clear '+cbd/+chidata/dir.m'
             thisPath = mfilename('fullpath');
-            thisFile = 'source\chidataseriesTest';
-            supportName = 'chidata\support';
+            thisFile = fullfile('source', 'chidataseriesTest');
+            supportName = fullfile('chidata', 'support');
             tc.supportDir = strrep(thisPath, thisFile, supportName);
             mkdir(tc.testDir);
             copyfile(tc.supportDir, tc.testDir)
@@ -49,6 +49,7 @@ classdef (Sealed) chidataseriesTest < sourceTest
         function teardownOnce(tc)
             % Remove the chidata directory
             rmdir(tc.testDir, 's')
+            clear '+cbd/+chidata/dir.m'
         end % function
     end % methods
 
@@ -94,6 +95,12 @@ classdef (Sealed) chidataseriesTest < sourceTest
             [~, props] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyTrue(isfield(props.dbInfo, 'FileMod'));
         end % function
+        
+        function chidataDirProp(tc)
+            [~, props] = tc.testfun(tc.seriesID, tc.opts);
+            tc.verifyTrue(isfield(props, 'chidataDir'));
+        end % function
+        
     end % methods
 
 end % classdef

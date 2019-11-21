@@ -2,9 +2,7 @@ classdef (Sealed) haverseriesTest < sourceTest
     %HAVERSERIESTEST is the test suite for cbd.source.haverseries
     %
     % USAGE
-    %   >> runtests('haverseries')
-    %
-    % SEE ALSO: SOURCETEST
+    %   >> runtests('haverseriesTest')
     %
     % Santiago Sordo-Palacios, 2019
 
@@ -42,7 +40,7 @@ classdef (Sealed) haverseriesTest < sourceTest
     methods (Test)
 
         function otherDB(tc)
-            % Test a pull to tc.otherdbID
+            % Test a pull to a different dbID
             tc.seriesID = tc.otherSeriesID;
             tc.opts.dbID = tc.otherdbID;
             [data, prop] = tc.testfun(tc.seriesID, tc.opts);
@@ -52,41 +50,6 @@ classdef (Sealed) haverseriesTest < sourceTest
             tc.verifyEqual(actualdbID, tc.opts.dbID);
         end % function
 
-        function allDB(tc)
-            % Attempt to establish haver() to all db's in haverPath
-            haverFileList = cellstr(ls(tc.haverPath));
-            idx = contains(lower(haverFileList), lower(tc.haverExt));
-            datFileList = haverFileList(idx);
-            nDat = length(datFileList);
-            for iDat = 1:nDat
-                thisFile = fullfile(tc.haverPath, datFileList{iDat});
-                thisConn = ishaver(thisFile);
-                tc.verifyEqual(thisConn, thisFile);
-            end % for-iDat
-        end % function
-
     end % methods
 
 end % classdef
-
-function dbname = ishaver(fname)
-%ISHAVER checks the connection to a haver database
-%
-% This function is used in the allDB test to produce a cleaner output
-% when a specific connection fails
-%
-% INPUTS:
-%   fname   ~ char, the name of the attempted database
-% OUTPUTS:
-%   dbname  ~ char, the name of the resulting database
-%           empty if the haver() call fails
-
-try
-    c = haver(fname);
-    assert(isequal(isconnection(c), 1));
-    dbname = c.DatabaseName;
-catch
-    dbname = '';
-end % try-catch
-
-end % function

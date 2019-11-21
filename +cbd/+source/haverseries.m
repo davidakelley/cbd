@@ -1,5 +1,5 @@
 function [data, props] = haverseries(seriesID, opts)
-%HAVERSERIES Fetch single Haver series and returns it in a table
+%HAVERSERIES fetches single Haver series and returns it as a table
 %
 % The function requires that the opts structure has all necessary fields
 % initialized (can be empty) except for dbID.
@@ -51,6 +51,7 @@ endDate = cbd.source.parseDates(opts.endDate, ...
 
 % Fetch the data from Haver
 fetch_data = fetch(c, seriesID, startDate, endDate);
+close(c);
 
 %% Format to cbd-style
 % Create the data table

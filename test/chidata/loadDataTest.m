@@ -5,7 +5,7 @@ classdef loadDataTest < chidataSuiteTest
 
     methods (Test)
 
-        function dataNotFound(tc)
+        function notFound(tc)
             % Test that a data file is not found
             tc.initializeTestDir(tc);
             delete(fullfile(tc.testDir, 'sectionA_data.csv'));
@@ -14,21 +14,21 @@ classdef loadDataTest < chidataSuiteTest
             tc.verifyError(actualErr, expectedErr);
         end % function
 
-        function dataReadSectionA(tc)
+        function readSectionA(tc)
             % Test that the data reads-in as expected
             tc.initializeTestDir(tc);
             actualData = cbd.chidata.loadData('sectionA');
             tc.verifyEqual(actualData, tc.expectedSectionAData);
         end % function
 
-        function dataReadSectionB(tc)
+        function readSectionB(tc)
             % Test that multiple timeseries can be read-in as expected
             tc.initializeTestDir(tc);
             actualData = cbd.chidata.loadData('sectionB');
             tc.verifyEqual(actualData, tc.expectedSectionBData);
         end % function
 
-        function dataMissingSeries(tc)
+        function missingSeries(tc)
             % Test the correct error when a series is missing
             tc.initializeTestDir(tc);
             expectedErr = 'chidata:loadData:missingSeries';
@@ -37,10 +37,10 @@ classdef loadDataTest < chidataSuiteTest
             tc.verifyError(actualErr, expectedErr);
         end % function
 
-        function dataReadOneSeries(tc)
+        function readOneSeries(tc)
             % Test that a single series can be read-in from multi-series
             tc.initializeTestDir(tc);
-            selectedSeries = 'seriesC';
+            selectedSeries = 'series3';
             actualData = cbd.chidata.loadData('sectionB', selectedSeries);
             expectedData = tc.expectedSectionBData(:, selectedSeries);
             tc.verifyEqual(actualData, expectedData);
