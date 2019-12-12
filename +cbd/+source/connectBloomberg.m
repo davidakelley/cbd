@@ -10,7 +10,7 @@ function c = connectBloomberg(dbID)
 % Santiago I. Sordo-Palacios, 2019
 
 if nargin == 1
-    assert(isequal(dbID, 'BLOOMBERG'), ...
+    assert(strcmpi(dbID, 'BLOOMBERG'), ...
         'bloombergseries:invaliddbID', ...
         'bloombergseries dbID "%s" is not BLOOMBERG', dbID);
 end % if-nargin
@@ -24,11 +24,12 @@ if ~onPath
     foundFile = ~ischar(fmsg);
     assert(foundFile, ...
         'connectBloomberg:jarNotFound', ...
-        '%s cannot be found', jarFile);
+        'The BLP jar file "%s" cannot be found', jarFile);
     javaaddpath(jarFile);
 end % if-notonPath
 
 % Create the Bloomberg connection
-c = blp;
+maxWait = 30000; % in miliseconds
+c = blp([], [], maxWait);
 
 end % function-connectBloomberg

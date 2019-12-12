@@ -50,7 +50,6 @@ classdef (Abstract) sourceTest < matlab.unittest.TestCase
     end % methods
 
     methods (Test)
-
         %% Tests for seriesID
         function nullSeries(tc)
             % Tests a null seriesID
@@ -97,6 +96,16 @@ classdef (Abstract) sourceTest < matlab.unittest.TestCase
             tc.verifyGreaterThan(size(data, 1), 100);
             tc.verifyEqual(size(data, 2), 1);
             tc.verifyEqual(data.Properties.VariableNames{1}, tc.seriesID)
+        end % function
+        
+        % Test case-insensitive call
+        function caseInsensitive(tc)
+            changeCase = @(x) ...
+                regexprep(lower(x),'(\<[a-z])','${upper($1)}');
+            tc.seriesID = changeCase(tc.seriesID);
+            tc.dbID = changeCase(tc.dbID);
+            data = tc.testfun(tc.seriesID, tc.opts);
+            tc.verifyTrue(~isempty(data));
         end % function
 
         %% Tests for dbID

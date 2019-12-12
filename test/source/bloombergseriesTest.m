@@ -17,12 +17,8 @@ classdef (Sealed) bloombergseriesTest < sourceTest
     end % properties
 
     properties (Constant)
-        XexpectedFreq = 'DAILY'; % The default frequency
-        XinvalidFreq = {'INVALID', 'I'}; % Invalid frequencies
         XshortFreq = {'D', 'W', 'M', 'Q'}; % short frequencies
         XlongFreq = {'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY'};
-        XepectedBbfield = 'LAST_PRICE'; % The default field
-        XotherBbfield = 'PX_BID'; % Another field to Test pull
     end % properties-constant
 
     methods (TestClassSetup)
@@ -42,6 +38,9 @@ classdef (Sealed) bloombergseriesTest < sourceTest
     end % methods
 
     methods (Test)
+        
+        function caseInsensitive(tc)
+        
         %% Tests for frequency
         function missFreq(tc)
             % Test pull with missing frequency
@@ -54,15 +53,17 @@ classdef (Sealed) bloombergseriesTest < sourceTest
         function nullFreq(tc)
             % Test pull with empty frequency
             tc.opts.frequency = '';
+            expectedFreq = 'DAILY';
             [~, dataProp] = tc.testfun(tc.seriesID, tc.opts);
-            tc.verifyEqual(dataProp.frequency, tc.XexpectedFreq);
+            tc.verifyEqual(dataProp.frequency, expectedFreq);
         end % function
 
         function invalidFreq(tc)
             expectedErr = 'bloombergseries:invalidFrequency';
-            nInv = length(tc.XinvalidFreq);
+            invalidFreqCell = {'INVALID', 'I'};
+            nInv = length(invalidFreqCell);
             for iInv = 1:nInv
-                tc.opts.frequency = tc.XinvalidFreq{iInv};
+                tc.opts.frequency = invalidFreqCell{iInv};
                 actualErr = @() tc.testfun(tc.seriesID, tc.opts);
                 tc.verifyError(actualErr, expectedErr);
             end % for-iChar
@@ -112,10 +113,11 @@ classdef (Sealed) bloombergseriesTest < sourceTest
         function nullBbfield(tc)
             % Test pull with a blank field
             tc.opts.bbfield = '';
+            expectedBbfield = 'LAST_PRICE';
             [data, prop] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyGreaterThan(size(data, 1), 100);
             tc.verifyEqual(size(data, 2), 1);
-            tc.verifyEqual(prop.bbfield, tc.XepectedBbfield);
+            tc.verifyEqual(prop.bbfield, expectedBbfield);
         end % function
 
         function invalidBbfield(tc)
@@ -131,20 +133,20 @@ classdef (Sealed) bloombergseriesTest < sourceTest
 
         function expectedBbfield(tc)
             % Test pull with the expected Bbfield
-            tc.opts.bbfield = tc.XepectedBbfield;
+            tc.opts.bbfield = 'LAST_PRICE';
             [data, prop] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyGreaterThan(size(data, 1), 100);
             tc.verifyEqual(size(data, 2), 1);
-            tc.verifyEqual(prop.bbfield, tc.XepectedBbfield);
+            tc.verifyEqual(prop.bbfield, tc.opts.bbfield);
         end % function
 
         function otherBbfield(tc)
             % Test pull with different field
-            tc.opts.bbfield = tc.XotherBbfield;
+            tc.opts.bbfield = 'PX_BID';
             [data, prop] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyGreaterThan(size(data, 1), 100);
             tc.verifyEqual(size(data, 2), 1);
-            tc.verifyEqual(prop.bbfield, tc.XotherBbfield);
+            tc.verifyEqual(prop.bbfield, tc.opts.bbfield);
         end % function
 
     end % methods-test

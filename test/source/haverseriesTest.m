@@ -15,14 +15,6 @@ classdef (Sealed) haverseriesTest < sourceTest
         benchmark = 0.31258; %v1.2.0
     end % properties
 
-    properties (Constant)
-        % The constant properties for the haverseries tests
-        haverPath = 'R:\_appl\Haver\DATA\'; % Path to the Haver files
-        haverExt = '.dat'; % Extension of Haver data
-        otherSeriesID = 'FRBCNAIM'; % A second seriesID to pull
-        otherdbID = 'SURVEYS'; % A second datavase to test
-    end % properties
-
     methods (TestClassSetup)
 
         function haverOpts(tc)
@@ -41,8 +33,8 @@ classdef (Sealed) haverseriesTest < sourceTest
 
         function otherDB(tc)
             % Test a pull to a different dbID
-            tc.seriesID = tc.otherSeriesID;
-            tc.opts.dbID = tc.otherdbID;
+            tc.seriesID = 'FRBCNAIM';
+            tc.opts.dbID = 'SURVEYS';
             [data, prop] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyGreaterThan(size(data, 1), 100);
             tc.verifyEqual(size(data, 2), 1);

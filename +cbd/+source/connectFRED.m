@@ -12,7 +12,7 @@ function [apiKey, fredURL, foundFRED] = connectFRED(dbID)
 % Santiago I. Sordo-Palacios
 
 if nargin == 1
-    assert(isequal(dbID, 'FRED'), ...
+    assert(strcmpi(dbID, 'FRED'), ...
         'fredseries:invaliddbID', ...
         'fredseries dbID "%s" is not FRED', dbID);
 end % if-nargin
@@ -32,10 +32,10 @@ if nargout == 3
         foundFRED = true;
     catch ME
         id = 'fredseries:badFREDconn';
-        message = 'Could not perform a GDP pull for FRED database';
+        message = 'The provided API Key failed to download GDP data';
         MEnew = MException(id, message);
         MEnew = addCause(MEnew, ME);
-        throwAsCaller(MEnew)
+        throw(MEnew)
     end % try-catch
 end % if-nargout
 

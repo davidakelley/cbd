@@ -1,9 +1,9 @@
-classdef expressiontest < matlab.unittest.TestCase
+classdef expressionTest < matlab.unittest.TestCase
     %EXPRESSIONTEST is the test suite for cbd.expression and
     %by extension of cbd.private.expression_eval
     %
     % USAGE
-    %   >> runtests('expressiontest')
+    %   >> runtests('expressionTest')
     %
     % SEE ALSO: SOURCESERIES
     %
@@ -27,8 +27,6 @@ classdef expressiontest < matlab.unittest.TestCase
         
         startDate = '01-Jan-2000';
         endDate = '31-Dec-2000';
-        typeErr = 'MATLAB:invalidType';
-        validationErr = 'MATLAB:InputParser:ArgumentFailedValidation';
     end % properties
     
     methods (TestClassSetup)
@@ -50,10 +48,6 @@ classdef expressiontest < matlab.unittest.TestCase
             tc.optsB.asOfEnd = [];
         end % function
         
-        function offWarn(tc) %#ok<MANU>
-            warning('off', 'fredseries:useHaver');
-        end % function
-        
         function getData(tc)
             tc.dataA = tc.funA(tc.idA, tc.optsA);
             tc.dataB = tc.funB(tc.idB, tc.optsB);
@@ -67,59 +61,8 @@ classdef expressiontest < matlab.unittest.TestCase
         end % function
     end % methods
     
-    methods (Test)
-        %% Test expression errors
-        function badSeriesInput(tc)
-            actualErr = @() cbd.expression("");
-            tc.verifyError(actualErr, tc.typeErr);
-        end % function
-        
-        function badDBInput(tc)
-            actualErr = @() cbd.expression(tc.seriesA, 'dbId', "");
-            tc.verifyError(actualErr, tc.validationErr);
-        end % function
-        
-        function badStartDateInput(tc)
-            actualErr = @() cbd.expression(tc.seriesA, 'startDate', "");
-            tc.verifyError(actualErr, tc.typeErr);
-        end % function
-        
-        function badEndDateInput(tc)
-            actualErr = @() cbd.expression(tc.seriesA, 'endDate', "");
-            tc.verifyError(actualErr, tc.typeErr);
-        end % function
-        
-        function badIgnoreNanInput(tc)
-            actualErr = @() cbd.expression(tc.seriesA, 'ignoreNan', "");
-            tc.verifyError(actualErr, tc.validationErr);
-        end % function
-        
-        function badAsOf(tc)
-            actualErr = @() cbd.expression(tc.seriesA, 'asOf', "");
-            tc.verifyError(actualErr, tc.typeErr);
-        end % function
-        
-        function badAsOfStart(tc)
-            actualErr = @() cbd.expression(tc.seriesA, 'asOfStart', "");
-            tc.verifyError(actualErr, tc.typeErr);
-        end % function
-        
-        function badAsOfEnd(tc)
-            actualErr = @() cbd.expression(tc.seriesA, 'asOfEnd', "");
-            tc.verifyError(actualErr, tc.typeErr);
-        end % function
-        
-        function badFrequency(tc)
-            actualErr = @() cbd.expression(tc.seriesA, 'frequency', "");
-            tc.verifyError(actualErr, tc.typeErr);
-        end % function
-        
-        function badBbfield(tc)
-            actualErr = @() cbd.expression(tc.seriesA, 'bbfield', "");
-            tc.verifyError(actualErr, tc.typeErr);
-        end % function
-        
-        %% Test expression_eval errors
+    methods (Test)       
+        %% Test expression_eval input errors
         function specTooManyD(tc)
             expectedErr = 'expression_eval:spec';
             testStr = '%d%d';
@@ -150,7 +93,7 @@ classdef expressiontest < matlab.unittest.TestCase
         end % function
         
         function badFunction(tc)
-            expectedErr = 'expression_eval:function';
+            expectedErr = 'expression_eval:missFunction';
             testStr = ['BADFUN(' tc.seriesA ')'];
             actualErr = @() cbd.expression(testStr);
             tc.verifyError(actualErr, expectedErr);
@@ -189,7 +132,7 @@ classdef expressiontest < matlab.unittest.TestCase
         % Note: these tests are equivalent to those in haverseries
         function nullSeries(tc)
             % Bad data series
-            expectedErr = 'haverseries:nullSeries';
+            expectedErr = 'expression_eval:invalidInput';
             actualErr = @() cbd.expression(' ');
             tc.verifyError(actualErr, expectedErr);
         end

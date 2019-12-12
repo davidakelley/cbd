@@ -17,15 +17,9 @@ classdef (Sealed) fredseriesTest < sourceTest
     
     properties (Constant)
         % The constant properties for the fredseries tests
-        asOf        = '12/31/1999'; % the asOf date to test vintage
-        asOfStart   = '6/30/2014'; % the asOfStart to test vintage
+        asOf        = '01/01/2000'; % the asOf date to test vintage
+        asOfStart   = '01/01/2000'; % the asOfStart to test vintage
         asOfEnd     = today(); % the asOfEnd to test vintage data
-    end % properties
-    
-    properties
-        % Other properties needed in fredseries
-        apiKey
-        fredURL
     end % properties
     
     methods (TestClassSetup)

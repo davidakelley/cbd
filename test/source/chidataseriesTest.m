@@ -54,7 +54,6 @@ classdef (Sealed) chidataseriesTest < sourceTest
     end % methods
 
     methods (Test)
-
         % Test the chidata-specific properties
         function aggTypeProp(tc)
             [~, props] = tc.testfun(tc.seriesID, tc.opts);
