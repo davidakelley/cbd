@@ -1,4 +1,4 @@
-classdef saveTest < chidataSuiteTest
+classdef (Sealed) saveTest < parentChidata
     %SAVETEST is the test suite for the cbd.chidata.save function
     %
     % Santiago Sordo-Palacios, 2019
@@ -49,7 +49,7 @@ classdef saveTest < chidataSuiteTest
 
         function saveDataPropMismatchCase1(tc)
             expectedErr = 'chidata:save:dataPropMismatch';
-            tc.data.seriesB = tc.data.series1;
+            tc.data.seriesB = tc.data.SERIES1;
             actualErr = @() ...
                 cbd.chidata.save(tc.section, tc.data, tc.props);
             tc.verifyError(actualErr, expectedErr);
@@ -83,7 +83,7 @@ classdef saveTest < chidataSuiteTest
             
             % Create the new section, data, and props
             expSection = 'newSection';
-            expSeries = 'newSeries';
+            expSeries = 'NEWSERIES';
             tc.data.Properties.VariableNames = {expSeries};
             expData = tc.data;
             expProps = tc.props;

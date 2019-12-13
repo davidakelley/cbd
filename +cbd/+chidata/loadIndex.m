@@ -60,7 +60,10 @@ assert(~duplicateSeries, ...
     'Index file "%s" contains duplicate series entries', ...
     fname);
 
+% Replace the series with the upper case versions
+series = upper(indexTable.Series);
+
 % Create a container for the index
-index = containers.Map(indexTable.Series, indexTable.Section);
+index = containers.Map(series, indexTable.Section);
 
 end % function

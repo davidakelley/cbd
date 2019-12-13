@@ -39,6 +39,9 @@ data = readtable(fname, ...
     'EndOfLine', '\n', ...
     'DatetimeType', 'text');
 
+% Replace variables with uppercase version
+data.Properties.VariableNames = upper(data.Properties.VariableNames);
+
 % Check that the rownames are correct
 % TODO: Should this be a prompt?
 formattedRowNames = datestr(data.Properties.RowNames, 'dd-mmm-yyyy');
@@ -46,11 +49,15 @@ data.Properties.RowNames = cellstr(formattedRowNames);
 
 % Return only one series if requested
 if nargin == 2
+    % Look for the series in the variable names
+    seriesID = upper(seriesID);
     [hasSeries, loc] = ismember(seriesID, data.Properties.VariableNames);
     assert(hasSeries, ...
         'chidata:loadData:missingSeries', ...
         'Series "%s" not found in section "%s"', ...
         seriesID, section);
+    
+    % Index into the series of interest
     data = data(:, loc);
 end % if-nargin
 

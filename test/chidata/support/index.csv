@@ -1,6 +1,9 @@
 Series,Section
-series1,sectionA
-series2,sectionB
-series3,sectionB
-series4,sectionB
-testSeries,testSection
+BBSDEMAND,disagg
+BBSOUTLOOK,disagg
+SERIES1,sectionA
+SERIES2,sectionB
+SERIES3,sectionB
+SERIES4,sectionB
+TESTSERIES,testSection
+MLU67G,agg

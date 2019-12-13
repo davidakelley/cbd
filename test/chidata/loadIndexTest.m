@@ -1,4 +1,4 @@
-classdef loadIndexTest < chidataSuiteTest
+classdef (Sealed) loadIndexTest < parentChidata
     %LOADINEXTEST is the test suite for cbd.chidata.loadIndex
     %
     % Santiago Sordo-Palacios, 2019

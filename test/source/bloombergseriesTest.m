@@ -1,4 +1,4 @@
-classdef (Sealed) bloombergseriesTest < sourceTest
+classdef (Sealed) bloombergseriesTest < parentSource
     %BLOOMBERGSERIES is the test suite for cbd.source.bloombergseries()
     %
     % USAGE
@@ -38,9 +38,6 @@ classdef (Sealed) bloombergseriesTest < sourceTest
     end % methods
 
     methods (Test)
-        
-        function caseInsensitive(tc)
-        
         %% Tests for frequency
         function missFreq(tc)
             % Test pull with missing frequency

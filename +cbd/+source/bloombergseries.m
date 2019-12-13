@@ -33,10 +33,10 @@ defaultEndDate = floor(now);
 % Parse the inputs
 c = cbd.source.connectBloomberg(opts.dbID);
 sec = parseSeriesID(seriesID);
-startDate = cbd.source.parseDates(opts.startDate, ...
+startDate = cbd.private.parseDates(opts.startDate, ...
     'defaultDate', defaultStartDate, ...
     'formatOut', 'datenum');
-endDate = cbd.source.parseDates(opts.endDate, ...
+endDate = cbd.private.parseDates(opts.endDate, ...
     'defaultDate', defaultEndDate, ...
     'formatOut', 'datenum');
 frequency = parseFrequency(opts.frequency);
@@ -94,6 +94,9 @@ function seriesID = parseSeriesID(seriesID)
 %   seriesID    ~ char, the name of the series being pull
 % OUPUTS:
 %   seriesID    ~ char, the cleaned version of the seriesID being pulled
+
+% Make uppercase because history() is case sensitive
+seriesID = upper(seriesID);
 
 % Add spaces to Bloomberg Series
 replacementChars = {'_', ' '; '|', '/'};

@@ -1,4 +1,4 @@
-classdef loadDataTest < chidataSuiteTest
+classdef (Sealed) loadDataTest < parentChidata
     %LAODDATATEST is the test suite for cbd.chidata.loadData()
     %
     % Santiago Sordo-Palacios, 2019
@@ -40,11 +40,11 @@ classdef loadDataTest < chidataSuiteTest
         function readOneSeries(tc)
             % Test that a single series can be read-in from multi-series
             tc.initializeTestDir(tc);
-            selectedSeries = 'series3';
+            selectedSeries = 'SERIES3';
             actualData = cbd.chidata.loadData('sectionB', selectedSeries);
             expectedData = tc.expectedSectionBData(:, selectedSeries);
             tc.verifyEqual(actualData, expectedData);
-        end % function
+        end % functions
 
     end % methods
 

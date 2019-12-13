@@ -1,4 +1,4 @@
-classdef (Sealed) fredseriesTest < sourceTest
+classdef (Sealed) fredseriesTest < parentSource
     %FREDSERIES is the test suite for cbd.source.fredseries()
     %
     % USAGE

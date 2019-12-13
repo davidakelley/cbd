@@ -1,4 +1,4 @@
-classdef (Sealed) chidataseriesTest < sourceTest
+classdef (Sealed) chidataseriesTest < parentSource
     %CHIDATASERIES is the test suite for cbd.source.chidataseries()
     %
     % USAGE
@@ -12,7 +12,7 @@ classdef (Sealed) chidataseriesTest < sourceTest
     properties
         % The abstract properties from the parent class
         source      = 'chidataseries';
-        seriesID    = 'testSeries'
+        seriesID    = 'TESTSERIES'
         dbID        = 'CHIDATA';
         testfun     = @(x,y) cbd.source.chidataseries(x,y);
         benchmark   = 0.24087; %v1.2.0

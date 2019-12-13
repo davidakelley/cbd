@@ -33,9 +33,9 @@ cbd.source.assertOpts(opts, reqFields, mfilename());
 
 % Parse date inputs
 formatOut = 'YYYY-mm-DD';
-startDate = cbd.source.parseDates(opts.startDate, ...
+startDate = cbd.private.parseDates(opts.startDate, ...
     'formatOut', formatOut);
-endDate = cbd.source.parseDates(opts.endDate, ...
+endDate = cbd.private.parseDates(opts.endDate, ...
     'formatOut', formatOut);
 [asOfStart, asOfEnd] = parseAsOf( ...
     opts.asOf, opts.asOfStart, opts.asOfEnd, formatOut);
@@ -200,7 +200,7 @@ elseif isempty(asOfEnd)
 end
 
 % datestr into FRED format
-asOfStart = cbd.source.parseDates(asOfStart, 'formatOut', formatOut);
-asOfEnd = cbd.source.parseDates(asOfEnd, 'formatOut', formatOut);
+asOfStart = cbd.private.parseDates(asOfStart, 'formatOut', formatOut);
+asOfEnd = cbd.private.parseDates(asOfEnd, 'formatOut', formatOut);
 
 end % function-parseAsOf

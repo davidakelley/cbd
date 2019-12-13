@@ -1,4 +1,4 @@
-classdef dirTest < chidataSuiteTest
+classdef (Sealed) dirTest < parentChidata
     %DIRTEST is the test suite for cbd.chidata.dir()
     %
     % Santiago Sordo-Palacios, 2019

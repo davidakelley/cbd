@@ -25,13 +25,14 @@ index = cbd.chidata.loadIndex();
 
 %% Parse inputs
 cbd.source.assertSeries(seriesID, mfilename());
+seriesID = upper(seriesID);
 reqFields = {'dbID', 'startDate', 'endDate'};
 cbd.source.assertOpts(opts, reqFields, mfilename());
 assert(strcmpi(opts.dbID, 'CHIDATA'), ...
     'chidataseries:invaliddbID', ... 
     'dbID "%s" in chidataseries is not CHIDATA', opts.dbID);
-startDate = cbd.source.parseDates(opts.startDate);
-endDate = cbd.source.parseDates(opts.endDate);
+startDate = cbd.private.parseDates(opts.startDate);
+endDate = cbd.private.parseDates(opts.endDate);
 
 %% Get file name, read the data
 if ~isKey(index, seriesID)

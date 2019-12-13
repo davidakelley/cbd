@@ -1,4 +1,4 @@
-classdef updateIndexTest < chidataSuiteTest
+classdef (Sealed) updateIndexTest < parentChidata
     %UPDATEINDEXTEST is the test suite for cbd.chidata.updateIndex
     %
     % Santiago Sordo-Palacios, 2019
@@ -24,7 +24,7 @@ classdef updateIndexTest < chidataSuiteTest
         function moveSeriesCase1(tc)
             % Errow for a new section with a series that already exists
             section = 'newSection';
-            seriesNames = {'series1'};
+            seriesNames = {'SERIES1'};
             expectedErr = 'chidata:updateIndex:moveSeries';
             actualErr = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyError(actualErr, expectedErr);
@@ -33,7 +33,7 @@ classdef updateIndexTest < chidataSuiteTest
         function addSection(tc)
             % Warning for adding a new section
             section = 'newSection';
-            seriesNames = {'newSeries1', 'newSeries2'};
+            seriesNames = {'NEWSERIES1', 'NEWSERIES2'};
             expectedWarn = 'chidata:updateIndex:addSection';
             actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyWarning(actualWarn, expectedWarn);            
@@ -43,7 +43,7 @@ classdef updateIndexTest < chidataSuiteTest
             % Error for an existing section with an existing series from
             % a different section
             section = 'sectionB';
-            seriesNames = {'series1'};
+            seriesNames = {'SERIES1'};
             expectedErr = 'chidata:updateIndex:moveSeries';
             actualErr = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyError(actualErr, expectedErr);
@@ -53,7 +53,7 @@ classdef updateIndexTest < chidataSuiteTest
             % Test that when updating an existing section as is nothing
             % happens to the index returned
             section = 'sectionA';
-            seriesNames = {'series1'};
+            seriesNames = {'SERIES1'};
             actualIndex = tc.testfun(section, seriesNames, tc.promptn);
             tc.verifyEqual(actualIndex, tc.expectedIndex);
         end % function
@@ -61,7 +61,7 @@ classdef updateIndexTest < chidataSuiteTest
         function removeSeries(tc)
             % Test for an existing section that removes series
             section = 'sectionB';
-            seriesNames = {'series2'};
+            seriesNames = {'SERIES2'};
             expectedWarn = 'chidata:updateIndex:removeSeries';
             actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyWarning(actualWarn, expectedWarn);
@@ -70,7 +70,7 @@ classdef updateIndexTest < chidataSuiteTest
         function addSeries(tc)
             % Test for existing section that adds series
             section = 'sectionA';
-            seriesNames = {'series1', 'newSeries'};
+            seriesNames = {'SERIES1', 'NEWSERIES'};
             expectedWarn = 'chidata:updateIndex:addSeries';
             actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyWarning(actualWarn, expectedWarn);
@@ -79,7 +79,7 @@ classdef updateIndexTest < chidataSuiteTest
         function modifySeries(tc)
             % Test for existing section that adds and removes series
             section = 'sectionA';
-            seriesNames = {'newSeries'};
+            seriesNames = {'NEWSERIES'};
             expectedWarn = 'chidata:updateIndex:modifySeries';
             actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyWarning(actualWarn, expectedWarn);

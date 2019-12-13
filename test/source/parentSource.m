@@ -1,8 +1,8 @@
-classdef (Abstract) sourceTest < matlab.unittest.TestCase
-    %SOURCETEST is the parent class for the cbd.source tests
+classdef (Abstract) parentSource < matlab.unittest.TestCase
+    %PARENTSOURCE is the parent class for the cbd.source tests
     %
     % DESCRIPTION
-    %   The sourceTest class is the parent class for all tests of the
+    %   The parentSource class is the parent class for all tests of the
     %   cbd.source functions, which are in the test/ folder
     %   This class contains the properties (options) and methods (tests)
     %   that all cbd.source functions must pass
@@ -286,4 +286,4 @@ classdef (Abstract) sourceTest < matlab.unittest.TestCase
 
     end % methods-test
 
-end % classdef-sourceTest
+end % classdef

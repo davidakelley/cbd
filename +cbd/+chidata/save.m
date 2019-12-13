@@ -71,6 +71,9 @@ checkInputs(section, data, props, dynamicFields);
 % Load the chidata directory
 chidataDir = cbd.chidata.dir();
 
+% Replace variable names with UPPER versions
+data.Properties.VariableNames = upper(data.Properties.VariableNames);
+
 %% Index
 % Load the index
 [index, indexFname] = cbd.chidata.loadIndex();

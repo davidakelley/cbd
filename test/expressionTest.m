@@ -317,7 +317,7 @@ classdef expressionTest < matlab.unittest.TestCase
         
         function changePCT(tc)
             expected = cbd.changePct(tc.dataA);
-            testStr = ['changePCT(' tc.seriesA ')'];
+            testStr = ['CHANGEPCT(' tc.seriesA ')'];
             actual = cbd.expression(testStr);
             tc.verifyEqual(actual, expected);
         end % function

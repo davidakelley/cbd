@@ -37,12 +37,20 @@ propTable = readtable(fname, ...
     'Delimiter', ',');
 props = prop_table2struct(propTable);
 
+% Replace series and variables with uppercase version
+upperPropName = upper({props.Name});
+[props.Name] = upperPropName{:};
+
 % Return only one series if requested
 if nargin == 2
+    % Look for the series in the variable names
+    seriesID = upper(seriesID);
     [hasSeries, loc] = ismember(seriesID, {props.Name});
     assert(hasSeries, ...
         'chidata:loadProps:missingSeries', ...
         'Series "%s" not found in section "%s"');
+    
+    % Index into the series of interest
     props = props(:, loc);
 end % if-nargin
     

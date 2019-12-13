@@ -1,4 +1,4 @@
-classdef loadPropsTest < chidataSuiteTest
+classdef (Sealed) loadPropsTest < parentChidata
     %LOADPROPSTEST is the test suite for cbd.chidata.loadProps()
     %
     % Santiago Sordo-Palacios, 2019
@@ -40,7 +40,7 @@ classdef loadPropsTest < chidataSuiteTest
         function readOneSeries(tc)
             % Test that a single series can be read-in
             tc.initializeTestDir(tc);
-            thisSeries = 'series3';
+            thisSeries = 'SERIES3';
             actualProps = cbd.chidata.loadProps('sectionB', thisSeries);
             [~, propIdx] = ismember( ...
                 thisSeries, {tc.expectedSectionBProp.Name});

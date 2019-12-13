@@ -1,4 +1,4 @@
-classdef (Sealed) haverseriesTest < sourceTest
+classdef (Sealed) haverseriesTest < parentSource
     %HAVERSERIESTEST is the test suite for cbd.source.haverseries
     %
     % USAGE
