@@ -28,7 +28,9 @@ if nargout == 3
         '&api_key=', apiKey, ...
         '&file_type=json'];
     try
-        webread(requestURL);
+        maxWait = 30;
+        options = weboptions('Timeout', maxWait);
+        webread(requestURL, options);
         foundFRED = true;
     catch ME
         id = 'fredseries:badFREDconn';

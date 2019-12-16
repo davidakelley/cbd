@@ -65,7 +65,9 @@ end
 
 % Fetch the data
 try
-    structResp = webread(requestURL);
+    maxWait = 30;
+    options = weboptions('Timeout', maxWait);
+    structResp = webread(requestURL, options);
 catch ME
     if strcmpi(ME.identifier, 'MATLAB:webservices:HTTP400StatusCodeError')
         id = 'fredseries:noPull';
@@ -150,20 +152,20 @@ data = cbd.private.cbdTable(vintages, cbdDates, seriesNames);
 
 %% Get Data Properties
 if nargout == 2
-    requestURL = [fredURL, ...
+    propsURL = [fredURL, ...
         'series?series_id=', seriesID, ...
         '&api_key=', apiKey, ...
         '&file_type=json'];
     
     if ~isempty(asOfStart)
-        requestURL = [requestURL '&realtime_start=' asOfStart];
+        propsURL = [propsURL '&realtime_start=' asOfStart];
     end
     
     if ~isempty(asOfEnd)
-        requestURL = [requestURL '&realtime_end=' asOfEnd];
+        propsURL = [propsURL '&realtime_end=' asOfEnd];
     end
     
-    fredProp = webread(requestURL);    
+    fredProp = webread(propsURL, options);    
     dataProp = struct;
     dataProp.ID = [seriesID '@FRED'];
     dataProp.dbInfo = fredProp.seriess;
