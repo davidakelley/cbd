@@ -83,31 +83,19 @@ curSeries = data.Properties.VariableNames;
 [updatedIndex, isNewSection] = ...
     cbd.chidata.updateIndex(index, section, curSeries, prompt);
 
-%% Data 
-% Open the old data if it exists, otherwise just store the file name
+%% Update step 
+% Get the data and props files
 if ~isNewSection
+    % If it is not a new section, open data and prop files and compare
     [oldData, dataFname] = cbd.chidata.loadData(section);
-else
-    dataFname = fullfile(chidataDir, [section '_data.csv']);
-end % if-else
-
-% Check the old data
-if ~isNewSection
     cbd.chidata.compareData(data, oldData, tolerance, prompt);
-end % if-oldDataExists
-
-%% Properties Step
-% Open the old data if it exists, otherwise just store the file name
-if ~isNewSection
     [oldProps, propsFname] = cbd.chidata.loadProps(section);
+    cbd.chidata.compareProps(props, oldProps, dynamicFields, prompt);
 else
+    % If it is a new section, store the names of the new files
+    dataFname = fullfile(chidataDir, [section '_data.csv']);
     propsFname = fullfile(chidataDir, [section '_prop.csv']);
 end % if-else
-
-% Check old properties
-if ~isNewSection
-    cbd.chidata.compareProps(props, oldProps);
-end % try-catch
 
 % Write the dynamic properties to the structure
 props = addDynamicFields(props);
@@ -156,14 +144,14 @@ assert(isstruct(props) && ~isempty(props), ...
 hasDynamicFields = any(ismember(dynamicFields, fieldnames(props)));
 assert(~hasDynamicFields, ...
     'chidata:save:invalidProps', ...
-    'Incoming properties structure contains');
+    'Incoming properties structure contains a dynamic field');
 
 % Check that the size of data and props are equal
 dataSize = size(data, 2);
 propSize = size(props, 2);
 assert(isequal(dataSize, propSize), ...
     'chidata:save:dataPropMismatch', ...
-    'The number of series in data does not match number of props');
+    'The number of series in data does not match the number in props');
 
 end % function
 
@@ -221,14 +209,14 @@ FileMod = cellstr(repmat(callFile, nProps, 1));
 
 end % function
 
-function propTable = prop_struct2table(props, data)
+function propTable = prop_struct2table(propStruct, data)
 %PROP_STRUCT2TABLE transforms a properties structure into a table
 %
 % Santiago Sordo-Palacios, 2019
 
 % Convert structure to table
-propCell = squeeze(struct2cell(props));
-cellNames = fieldnames(props);
+propCell = squeeze(struct2cell(propStruct));
+cellNames = fieldnames(propStruct);
 propTable = cell2table(propCell, ...
     'RowNames', cellNames, ...
     'VariableNames', data.Properties.VariableNames);

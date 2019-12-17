@@ -22,7 +22,7 @@ classdef (Sealed) saveTest < parentChidata
 
     methods (Test)
         %% Test the handle inputs step
-        function saveInvalidSectionErr(tc)
+        function invalidSectionErr(tc)
             % Test for invalid section input
             expectedErr = 'chidata:save:invalidSection';
             actualErr = @() cbd.chidata.save( ...
@@ -30,7 +30,7 @@ classdef (Sealed) saveTest < parentChidata
             tc.verifyError(actualErr, expectedErr);
         end % function
 
-        function saveInvalidDataErr(tc)
+        function invalidDataErr(tc)
             % Test for invalid data input
             expectedErr = 'chidata:save:invalidData';
             actualErr = @() cbd.chidata.save( ...
@@ -38,7 +38,7 @@ classdef (Sealed) saveTest < parentChidata
             tc.verifyError(actualErr, expectedErr);
         end % function
 
-        function saveInvalidPropsCase1(tc)
+        function invalidPropsCase1(tc)
             % Test for invalid properties inputs
             expectedErr = 'chidata:save:invalidProps';
             actualErr = @() cbd.chidata.save( ...
@@ -47,7 +47,7 @@ classdef (Sealed) saveTest < parentChidata
             % Test an invalid props structure
         end % function
 
-        function saveDataPropMismatchCase1(tc)
+        function dataPropMismatchCase1(tc)
             expectedErr = 'chidata:save:dataPropMismatch';
             tc.data.seriesB = tc.data.SERIES1;
             actualErr = @() ...
@@ -55,7 +55,7 @@ classdef (Sealed) saveTest < parentChidata
             tc.verifyError(actualErr, expectedErr);
         end % function
 
-        function saveDataPropMismatchCase2(tc)
+        function dataPropMismatchCase2(tc)
             expectedErr = 'chidata:save:dataPropMismatch';
             tc.props(2) = tc.props(1);
             actualErr = @() ...
@@ -63,7 +63,7 @@ classdef (Sealed) saveTest < parentChidata
             tc.verifyError(actualErr, expectedErr);
         end % function
 
-        function saveInvalidPropsCase2(tc)
+        function invalidPropsCase2(tc)
             % Test invalid fields in properties structure
             expectedErr = 'chidata:save:invalidProps';
             nFields = length(tc.dynamicFields);
@@ -76,8 +76,19 @@ classdef (Sealed) saveTest < parentChidata
         end % function
         
         %% Test the index step
-        function saveAddNewSection(tc)
-            % Set-up the environemtn
+        function updateExisting(tc)
+            % Set-up the environemnt
+            tc.initializeTestDir(tc);
+            
+            % Save the existing data
+            saved = cbd.chidata.save(tc.section, tc.data, tc.props, ...
+                'userInput', 'n');
+            tc.verifyTrue(saved);
+        end % function
+        
+        
+        function addNewSection(tc)
+            % Set-up the environemnt
             tc.initializeTestDir(tc);
             expectedWarn = 'chidata:updateIndex:addSection';
             
