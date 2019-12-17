@@ -65,7 +65,7 @@ if nargout == 2
     props = struct;
     props.ID = [seriesID '@' opts.dbID];
     props.dbInfo = seriesInfo;
-    props.value = [];
+    props.value = data;
     props.provider = 'haver';
 end % if-nargout
 

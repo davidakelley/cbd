@@ -98,8 +98,8 @@ classdef (Abstract) parentSource < matlab.unittest.TestCase
             tc.verifyEqual(data.Properties.VariableNames{1}, tc.seriesID)
         end % function
         
-        % Test case-insensitive call
         function caseInsensitive(tc)
+            % Test case-insensitive call
             changeCase = @(x) ...
                 regexprep(lower(x),'(\<[a-z])','${upper($1)}');
             tc.seriesID = changeCase(tc.seriesID);
@@ -260,8 +260,8 @@ classdef (Abstract) parentSource < matlab.unittest.TestCase
 
         function valueProp(tc)
             % Test the props.value field
-            [~, props] = tc.testfun(tc.seriesID, tc.opts);
-            expectedVal = [];
+            [data, props] = tc.testfun(tc.seriesID, tc.opts);
+            expectedVal = data;
             tc.verifyEqual(props.value, expectedVal);
         end % function
 

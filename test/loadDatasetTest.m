@@ -40,7 +40,7 @@ classdef loadDatasetTest < matlab.unittest.TestCase
 
             dataset = cbd.loadDataset(specs, 'Names', names, 'Display', 'none');
             testCase.verifyGreaterThan(size(dataset, 1), 100);
-            testCase.verifyEqual(size(dataset, 2), 17);
+            testCase.verifyEqual(size(dataset, 2), 16);
         end
 
         function testNames(testCase)

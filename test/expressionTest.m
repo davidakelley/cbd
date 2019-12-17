@@ -11,20 +11,25 @@ classdef expressionTest < matlab.unittest.TestCase
     % Santiago Sordo-Palacios, 2019
     
     properties
+        % Haver properties
         idA = 'GDPH'
         dbA = 'USECON';
         seriesA char
         optsA = struct();
         dataA table
+        propsA struct
         funA = @(x,y) cbd.source.haverseries(x,y)
         
+        % FRED properties
         idB = 'GDP';
         dbB = 'FRED';
         seriesB char
         optsB = struct();
         dataB table
+        propsB struct
         funB = @(x,y) cbd.source.fredseries(x,y)
         
+        % opts properties
         startDate = '01-Jan-2000';
         endDate = '31-Dec-2000';
     end % properties
@@ -49,16 +54,10 @@ classdef expressionTest < matlab.unittest.TestCase
         end % function
         
         function getData(tc)
-            tc.dataA = tc.funA(tc.idA, tc.optsA);
-            tc.dataB = tc.funB(tc.idB, tc.optsB);
+            [tc.dataA, tc.propsA] = tc.funA(tc.idA, tc.optsA);
+            [tc.dataB, tc.propsB] = tc.funB(tc.idB, tc.optsB);
         end % function
         
-    end % methods
-    
-    methods (TestClassTeardown)
-        function onWarn(tc) %#ok<MANU>
-            warning('on', 'fredseries:useHaver');
-        end % function
     end % methods
     
     methods (Test)       
@@ -113,11 +112,6 @@ classdef expressionTest < matlab.unittest.TestCase
             tc.verifyError(actualErr, expectedErr);
         end % function
         
-        function stringInput(tc)
-            % TODO: there is nothing testing the
-            % expression_eval:stringInput
-        end % function
-        
         function invalidInput(tc)
             % TODO: this brings up an interesting point with blank inputs
             expectedErr = 'expression_eval:invalidInput';
@@ -151,121 +145,169 @@ classdef expressionTest < matlab.unittest.TestCase
             tc.verifyError(actualErr, expectedErr);
         end % function
         
-        %% Test basic usage
+        %% Test basic usage of data calls
         function oneTable(tc)
-            expected = tc.dataA;
+            % Use one table and return it
             testStr = '%d';
-            actual = cbd.expression(testStr, tc.dataA);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr, tc.dataA);
+            tc.verifyEqual(data, tc.dataA);
+            tc.verifyEqual(props{1}.value, tc.propsA.value)
         end % function
         
         function oneHaver(tc)
             % Pull one series from Haver
-            expected = tc.dataA;
-            actual = cbd.expression(tc.seriesA);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(tc.seriesA);
+            tc.verifyEqual(data, tc.dataA);
+            tc.verifyEqual(props{1}, tc.propsA)
         end % function
         
         function oneFRED(tc)
             % Pull one series from FRED
-            expected = tc.dataB;
-            actual = cbd.expression(tc.seriesB);
-            tc.verifyEqual(actual, expected);
-        end % function
-        
-        function multTables(tc)
-            expected = cbd.merge(tc.dataA, tc.dataB);
-            testStr = 'MERGE(%d, %d)';
-            actual = cbd.expression(testStr, ...
-                tc.dataA, tc.dataB);
-            tc.verifyEqual(actual, expected);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(tc.seriesB);
+            tc.verifyEqual(data, tc.dataB);
+            tc.verifyEqual(props{1}, tc.propsB)
         end % function
         
         function multPulls(tc)
             % Pull two series and merge them
             expected = cbd.merge(tc.dataA, tc.dataB);
-            actual = cbd.expression({tc.seriesA, tc.seriesB});
-            tc.verifyEqual(actual, expected);
-        end % function
-        
-        function multMixed(tc)
-            expected = cbd.merge(tc.dataA, tc.dataB);
-            testStr = ['MERGE(%d,' tc.seriesB ')'];
-            actual = cbd.expression(testStr, tc.dataA);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression({tc.seriesA, tc.seriesB});
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}, tc.propsA)
+            tc.verifyEqual(props{2}, tc.propsB);
         end % function
         
         %% Test basic operations
         function addition(tc)
             expected = cbd.addition(tc.dataA, tc.dataB);
             testStr = [tc.seriesA '+' tc.seriesB];
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, 'addition');
+            tc.verifyEqual(props{1}.series{1}, tc.propsA);
+            tc.verifyEqual(props{1}.series{2}, tc.propsB);
         end % function
         
         function subtraction(tc)
             expected = cbd.subtraction(tc.dataA, tc.dataB);
             testStr = [tc.seriesA '-' tc.seriesB];
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, 'subtraction');
+            tc.verifyEqual(props{1}.series{1}, tc.propsA);
+            tc.verifyEqual(props{1}.series{2}, tc.propsB);
         end % function
         
         function multiplication(tc)
             expected = cbd.multiplication(tc.dataA, tc.dataB);
             testStr = [tc.seriesA '*' tc.seriesB];
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, 'multiplication');
+            tc.verifyEqual(props{1}.series{1}, tc.propsA);
+            tc.verifyEqual(props{1}.series{2}, tc.propsB);
+        end % function
+        
+        function scalar(tc)
+            expected = cbd.multiplication(7, tc.dataA);
+            testStr = ['7*' tc.seriesA];
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, 'multiplication');
+            tc.verifyEqual(props{1}.series{1}.value, 7);
+            tc.verifyEqual(props{1}.series{2}, tc.propsA);
         end % function
         
         function negative(tc)
             expected = cbd.multiplication(-1, tc.dataA);
             testStr = ['-' tc.seriesA];
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, 'multiplication');
+            tc.verifyEqual(props{1}.series{1}.value, -1);
+            tc.verifyEqual(props{1}.series{2}, tc.propsA);
         end % function
         
         function division(tc)
             expected = cbd.division(tc.dataA, tc.dataB);
             testStr = [tc.seriesA '/' tc.seriesB];
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, 'division');
+            tc.verifyEqual(props{1}.series{1}, tc.propsA);
+            tc.verifyEqual(props{1}.series{2}, tc.propsB);
         end % function
         
         function parens(tc)
             expected = tc.dataA;
             testStr = ['(' tc.seriesA ')'];
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, '');
+            tc.verifyEqual(props{1}.series{1}, tc.propsA);
         end % function
         
         %% Test order of operations
         function operationsA(tc)
-            expected = 34;
-            testStr = 'C07 * C05 - C01';
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual{end, 1}, expected);
+            expected = 4;
+            testStr = 'C05 - C01';
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data{end, 1}, expected);
+            tc.verifyEqual(props{1}.func, 'subtraction');
         end % function
         
         function operationsB(tc)
             expected = 1;
             testStr = 'C10 / C05 - C01';
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual{end, 1}, expected);
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data{end, 1}, expected);
+            tc.verifyEqual(props{1}.func, 'subtraction');
+            tc.verifyEqual(props{1}.series{1}.func, 'division'); 
         end % function
         
         function operationsC(tc)
             expected = 3;
             testStr = 'C02 + C10 / C05 - C01';
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual{end, 1}, expected);
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data{end, 1}, expected);
+            tc.verifyEqual(props{1}.func, 'addition');
+            tc.verifyEqual(props{1}.series{2}.func, 'subtraction');
+            tc.verifyEqual(props{1}.series{2}.series{1}.func, 'division');
         end % function
         
         function operationsD(tc)
             expected = 4.5;
             testStr = 'C02 + C10 / (C05 - C01)';
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual{end, 1}, expected);
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data{end, 1}, expected);
+            tc.verifyEqual(props{1}.func, 'addition');
+            tc.verifyEqual(props{1}.series{2}.func, 'division');
+            tc.verifyEqual(props{1}.series{2}.series{2}.func, '');
+            tc.verifyEqual(props{1}.series{2}.series{2}.series{1}.func, 'subtraction');
+        end % function
+        
+        function operationsE(tc)
+            expected = 3;
+            testStr = '(C02 + C10) / (C05 - C01)';
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data{end, 1}, expected);
+            tc.verifyEqual(props{1}.func, 'division');
+            tc.verifyEqual(props{1}.series{1}.func, '');
+            tc.verifyEqual(props{1}.series{1}.series{1}.func, 'addition');
+            tc.verifyEqual(props{1}.series{2}.func, '');
+            tc.verifyEqual(props{1}.series{2}.series{1}.func, 'subtraction');
         end % function
         
         %% Test order with varied inputs
@@ -273,53 +315,102 @@ classdef expressionTest < matlab.unittest.TestCase
             expected = cbd.division( ...
                 cbd.addition(tc.dataA, tc.dataB), 1000);
             testStr = '(%d+%d)/1000';
-            actual = cbd.expression(testStr, tc.dataA, tc.dataB);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr, tc.dataA, tc.dataB);
+            
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, 'division');
+            tc.verifyEqual(props{1}.series{1}.func, '');
+            tc.verifyEqual(props{1}.series{1}.series{1}.func, 'addition');
+            tc.verifyEqual(props{1}.series{2}.value, 1000);
         end % function
         
         function orderPulls(tc)
             expected = cbd.division( ...
                 cbd.addition(tc.dataA, tc.dataB), 1000);
             testStr = ['(' tc.seriesA '+' tc.seriesB ')/1000'];
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr);
+            
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, 'division');
+            tc.verifyEqual(props{1}.series{1}.func, '');
+            tc.verifyEqual(props{1}.series{1}.series{1}.func, 'addition');
+            tc.verifyEqual(props{1}.series{2}.value, 1000);
         end % function
         
         function orderMixed(tc)
             expected = cbd.division( ...
                 cbd.addition(tc.dataA, tc.dataB), 1000);
             testStr = ['(%d+' tc.seriesB ')/1000'];
-            actual = cbd.expression(testStr, tc.dataA);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr, tc.dataA);
+            
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, 'division');
+            tc.verifyEqual(props{1}.series{1}.func, '');
+            tc.verifyEqual(props{1}.series{1}.series{1}.func, 'addition');
+            tc.verifyEqual(props{1}.series{2}.value, 1000);
         end % function
         
-        %% Test function calls
+        %% Test function calls with varying case sensitivity
         function changePct(tc)
             expected = cbd.changePct(tc.dataA);
             testStr = ['changePct(' tc.seriesA ')'];
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr);
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, str2func('cbd.changePct'));
         end % function
         
-        function changePctSign(tc)
+        function changeSign(tc)
             expected = cbd.changePct(tc.dataA);
             testStr = ['change%(' tc.seriesA ')'];
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr);
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, str2func('cbd.changePct'));
         end % function
         
         function changepct(tc)
             expected = cbd.changePct(tc.dataA);
             testStr = ['changepct(' tc.seriesA ')'];
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr);
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, str2func('cbd.changePct'));
         end % function
         
-        function changePCT(tc)
+        function CHANGEPCT(tc)
             expected = cbd.changePct(tc.dataA);
             testStr = ['CHANGEPCT(' tc.seriesA ')'];
-            actual = cbd.expression(testStr);
-            tc.verifyEqual(actual, expected);
+            [data, props] = cbd.expression(testStr);
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, str2func('cbd.changePct'));
+        end % function
+        
+        %% Test function calls with input arguments
+        function movv(tc)
+            expected = cbd.movv(tc.dataA, 5);
+            testStr = ['MOVV(' tc.seriesA ', 5)'];
+            [data, props] = cbd.expression(testStr);
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, str2func('cbd.movv'));
+            tc.verifyEqual(props{1}.series{2}.value, 5);
+        end % function
+        
+        function movvIncludeNan(tc)
+            expected = cbd.movv(tc.dataA, 5, 'includenan');
+            testStr = ['MOVV(' tc.seriesA ', 5, "includenan")'];
+            [data, props] = cbd.expression(testStr);
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, str2func('cbd.movv'));
+            tc.verifyEqual(props{1}.series{2}.value, 5);
+            tc.verifyEqual(props{1}.series{3}.value, 'includenan');
+        end % function
+        
+        function movvOmitNan(tc)
+            expected = cbd.movv(tc.dataA, 5, 'omitnan');
+            testStr = ['MOVV(' tc.seriesA ', 5, "omitnan")'];
+            [data, props] = cbd.expression(testStr);
+            tc.verifyEqual(data, expected);
+            tc.verifyEqual(props{1}.func, str2func('cbd.movv'));
+            tc.verifyEqual(props{1}.series{2}.value, 5);
+            tc.verifyEqual(props{1}.series{3}.value, 'omitnan');
         end % function
         
         %% Specified dbID

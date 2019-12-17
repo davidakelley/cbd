@@ -1,4 +1,4 @@
-function [data, dataProp] = fredseries(seriesID, opts)
+function [data, props] = fredseries(seriesID, opts)
 %FREDSERIES Fetch single FRED series and returns it in a table
 %
 % FREDSERIES can also pull from ALFRED by specifying the date or the date
@@ -165,12 +165,12 @@ if nargout == 2
         propsURL = [propsURL '&realtime_end=' asOfEnd];
     end
     
-    fredProp = webread(propsURL, options);    
-    dataProp = struct;
-    dataProp.ID = [seriesID '@FRED'];
-    dataProp.dbInfo = fredProp.seriess;
-    dataProp.value = [];
-    dataProp.provider = 'fred';
+    dbInfo = webread(propsURL, options);    
+    props = struct;
+    props.ID = [seriesID '@FRED'];
+    props.dbInfo = dbInfo.seriess;
+    props.value = data;
+    props.provider = 'fred';
 end
 
 end % function-freseries

@@ -79,7 +79,7 @@ if nargout == 2
     props = struct;
     props.ID = [seriesID '@' opts.dbID];
     props.dbInfo = 'BLOOMBERG';
-    props.value = [];
+    props.value = data;
     props.provider = 'bloomberg';
     props.frequency = frequency;
     props.bbfield = bbfield;

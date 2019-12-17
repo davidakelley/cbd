@@ -61,7 +61,7 @@ if nargout == 2
     props = struct;
     props.ID = [seriesID '@' opts.dbID];
     props.dbInfo = cbd.chidata.loadProps(section, seriesID);
-    props.value = [];
+    props.value = data;
     props.provider = 'chidata';
     props.chidataDir = cbd.chidata.dir();
 end

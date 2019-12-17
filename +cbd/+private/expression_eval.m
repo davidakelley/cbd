@@ -59,6 +59,7 @@ if ~isempty(operatorDiv)
             negMultProp = struct;
             negMultProp.ID = [];
             negMultProp.dbInfo = [];
+            negMultProp.value = -1;
             props = ...
                 cbd.private.combineProp('multiplication', ...
                 negMultProp, posProps);
@@ -206,6 +207,7 @@ elseif ~isempty(tableInRegex)
     props = struct;
     props.ID = [];
     props.dbInfo = [];
+    props.value = data;
 
 elseif ~isempty(str2double(strIn)) && ~isnan(str2double(strIn))
     % Case with numeric input argument
@@ -214,6 +216,7 @@ elseif ~isempty(str2double(strIn)) && ~isnan(str2double(strIn))
     props = struct;
     props.ID = [];
     props.dbInfo = [];
+    props.value = data;
 
 elseif contains(strIn, char(34))
     % Case with a string input argument
