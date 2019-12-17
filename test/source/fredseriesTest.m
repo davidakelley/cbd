@@ -94,7 +94,7 @@ classdef (Sealed) fredseriesTest < parentSource
             tc.verifyError(actualErr, expectedErr);
         end % function
         
-        function datestrAsOfStartAsOfEnd(tc)
+        function datestrBothAsOfStartEnd(tc)
             % Bring in the testset
             testset = tc.testfun(tc.seriesID, tc.opts);
             
