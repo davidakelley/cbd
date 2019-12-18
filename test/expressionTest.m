@@ -151,6 +151,7 @@ classdef expressionTest < matlab.unittest.TestCase
             testStr = '%d';
             [data, props] = cbd.expression(testStr, tc.dataA);
             tc.verifyEqual(data, tc.dataA);
+            tc.verifyEqual(props{1}.ID, '%d')
             tc.verifyEqual(props{1}.value, tc.propsA.value)
         end % function
         
@@ -184,7 +185,7 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data, expected);
-            tc.verifyEqual(props{1}.func, 'addition');
+            tc.verifyEqual(props{1}.func, str2func('cbd.addition'));
             tc.verifyEqual(props{1}.series{1}, tc.propsA);
             tc.verifyEqual(props{1}.series{2}, tc.propsB);
         end % function
@@ -195,7 +196,7 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data, expected);
-            tc.verifyEqual(props{1}.func, 'subtraction');
+            tc.verifyEqual(props{1}.func, str2func('cbd.subtraction'));
             tc.verifyEqual(props{1}.series{1}, tc.propsA);
             tc.verifyEqual(props{1}.series{2}, tc.propsB);
         end % function
@@ -206,7 +207,7 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data, expected);
-            tc.verifyEqual(props{1}.func, 'multiplication');
+            tc.verifyEqual(props{1}.func, str2func('cbd.multiplication'));
             tc.verifyEqual(props{1}.series{1}, tc.propsA);
             tc.verifyEqual(props{1}.series{2}, tc.propsB);
         end % function
@@ -217,7 +218,8 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data, expected);
-            tc.verifyEqual(props{1}.func, 'multiplication');
+            tc.verifyEqual(props{1}.func, str2func('cbd.multiplication'));
+            tc.verifyEqual(props{1}.series{1}.ID, 'scalar');
             tc.verifyEqual(props{1}.series{1}.value, 7);
             tc.verifyEqual(props{1}.series{2}, tc.propsA);
         end % function
@@ -228,7 +230,8 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data, expected);
-            tc.verifyEqual(props{1}.func, 'multiplication');
+            tc.verifyEqual(props{1}.func, str2func('cbd.multiplication'));
+            tc.verifyEqual(props{1}.series{1}.ID, 'scalar');
             tc.verifyEqual(props{1}.series{1}.value, -1);
             tc.verifyEqual(props{1}.series{2}, tc.propsA);
         end % function
@@ -239,7 +242,7 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data, expected);
-            tc.verifyEqual(props{1}.func, 'division');
+            tc.verifyEqual(props{1}.func, str2func('cbd.division'));
             tc.verifyEqual(props{1}.series{1}, tc.propsA);
             tc.verifyEqual(props{1}.series{2}, tc.propsB);
         end % function
@@ -250,7 +253,7 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data, expected);
-            tc.verifyEqual(props{1}.func, '');
+            tc.verifyEqual(props{1}.func, 'parentheses');
             tc.verifyEqual(props{1}.series{1}, tc.propsA);
         end % function
         
@@ -261,7 +264,7 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data{end, 1}, expected);
-            tc.verifyEqual(props{1}.func, 'subtraction');
+            tc.verifyEqual(props{1}.func, str2func('cbd.subtraction'));
         end % function
         
         function operationsB(tc)
@@ -270,8 +273,8 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data{end, 1}, expected);
-            tc.verifyEqual(props{1}.func, 'subtraction');
-            tc.verifyEqual(props{1}.series{1}.func, 'division'); 
+            tc.verifyEqual(props{1}.func, str2func('cbd.subtraction'));
+            tc.verifyEqual(props{1}.series{1}.func, str2func('cbd.division')); 
         end % function
         
         function operationsC(tc)
@@ -280,9 +283,9 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data{end, 1}, expected);
-            tc.verifyEqual(props{1}.func, 'addition');
-            tc.verifyEqual(props{1}.series{2}.func, 'subtraction');
-            tc.verifyEqual(props{1}.series{2}.series{1}.func, 'division');
+            tc.verifyEqual(props{1}.func, str2func('cbd.addition'));
+            tc.verifyEqual(props{1}.series{2}.func, str2func('cbd.subtraction'));
+            tc.verifyEqual(props{1}.series{2}.series{1}.func, str2func('cbd.division'));
         end % function
         
         function operationsD(tc)
@@ -291,10 +294,10 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data{end, 1}, expected);
-            tc.verifyEqual(props{1}.func, 'addition');
-            tc.verifyEqual(props{1}.series{2}.func, 'division');
-            tc.verifyEqual(props{1}.series{2}.series{2}.func, '');
-            tc.verifyEqual(props{1}.series{2}.series{2}.series{1}.func, 'subtraction');
+            tc.verifyEqual(props{1}.func, str2func('cbd.addition'));
+            tc.verifyEqual(props{1}.series{2}.func, str2func('cbd.division'));
+            tc.verifyEqual(props{1}.series{2}.series{2}.func, 'parentheses');
+            tc.verifyEqual(props{1}.series{2}.series{2}.series{1}.func, str2func('cbd.subtraction'));
         end % function
         
         function operationsE(tc)
@@ -303,11 +306,11 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data{end, 1}, expected);
-            tc.verifyEqual(props{1}.func, 'division');
-            tc.verifyEqual(props{1}.series{1}.func, '');
-            tc.verifyEqual(props{1}.series{1}.series{1}.func, 'addition');
-            tc.verifyEqual(props{1}.series{2}.func, '');
-            tc.verifyEqual(props{1}.series{2}.series{1}.func, 'subtraction');
+            tc.verifyEqual(props{1}.func, str2func('cbd.division'));
+            tc.verifyEqual(props{1}.series{1}.func, 'parentheses');
+            tc.verifyEqual(props{1}.series{1}.series{1}.func, str2func('cbd.addition'));
+            tc.verifyEqual(props{1}.series{2}.func, 'parentheses');
+            tc.verifyEqual(props{1}.series{2}.series{1}.func, str2func('cbd.subtraction'));
         end % function
         
         %% Test order with varied inputs
@@ -318,9 +321,12 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr, tc.dataA, tc.dataB);
             
             tc.verifyEqual(data, expected);
-            tc.verifyEqual(props{1}.func, 'division');
-            tc.verifyEqual(props{1}.series{1}.func, '');
-            tc.verifyEqual(props{1}.series{1}.series{1}.func, 'addition');
+            tc.verifyEqual(props{1}.func, str2func('cbd.division'));
+            tc.verifyEqual(props{1}.series{1}.func, 'parentheses');
+            tc.verifyEqual(props{1}.series{1}.series{1}.func, str2func('cbd.addition'));
+            tc.verifyEqual(props{1}.series{1}.series{1}.series{1}.ID, '%d');
+            tc.verifyEqual(props{1}.series{1}.series{1}.series{2}.ID, '%d');
+            tc.verifyEqual(props{1}.series{2}.ID, 'scalar');
             tc.verifyEqual(props{1}.series{2}.value, 1000);
         end % function
         
@@ -331,9 +337,12 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr);
             
             tc.verifyEqual(data, expected);
-            tc.verifyEqual(props{1}.func, 'division');
-            tc.verifyEqual(props{1}.series{1}.func, '');
-            tc.verifyEqual(props{1}.series{1}.series{1}.func, 'addition');
+            tc.verifyEqual(props{1}.func, str2func('cbd.division'));
+            tc.verifyEqual(props{1}.series{1}.func, 'parentheses');
+            tc.verifyEqual(props{1}.series{1}.series{1}.func, str2func('cbd.addition'));
+            tc.verifyEqual(props{1}.series{1}.series{1}.series{1}, tc.propsA);
+            tc.verifyEqual(props{1}.series{1}.series{1}.series{2}, tc.propsB);
+            tc.verifyEqual(props{1}.series{2}.ID, 'scalar');
             tc.verifyEqual(props{1}.series{2}.value, 1000);
         end % function
         
@@ -344,9 +353,12 @@ classdef expressionTest < matlab.unittest.TestCase
             [data, props] = cbd.expression(testStr, tc.dataA);
             
             tc.verifyEqual(data, expected);
-            tc.verifyEqual(props{1}.func, 'division');
-            tc.verifyEqual(props{1}.series{1}.func, '');
-            tc.verifyEqual(props{1}.series{1}.series{1}.func, 'addition');
+            tc.verifyEqual(props{1}.func, str2func('cbd.division'));
+            tc.verifyEqual(props{1}.series{1}.func, 'parentheses');
+            tc.verifyEqual(props{1}.series{1}.series{1}.func, str2func('cbd.addition'));
+            tc.verifyEqual(props{1}.series{1}.series{1}.series{1}.ID, '%d');
+            tc.verifyEqual(props{1}.series{1}.series{1}.series{2}, tc.propsB);
+            tc.verifyEqual(props{1}.series{2}.ID, 'scalar');
             tc.verifyEqual(props{1}.series{2}.value, 1000);
         end % function
         

@@ -1,8 +1,8 @@
-function props = combineProp(fnName, varargin)
-%COMBINEPROP creates a new structure of data properties from a function of series
+function props = combineProp(fnHandle, varargin)
+%COMBINEPROP creates the data properties from functions and its series
 %
 % INPUTS:
-%   fnName      ~ char, the name of the function execited
+%   fnHandle    ~ function_handle, the handle of the function executed
 %   varargin    ~ cell, list of the props structures used in the function
 %
 % OUTPUTS:
@@ -10,8 +10,8 @@ function props = combineProp(fnName, varargin)
 %
 % David Kelley, 2015
 
-props = struct;
-props.func = fnName;
+props = struct();
+props.func = fnHandle;
 props.series = varargin;
 
 end % function

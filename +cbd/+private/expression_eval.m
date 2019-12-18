@@ -51,18 +51,24 @@ if ~isempty(operatorDiv)
 
         % Special case: negative operator at the beginning of string
         if iOp == 2 && operatorDiv(1) == 1
-            % Strip out the negative sign and multiply by -1.
+            % Strip out the negative sign and call the data pull
             [posData, posProps] = ...
                 cbd.private.expression_eval( ...
                 strIn(2:end), opts, varargin{:});
-            data = cbd.multiplication(-1, posData);
+            
+            % Multiply by -1
+            multHandle = findCbdFunction('multiplication');
+            data = multHandle(-1, posData);
+            
+            % Create the properties of -1 multiplication
             negMultProp = struct;
-            negMultProp.ID = [];
+            negMultProp.ID = 'scalar';
             negMultProp.dbInfo = [];
             negMultProp.value = -1;
-            props = ...
-                cbd.private.combineProp('multiplication', ...
-                negMultProp, posProps);
+            
+            % Combine the properties
+            props = cbd.private.combineProp(...
+                multHandle, negMultProp, posProps);
             return
         end % if-iOp
 
@@ -100,10 +106,11 @@ if ~isempty(operatorDiv)
             end % for-iArg
 
             % Execute the operation function
-            op_fn = findCbdFunction(operations{iOp});
-            data = op_fn(arguments{:}, 'ignoreNan', opts.ignoreNan);
-            props = ...
-                cbd.private.combineProp(operations{iOp}, seriesProps{:});
+            operationHandle = findCbdFunction(operations{iOp});
+            data = operationHandle( ...
+                arguments{:}, 'ignoreNan', opts.ignoreNan);
+            props = cbd.private.combineProp( ...
+                operationHandle, seriesProps{:});
             return
 
         end % if-length
@@ -183,8 +190,8 @@ elseif ~isempty(fnRegex)
 
     % Find and execute the transformation specified by the funciton
     if ~isempty(fnNameIn)
-        fnName = findCbdFunction(fnNameIn);
-        data = fnName(arguments{:});
+        transformHandle = findCbdFunction(fnNameIn);
+        data = transformHandle(arguments{:});
     else
         % Check that there weren't insufficient arguments
         lengthArgCheck = length(arguments) <= 1;
@@ -192,20 +199,20 @@ elseif ~isempty(fnRegex)
         lengthArgMsg = 'Insufficient number of arguments provided';
         assert(lengthArgCheck, lengthArgID, lengthArgMsg);
 
-        % Store the arguments for combining properties
+        % Store the arguments and note that it was parentheses evaluation
         data = arguments{1};
-        fnName = '';
+        transformHandle = 'parentheses';
     end
 
     % Combine and store the properties
-    props = cbd.private.combineProp(fnName, seriesProps{:});
+    props = cbd.private.combineProp(transformHandle, seriesProps{:});
 
 elseif ~isempty(tableInRegex)
     % Case with provided table argument
 
     data = varargin{1};
     props = struct;
-    props.ID = [];
+    props.ID = '%d';
     props.dbInfo = [];
     props.value = data;
 
@@ -214,7 +221,7 @@ elseif ~isempty(str2double(strIn)) && ~isnan(str2double(strIn))
 
     data = str2double(strIn);
     props = struct;
-    props.ID = [];
+    props.ID = 'scalar';
     props.dbInfo = [];
     props.value = data;
 
