@@ -1,8 +1,8 @@
 function dataOut = multiseriesFunction(dataA, dataB, fnHandle, varargin)
 %MULTISERIESFUNCTION computes binary operations on cbd tables and scalars
 %
-% This is a private function that handles performing operations on 
-% cbd tables and/or scalars. This should only be called inside of 
+% This is a private function that handles performing operations on
+% cbd tables and/or scalars. This should only be called inside of
 % CBD.ADDITION, CBD.SUBTRACTION, CBD.MULTIPLICATION, and CBD.DIVISION
 %
 % INPUTS:
@@ -10,8 +10,8 @@ function dataOut = multiseriesFunction(dataA, dataB, fnHandle, varargin)
 %   dataB       ~ table/double, either a cbd table or a scalar
 %   fnHandle    ~ function_handle, the handle of the operation
 %   ignoreNan   ~ logical, whether NaN's should be ignored in operations
-%               in addition and subtraction, this means the NaN's are 
-%               turned into 0's and for multiplication and division 
+%               in addition and subtraction, this means the NaN's are
+%               turned into 0's and for multiplication and division
 %               the NaN's are turned into 1's.
 %
 % OUTPUTS:
@@ -21,7 +21,7 @@ function dataOut = multiseriesFunction(dataA, dataB, fnHandle, varargin)
 %               ~ If dataA and dataB are scalars, dataOUt will be a scalar
 %               ~ If one is a table and the other is a scalar, then
 %               dataOut will be a table
-%       
+%
 % David Kelley, 2015
 % Santiago I. Sordo-Palacios, 2019
 
@@ -59,7 +59,7 @@ ignoreNan = inP.Results.ignoreNan;
 if istable(dataA) && istable(dataB) % Both are tables
     % Merge the data together
     data = cbd.merge(dataA, dataB);
-    
+
     % Replace NaN's  depending on input if option is specified
     if ignoreNan
         fnStr = func2str(fnHandle);
@@ -73,7 +73,7 @@ if istable(dataA) && istable(dataB) % Both are tables
             error(id, msg, fnStr);
         end % if-contains
     end % if-ignoreNan
-    
+
     % Perform the calculation
     fnResult = fnHandle(data{:, 1}, data{:, 2});
     dataOut = array2table(fnResult, ...

@@ -1,9 +1,9 @@
-classdef expressionTest < matlab.unittest.TestCase
-    %EXPRESSIONTEST is the test suite for cbd.expression and
-    %by extension of cbd.private.expression_eval
+classdef expression_evalTest < matlab.unittest.TestCase
+    %EXPRESSION_EVALTEST is the test suite for cbd.private.expression_eval
+    %although it relies on its wrapper cbd.expression to execute it
     %
     % USAGE
-    %   >> runtests('expressionTest')
+    %   >> runtests('expression_evalTest')
     %
     % SEE ALSO: SOURCESERIES
     %

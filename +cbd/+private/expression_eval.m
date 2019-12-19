@@ -55,19 +55,19 @@ if ~isempty(operatorDiv)
             [posData, posProps] = ...
                 cbd.private.expression_eval( ...
                 strIn(2:end), opts, varargin{:});
-            
+
             % Multiply by -1
             multHandle = findCbdFunction('multiplication');
             data = multHandle(-1, posData);
-            
+
             % Create the properties of -1 multiplication
             negMultProp = struct;
             negMultProp.ID = 'scalar';
             negMultProp.dbInfo = [];
             negMultProp.value = -1;
-            
+
             % Combine the properties
-            props = cbd.private.combineProp(...
+            props = combineProp( ...
                 multHandle, negMultProp, posProps);
             return
         end % if-iOp
@@ -109,7 +109,7 @@ if ~isempty(operatorDiv)
             operationHandle = findCbdFunction(operations{iOp});
             data = operationHandle( ...
                 arguments{:}, 'ignoreNan', opts.ignoreNan);
-            props = cbd.private.combineProp( ...
+            props = combineProp( ...
                 operationHandle, seriesProps{:});
             return
 
@@ -205,7 +205,7 @@ elseif ~isempty(fnRegex)
     end
 
     % Combine and store the properties
-    props = cbd.private.combineProp(transformHandle, seriesProps{:});
+    props = combineProp(transformHandle, seriesProps{:});
 
 elseif ~isempty(tableInRegex)
     % Case with provided table argument
@@ -385,3 +385,12 @@ if strcmpi(cleanStr(1), char(34)) && strcmpi(cleanStr(end), char(34))
 end
 
 end % function-quoteStrip
+
+function props = combineProp(fnHandle, varargin)
+%COMBINEPROP creates the data properties from functions and its series
+
+props = struct();
+props.func = fnHandle;
+props.series = varargin;
+
+end % function

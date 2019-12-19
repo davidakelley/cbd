@@ -1,11 +1,21 @@
-cbd.private functions
-=====================
-These functions are used internally by other cbd functions. There should be no reason to use them instead of the outer function that they are being used by. This sections is here only for documentation purposes. 
-* alignToDates - Used by the merge function to alter the tables before concatenating.
-* endOfPer - Returns dates shifted to the last day of the period (convention for cbd). Used to adjust Stata dates. 
-* haverpull - Takes a single string of Haver series and transformations and returns a table with a single series. 
-* haverseries - Takes a string of a Haver series (with no transformations!) and returns the level data. 
-* haverpull_stata - Pulls data using a Stata batch job insead of with the Matlab Haver API if the datafeed toolbox licenses are all used (somewhat slower). 
-* getFreq - Returns a string indicator of the frequency of a series based on the gaps in the dates. 
-* parse_json - Used to parse the JSON response from FRED. Taken from FEX.
-* rename - Renames a series in a table 
+# +private functions
+* The functions in the *+private* folder are used internally by other `cbd` functions
+
+## Function descriptions
+* `alignToDates` ~ aligns a dataset to a different set of dates
+* `cbdTable` ~ creates CBD data table from components
+* `endOfPer` ~ returns the last date within a period for each date in a vector
+* `expression_eval` ~ evaluates a cbd expression with printf-style inpu
+* `genDates` ~ creates a vector of serial dates at the end of the period type specified by freq from sDate to eDate.
+* `getFreq` ~ determines the frequency of a series of serial dates
+* `getpos` ~ get graphics object position in a flexible way
+* `inputCBDdata` ~ takes apart a cbd table into its components
+* `mdatenum` ~ converts a character array of dates in a datenum
+* `mdatestr` ~ converts a date number to a string with format 'dd-mmm-yyyy'
+* `midOfPer` ~ returns the middle date of a period
+* `multiseriesFunction` ~ computes binary operations on cbd tables and scalars
+* `parseDates` ~ transforms an input date from formatIn to formatOut
+* `rename` ~ renames the table variables
+* `setpos` ~ set graphics object position in a flexible way
+* `startOfPer` ~ finds the first serial date of each period
+* `tableDates` ~ returns the observation dates as datenum integers

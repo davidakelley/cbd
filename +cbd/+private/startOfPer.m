@@ -1,13 +1,14 @@
 function sopDates = startOfPer(dates, freq)
-% STARTOFPER finds the first serial date of each period.
+%STARTOFPER finds the first serial date of each period.
 %
-% sopDates = startOfPer(dates, frq) 
-
-% David Kelley, 2015
-
 % The first day of a period must be the day following the last day of the
 % previous period. So we find the first day by computing end of the
 % previous period.
+%
+% USAGE
+%   sopDates = startOfPer(dates, frq)
+%
+% David Kelley, 2015
 
 if ischar(dates)
     dates = datenum(dates);
@@ -17,10 +18,11 @@ validateattributes(dates, {'numeric'}, {'column'});
 
 switch upper(freq)
     case 'A'
-        prevY = cbd.year(dates) - 1; 
-        prevDate = cbd.private.endOfMonth(prevY, repmat(12, [size(dates, 1), 1]));
+        prevY = cbd.year(dates) - 1;
+        prevDate = cbd.private.endOfMonth( ...
+            prevY, repmat(12, [size(dates, 1), 1]));
     case 'Q'
-        prevY = cbd.year(dates); 
+        prevY = cbd.year(dates);
         prevQ = cbd.quarter(dates) - 1;
         % Adjust for year roll over
         roll = prevQ == 0;
@@ -28,7 +30,7 @@ switch upper(freq)
         prevQ(roll) = 4;
         prevDate = cbd.private.endOfMonth(prevY, 3*prevQ);
     case 'M'
-        prevY = cbd.year(dates); 
+        prevY = cbd.year(dates);
         prevM = cbd.month(dates) - 1;
         % Adjust for year roll over
         roll = prevM == 0;

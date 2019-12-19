@@ -1,5 +1,5 @@
 function data = cbdTable(values, dates, varNames)
-% Create CBD data table from components
+%CBDTABLE creates CBD data table from values, dates, and variable names
 %
 % INPUTS:
 %   values      ~ double, an array of the values in the table
@@ -19,9 +19,9 @@ assert(iscell(varNames), ...
 
 % Return an empty table if values are empty
 if isempty(values)
-  data = table([], ...
-      'VariableNames', varNames);
-  return
+    data = table([], ...
+        'VariableNames', varNames);
+    return
 end
 
 % Check the values and dates are both numeric
