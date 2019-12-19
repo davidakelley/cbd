@@ -65,6 +65,13 @@ classdef (Sealed) dirTest < parentChidata
             rmdir(otherDir, 's');
         end % function
         
+        function changeLocToExisting(tc)
+            % Test changing directory to a directory already set
+            tc.initializeTestDir(tc);
+            chidataDir = cbd.chidata.dir(tc.testDir, 'userInput', 'n');
+            tc.verifyEqual(chidataDir, tc.testDir);
+        end % function
+        
     end % methods
     
 end % function

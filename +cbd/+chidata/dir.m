@@ -47,7 +47,7 @@ else
     prompt = @(id, msg) cbd.chidata.prompt(id, msg, userInput);
 end % if-nargin
 
-%% Handle the inputLoc
+%% Handle the cases of inputs
 if ~persistentExists && ~inputExists
     % If no persistent and no input, throw error
     id = 'chidata:dir:notInitialized';
@@ -63,12 +63,20 @@ elseif ~persistentExists && inputExists
     chidataDir = inputLoc;
 elseif persistentExists && inputExists
     % If persistent and an input, prompt to change from persistent to input
-    id = 'chidata:dir:changeLoc';
-    msg = sprintf( ...
-        'Changing CHIDATA directory from "%s" to "%s"', ...
-        chidataDir, inputLoc);
-    prompt(id, msg);
-    chidataDir = inputLoc;
+    noChange = strcmpi(chidataDir, inputLoc);
+    if noChange
+        % Except when the directories are the same
+        returnLoc = chidataDir;
+        return;
+    else
+        % If they are not the same, prompt the change
+        id = 'chidata:dir:changeLoc';
+        msg = sprintf( ...
+            'Changing CHIDATA directory from "%s" to "%s"', ...
+            chidataDir, inputLoc);
+        prompt(id, msg);
+        chidataDir = inputLoc;
+    end % if-strcmpi
 end
 
 %% Checking CHIDATA directory
