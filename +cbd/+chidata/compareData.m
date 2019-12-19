@@ -17,17 +17,21 @@ newStartsBeforeOld = lt( ...
     datenum(oldData.Properties.RowNames{1}));
 if newStartsBeforeOld
     id = 'chidata:compareData:newStartsBeforeOld';
-    msg = 'Overwriting with new startDate before old startDate';
+    msg = sprintf( ...
+        'Overwriting data with new startDate "%s" BEFORE old startDate "%s"', ...
+        data.Properties.RowNames{1}, oldData.Properties.RowNames{1});
     prompt(id, msg);
 end
 
 % Check if new startDate after the old startDate
-newStartsAfterOld = ne( ...
+newStartsAfterOld = gt( ...
     datenum(data.Properties.RowNames{1}), ...
     datenum(oldData.Properties.RowNames{1}));
 if newStartsAfterOld
     id = 'chidata:compareData:newStartsAfterOld';
-    msg = 'Overwriting with new startDate after the old startDate';
+    msg = sprintf( ...
+        'Overwriting data with new startDate "%s" AFTER old startDate "%s"', ...
+        data.Properties.RowNames{1}, oldData.Properties.RowNames{1});
     prompt(id, msg);
 end
 
@@ -37,7 +41,9 @@ newEndsBeforeOld = lt( ...
     datenum(oldData.Properties.RowNames{end}));
 if newEndsBeforeOld
     id = 'chidata:compareData:newEndsBeforeOld';
-    msg = 'Overwriting with new endDate before the old endDate';
+    msg = sprintf( ...
+        'Overwriting data with new endDate "%s" BEFORE old endDate "%s"', ...
+        data.Properties.RowNames{end}, oldData.Properties.RowNames{end});
     prompt(id, msg);
 end
 
@@ -57,7 +63,9 @@ nanArray = arrayfun( ...
 newHasRevisions = ~all(equalArray | nanArray);
 if newHasRevisions
     id = 'chidata:compareData:newHasRevisions';
-    msg = 'Overwriting with revised data';
+    msg = sprintf( ...
+        'Overwriting with new values that DIFFER from old values (tolerance: "%s")', ...
+        num2str(tolerance));
     prompt(id, msg);
 end
 

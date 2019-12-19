@@ -145,13 +145,15 @@ hasDynamicFields = any(ismember(dynamicFields, fieldnames(props)));
 assert(~hasDynamicFields, ...
     'chidata:save:invalidProps', ...
     'Incoming properties structure contains a dynamic field');
+% TODO: List dynamic fields
 
 % Check that the size of data and props are equal
 dataSize = size(data, 2);
 propSize = size(props, 2);
 assert(isequal(dataSize, propSize), ...
     'chidata:save:dataPropMismatch', ...
-    'The number of series in data does not match the number in props');
+    'Data contains "%s" series while properties has %s"', ...
+    dataSize, propSize);
 
 end % function
 

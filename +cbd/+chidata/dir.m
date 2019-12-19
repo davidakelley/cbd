@@ -51,7 +51,7 @@ end % if-nargin
 if ~persistentExists && ~inputExists
     % If no persistent and no input, throw error
     id = 'chidata:dir:notInitialized';
-    msg = 'You must first initialize a CHIDATA directory';
+    msg = 'The CHIDATA directory has not been initialized';
     ME = MException(id, msg);
     throw(ME);
 elseif persistentExists && ~inputExists
@@ -84,7 +84,7 @@ end
 dirExists = isequal(exist(chidataDir, 'dir'), 7);
 assert(dirExists, ...
     'chidata:dir:notFound', ...
-    'Directory "%s" is not found', chidataDir);
+    'Directory "%s" does not exist', chidataDir);
 
 % Check that the index file exists
 indexFname = fullfile(chidataDir, 'index.csv');
@@ -94,7 +94,7 @@ indexExists = isequal(exist(indexFname, 'file'), 2);
 if ~indexExists
     id = 'chidata:dir:makeNew';
     msg = sprintf( ...
-        'No index file found \nCreating new CHIDATA directory at %s', ...
+        'No index file found \nCreating new CHIDATA directory at "%s"', ...
         chidataDir);
     prompt(id, msg)
     cbd.chidata.writeIndex(indexFname);

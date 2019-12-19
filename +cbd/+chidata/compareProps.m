@@ -19,7 +19,7 @@ oldProps = rmfield(oldProps, dynamicFields(idx));
 newHasDiffProps = ~isequal(oldProps, props);
 if newHasDiffProps
     id = 'chidata:compareProps:overwriteProps';
-    msg = 'Overwriting with revised properties';
+    msg = 'Overwriting with a revised properties structure';
     prompt(id, msg);
 end
 
