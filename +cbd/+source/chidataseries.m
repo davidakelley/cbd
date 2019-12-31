@@ -49,6 +49,8 @@ else
     section = index(seriesID);
 end % if-else
 rawData = cbd.chidata.loadData(section, seriesID);
+rawData.Properties.UserData.dates = cbd.private.mdatenum( ...
+    rawData.Properties.RowNames);
 
 %% Trim the data
 if isempty(startDate) && isempty(endDate)

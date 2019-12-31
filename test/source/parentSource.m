@@ -105,7 +105,7 @@ classdef (Abstract) parentSource < matlab.unittest.TestCase
             tc.seriesID = changeCase(tc.seriesID);
             tc.dbID = changeCase(tc.dbID);
             data = tc.testfun(tc.seriesID, tc.opts);
-            tc.verifyTrue(~isempty(data));
+            tc.verifyNotEmpty(data);
         end % function
 
         %% Tests for dbID
@@ -270,6 +270,17 @@ classdef (Abstract) parentSource < matlab.unittest.TestCase
             [~, props] = tc.testfun(tc.seriesID, tc.opts);
             expectedProv = erase(tc.source, 'series');
             tc.verifyEqual(props.provider, expectedProv);
+        end % function
+        
+        %% Tests for UserDates
+        function userDataDates(tc)
+            % Test that the source functions add user dates
+            data = tc.testfun(tc.seriesID, tc.opts);
+            tc.verifyNotEmpty(data.Properties.UserData.dates);
+            tc.verifyInstanceOf(data.Properties.UserData.dates, 'double');
+            tc.verifyEqual( ...
+                data.Properties.UserData.dates, ...
+                cbd.private.mdatenum(data.Properties.RowNames));
         end % function
 
         %% Tests for speed of functions
