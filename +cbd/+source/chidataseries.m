@@ -21,7 +21,12 @@ function [data, props] = chidataseries(seriesID, opts)
 % Santiago I. Sordo-Palacios, 2019
 
 %% Setup
-index = cbd.chidata.loadIndex();
+% Load the index and confirm that it is not empty
+[index, indexFname] = cbd.chidata.loadIndex();
+if isempty(index)
+    error('chidataseries:emptyIndex', ...
+        'Index file "%s" is an empty index', indexFname);
+end % if-isempty
 
 %% Parse inputs
 cbd.source.assertSeries(seriesID, mfilename());

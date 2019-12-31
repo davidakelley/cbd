@@ -28,37 +28,53 @@ indexTable = readtable(fname, ...
     'Delimiter', ',', ...
     'HeaderLines', 0, ...
     'EndOfLine', '\n');
-
+    
 % Check the names of the variables in the index
 varNames = {'Series', 'Section'};
-hasBadHeaders = ~isequal(varNames, indexTable.Properties.VariableNames);
-assert(~hasBadHeaders, ...
+correctHeaders = isequal(varNames, indexTable.Properties.VariableNames);
+assert(correctHeaders, ...
     'chidata:loadIndex:badHeaders', ...
-    'Index file "%s" does not contain correct variable names', ...
-    fname);
+    'Index file "%s" does not have "%s" as its headers', ...
+    fname, strjoin(varNames, ','));
 
-% Check for empty series columns
-emptySeries = all(cellfun(@isempty, indexTable.Series));
-assert(~emptySeries, ...
-    'chidata:loadIndex:emptySeries', ...
-    'Index file "%s" contains empty Series observations', ...
-    fname);
+% Return empty container if this is a new index file
+emptyIndex = isequal(height(indexTable), 0);
+if emptyIndex
+    index = containers.Map.empty;
+    return
+end
 
-% Check for empty section columns
-emptySections = all(cellfun(@isempty, indexTable.Section));
-assert(~emptySections, ...
-    'chidata:loadIndex:emptySections', ...
-    'Index file "%s" contains empty Section observations', ...
-    fname);
+% Check for empty columns, using xor to avoid cases with completely empty
+emptySeries = cellfun(@isempty, indexTable.Series);
+emptySections = cellfun(@isempty, indexTable.Section);
+emptyCol = xor(emptySeries, emptySections);
+
+% If there are any empty columns, error on the cases
+if any(emptyCol)
+    % Case when a section is defined but no series
+    if any(emptySeries & emptyCol)
+        sectionList = strjoin(indexTable.Section(emptySeries & emptyCol), ',');
+        error('chidata:loadIndex:emptySeries', ...
+            'Index file "%s" is missing Series for Sections:\n%s\n', ...
+            fname, sectionList);
+    end
+    % Case when a series is defined but no section
+    if any(emptySections & emptyCol)
+        seriesList = strjoin(indexTable.Series(emptySections & emptyCol), ',');
+        error('chidata:loadIndex:emptySections', ...
+            'Index file "%s" is missing Sections for Series:\n%s\n', ...
+            fname, seriesList);
+    end 
+end % if-any
 
 % Check for duplicate series
-uniqueSeries = unique(sort(indexTable.Series));
-sortedSeres = sort(indexTable.Series);
-duplicateSeries = ~isequal(uniqueSeries, sortedSeres);
-assert(~duplicateSeries, ...
+A = sort(indexTable.Series);
+N = arrayfun(@(k) sum(arrayfun(@(j) isequal(A{k}, A{j}), 1:numel(A))), 1:numel(A));
+duplicateSeries = strjoin(unique(A(N>1)), ',');
+assert(isempty(duplicateSeries), ...
     'chidata:loadIndex:duplicateSeries', ...
-    'Index file "%s" contains duplicate series entries', ...
-    fname);
+    'Index file "%s" contains duplicate Series:\n%s\n', ...
+    fname, duplicateSeries);
 
 % Replace the series with the upper case versions
 series = upper(indexTable.Series);

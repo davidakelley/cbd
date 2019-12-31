@@ -23,6 +23,14 @@ classdef (Sealed) loadIndexTest < parentChidata
             expectedErr = 'chidata:loadIndex:badHeaders';
             tc.verifyError(actualErr, expectedErr);
         end % function
+        
+        function emptyIndex(tc)
+            % Test whether a new/empty index can be loaded
+            tc.initializeTestDir(tc);
+            modifyIndex(tc, 'Series, Section\n');
+           	index = cbd.chidata.loadIndex();
+            tc.verifyEqual(index, containers.Map.empty);
+        end % function
 
         function emptySeries(tc)
             % Test the error when there is an empty series
