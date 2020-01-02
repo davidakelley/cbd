@@ -35,7 +35,7 @@ classdef (Sealed) loadIndexTest < parentChidata
         function emptySeries(tc)
             % Test the error when there is an empty series
             tc.initializeTestDir(tc);
-            modifyIndex(tc, 'Series, Section\n"", sectionA');
+            modifyIndex(tc, 'Series, Section\n"", SECTIONA');
             actualErr = @() cbd.chidata.loadIndex();
             expectedErr = 'chidata:loadIndex:emptySeries';
             tc.verifyError(actualErr, expectedErr);
@@ -44,7 +44,7 @@ classdef (Sealed) loadIndexTest < parentChidata
         function emptySections(tc)
             % Test the error when there is an empty section
             tc.initializeTestDir(tc);
-            modifyIndex(tc, 'Series, Section\nseriesA, ""');
+            modifyIndex(tc, 'Series, Section\nSERIESA, ""');
             actualErr = @() cbd.chidata.loadIndex();
             expectedErr = 'chidata:loadIndex:emptySections';
             tc.verifyError(actualErr, expectedErr);
@@ -53,7 +53,7 @@ classdef (Sealed) loadIndexTest < parentChidata
         function duplicateSeriesCase1(tc)
             % Test the error when there are duplicate series in a section
             tc.initializeTestDir(tc);
-            newIndexStr = 'Series, Section\nseriesA, sectionA\nseriesA, sectionA';
+            newIndexStr = 'Series, Section\nSERIESA, SECTIONA\nSERIESA, SECTIONA';
             modifyIndex(tc, newIndexStr);
             actualErr = @() cbd.chidata.loadIndex();
             expectedErr = 'chidata:loadIndex:duplicateSeries';
@@ -64,7 +64,7 @@ classdef (Sealed) loadIndexTest < parentChidata
             % Test the error when there are duplicate series in different
             % sections
             tc.initializeTestDir(tc);
-            newIndexStr = 'Series, Section\nseriesA, sectionA\nseriesA, sectionB';
+            newIndexStr = 'Series, Section\nSERIESA, SECTIONA\nSERIESA, SECTIONB';
             modifyIndex(tc, newIndexStr);
             actualErr = @() cbd.chidata.loadIndex();
             expectedErr = 'chidata:loadIndex:duplicateSeries';

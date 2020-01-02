@@ -76,10 +76,8 @@ assert(isempty(duplicateSeries), ...
     'Index file "%s" contains duplicate Series:\n%s\n', ...
     fname, duplicateSeries);
 
-% Replace the series with the upper case versions
-series = upper(indexTable.Series);
-
 % Create a container for the index
-index = containers.Map(series, indexTable.Section);
+index = containers.Map( ...
+    upper(indexTable.Series), upper(indexTable.Section));
 
 end % function
