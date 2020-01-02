@@ -9,7 +9,7 @@ classdef (Sealed) updateIndexTest < parentChidata
         testfun function_handle
     end % properties
 
-    methods (TestMethodSetup)
+    methods (TestClassSetup)
 
         function getTestfun(tc)
             tc.testfun = @(section, seriesNames, prompt) ...
@@ -21,65 +21,118 @@ classdef (Sealed) updateIndexTest < parentChidata
 
     methods (Test)
 
-        function moveSeriesCase1(tc)
+        function moveOneSeriesNewSection(tc)
             % Errow for a new section with a series that already exists
-            section = 'newSection';
+            section = 'NEWSECTION';
             seriesNames = {'SERIES1'};
             expectedErr = 'chidata:updateIndex:moveSeries';
             actualErr = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyError(actualErr, expectedErr);
         end % function
+        
+        function moveMultipleSeriesNewSection(tc)
+            % Errow for a new section with a series that already exists
+            section = 'NEWSECTION';
+            seriesNames = {'SERIES1', 'SERIES2'};
+            expectedErr = 'chidata:updateIndex:moveSeries';
+            actualErr = @() tc.testfun(section, seriesNames, tc.prompty);
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        function moveOneSeriesExistingSection(tc)
+            % Errow for a new section with a series that already exists
+            section = 'SECTIONB';
+            seriesNames = {'SERIES1'};
+            expectedErr = 'chidata:updateIndex:moveSeries';
+            actualErr = @() tc.testfun(section, seriesNames, tc.prompty);
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        function moveMultipleSeriesExistingSection(tc)
+            % Errow for a new section with a series that already exists
+            section = 'TESTSECTION';
+            seriesNames = {'SERIES1', 'SERIES2'};
+            expectedErr = 'chidata:updateIndex:moveSeries';
+            actualErr = @() tc.testfun(section, seriesNames, tc.prompty);
+            tc.verifyError(actualErr, expectedErr);
+        end % function
 
-        function addSection(tc)
+        function addSectionOneSeries(tc)
             % Warning for adding a new section
-            section = 'newSection';
+            section = 'NEWSECTION';
+            seriesNames = {'NEWSERIES1'};
+            expectedWarn = 'chidata:updateIndex:addSection';
+            actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
+            tc.verifyWarning(actualWarn, expectedWarn);            
+        end % function
+        
+        function addSectionMultipleSeries(tc)
+            % Warning for adding a new section
+            section = 'NEWSECTION';
             seriesNames = {'NEWSERIES1', 'NEWSERIES2'};
             expectedWarn = 'chidata:updateIndex:addSection';
             actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyWarning(actualWarn, expectedWarn);            
         end % function
-
-        function moveSeriesCase2(tc)
-            % Error for an existing section with an existing series from
-            % a different section
-            section = 'sectionB';
-            seriesNames = {'SERIES1'};
-            expectedErr = 'chidata:updateIndex:moveSeries';
-            actualErr = @() tc.testfun(section, seriesNames, tc.prompty);
-            tc.verifyError(actualErr, expectedErr);
-        end % function
-
+        
         function updateExisting(tc)
             % Test that when updating an existing section as is nothing
             % happens to the index returned
-            section = 'sectionA';
+            section = 'SECTIONA';
             seriesNames = {'SERIES1'};
             actualIndex = tc.testfun(section, seriesNames, tc.promptn);
             tc.verifyEqual(actualIndex, tc.expectedIndex);
         end % function
 
-        function removeSeries(tc)
+        function removeOneSeries(tc)
             % Test for an existing section that removes series
-            section = 'sectionB';
+            section = 'SECTIONB';
+            seriesNames = {'SERIES2', 'SERIES3'}; % dropped SERIES4
+            expectedWarn = 'chidata:updateIndex:removeSeries';
+            actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
+            tc.verifyWarning(actualWarn, expectedWarn);
+        end % function
+        
+        function removeMultipleSeries(tc)
+            % Test for an existing section that removes series
+            section = 'SECTIONB';
             seriesNames = {'SERIES2'};
             expectedWarn = 'chidata:updateIndex:removeSeries';
             actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyWarning(actualWarn, expectedWarn);
         end % function
 
-        function addSeries(tc)
+        function addOneSeries(tc)
             % Test for existing section that adds series
-            section = 'sectionA';
-            seriesNames = {'SERIES1', 'NEWSERIES'};
+            section = 'SECTIONA';
+            seriesNames = {'SERIES1', 'NEWSERIES'}; 
             expectedWarn = 'chidata:updateIndex:addSeries';
             actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyWarning(actualWarn, expectedWarn);
         end % function
         
-        function modifySeries(tc)
+        function addMultipleSeries(tc)
+            % Test for existing section that adds series
+            section = 'SECTIONA';
+            seriesNames = {'SERIES1', 'NEWSERIES1', 'NEWSERIES2'}; 
+            expectedWarn = 'chidata:updateIndex:addSeries';
+            actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
+            tc.verifyWarning(actualWarn, expectedWarn);
+        end % function
+        
+        function addAndRemoveOneSeries(tc)
+            % Test for existing section that renames a series
+            section = 'SECTIONA';
+            seriesNames = {'SERIES1RENAMED'};
+            expectedWarn = 'chidata:updateIndex:modifySeries';
+            actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
+            tc.verifyWarning(actualWarn, expectedWarn);
+        end % function
+        
+        function addAndRemoveMultipleSeries(tc)
             % Test for existing section that adds and removes series
-            section = 'sectionA';
-            seriesNames = {'NEWSERIES'};
+            section = 'SECTIONB';
+            seriesNames = {'SERIES2RENAMED', 'SERIES3RENAMED'};
             expectedWarn = 'chidata:updateIndex:modifySeries';
             actualWarn = @() tc.testfun(section, seriesNames, tc.prompty);
             tc.verifyWarning(actualWarn, expectedWarn);
