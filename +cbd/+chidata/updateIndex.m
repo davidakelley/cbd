@@ -1,4 +1,4 @@
-function [updatedIndex, isNewSection] = updateIndex(index, thisSection, newSeries, prompt)
+function [updatedIndex, isNewSection] = updateIndex(index, thisSection, curSeries, prompt)
 %UPDATEINDEX is the helper function to update an index container
 %
 % INPUTS:
@@ -19,104 +19,110 @@ indexSections = values(index);
 % Check if the section is a value in the index
 isNewSection = ~ismember(thisSection, indexSections);
 
-% Check if the series exists anywhere in the index
-check4new = @(x) ~ismember(x, indexSeries);
-isNewSeries = cellfun(check4new, newSeries);
+% Check if the section has moved
+movingSeries = findMovingSeries(index, thisSection, curSeries);
+if ~isempty(movingSeries)
+    seriesList = strjoin(movingSeries, ', ');
+    id = 'chidata:updateIndex:moveSeries';
+    msg = sprintf( ...
+        ['The new section "%s" cannot contain series:', ...
+        '\n%s\n', ...
+        'Because they are already defined elsewhere in CHIDATA'], ...
+        thisSection, seriesList);
+    error(id, msg); %#ok<*SPERR>
+end
 
-% Get the names of all the series newrently in the section
+% Get the names of all the series currently in this section
 oldSeries = indexSeries(strcmpi(thisSection, indexSections));
 
-% Check if the incoming seriesNames add new series
-newInOld = ismember(newSeries, oldSeries);
-oldInNew = ismember(oldSeries, newSeries);
+% Check if the incoming seriesNames adds or removes series
+curInOld = ismember(curSeries, oldSeries);
+oldInCur = ismember(oldSeries, curSeries);
 
 % Treat the new section cases
 if isNewSection
-    if all(isNewSeries)
-        % When the new section has all new series
-        id = 'chidata:updateIndex:addSection';
-        msg = sprintf('Adding a new section "%s" to CHIDATA', ...
-            thisSection);
-        prompt(id, msg);
-        updatedIndex = addToIndex(index, thisSection, newSeries);
-    else
-        % When the new section contains existing series
-        seriesList = strjoin(newSeries(~isNewSeries), ', ');
-        id = 'chidata:updateIndex:moveSeries';
-        msg = sprintf( ...
-            ['The new section "%s" cannot contain series:', ...
-            '\n%s\n', ...
-            'Because they are already defined in CHIDATA'], ...
-            thisSection, seriesList);
-        error(id, msg); %#ok<*SPERR>
-    end
-end % if-newSection
+    % When the new section has all new series
+    id = 'chidata:updateIndex:addSection';
+    msg = sprintf('Adding a new section "%s" to CHIDATA', ...
+        thisSection);
+    prompt(id, msg);
+    updatedIndex = addToIndex(index, thisSection, curSeries);
 
 % Treat the existing section cases
-if ~isNewSection
-    if all(newInOld) && all(oldInNew)
+else 
+    if all(curInOld) && all(oldInCur)
         % When the existing section has all of iis own series
         updatedIndex = index;
-    elseif all(newInOld) && ~all(oldInNew)
+    elseif all(curInOld) && ~all(oldInCur)
         % When an existing section removes a series
-        seriesToRemove = oldSeries(~oldInNew);
-        seriesList = strjoin(seriesToRemove, ', ');
+        seriesToRemove = oldSeries(~oldInCur);
         id = 'chidata:updateIndex:removeSeries';
         msg = sprintf('Removing series from section "%s":\n%s\n', ...
-            thisSection, seriesList);
+            thisSection, strjoin(seriesToRemove, ', '));
+        
         prompt(id, msg);
         updatedIndex = remove(index, seriesToRemove);
-    elseif ~all(newInOld) && all(oldInNew)
+    elseif ~all(curInOld) && all(oldInCur)
         % When an existing section adds a series
-        seriesToAdd = newSeries(~newInOld);
-        seriesList = strjoin(seriesToAdd, ', ');
+        seriesToAdd = curSeries(~curInOld);
         id = 'chidata:updateIndex:addSeries';
         msg = sprintf('Adding series to section "%s":\n%s\n', ...
-            thisSection, seriesList);
+            thisSection, strjoin(seriesToAdd, ', '));
+        
         prompt(id, msg);
         updatedIndex = addToIndex(index, thisSection, seriesToAdd);
-    elseif ~all(newInOld) && ~all(oldInNew)
-        if ~all(isNewSeries)
-            % When an existing section adds series already defined
-            seriesList = strjoin(newSeries(~isNewSeries), ', ');
-            id = 'chidata:updateIndex:moveSeries';
-            msg = sprintf( ...
-                ['The existing section "%s" cannot contain series:', ...
-                '\n%s\n', ...
-                'Because they are already defined in CHIDATA'], ...
-                thisSection, seriesList);
-            error(id, msg);
-        elseif all(isNewSeries)
-            % When an existing sections adds and removes series
-            seriesToRemove = oldSeries(~oldInNew);
-            seriesToRemoveList = strjoin(seriesToRemove, ', ');
-            seriesToAdd = newSeries(~newInOld);
-            seriesToAddList = strjoin(seriesToAdd, ', ');
-            
-            id = 'chidata:updateIndex:modifySeries';
-            msg = sprintf( ...
-                ['Removing series from section "%s":', ...
-                '\n%s\n', ...
-                'And adding series to it:', ...
-                '\n%s\n'], ...
-                thisSection, seriesToRemoveList, seriesToAddList);
-            
-            prompt(id, msg);
-            updatedIndex = remove(index, seriesToRemove);
-            updatedIndex = addToIndex( ...
-                updatedIndex, thisSection, seriesToAdd);
-        end % if-elseif
+    elseif ~all(curInOld) && ~all(oldInCur)
+        % When an existing sections adds and removes series
+        seriesToRemove = oldSeries(~oldInCur);
+        seriesToAdd = curSeries(~curInOld);
+        
+        id = 'chidata:updateIndex:modifySeries';
+        msg = sprintf( ...
+            ['Removing series from section "%s":', ...
+            '\n%s\n', ...
+            'And adding series to it:', ...
+            '\n%s\n'], ...
+            thisSection, ...
+            strjoin(seriesToRemove, ', '), ...
+            strjoin(seriesToAdd, ', '));
+        
+        prompt(id, msg);
+        updatedIndex = remove(index, seriesToRemove);
+        updatedIndex = addToIndex( ...
+            updatedIndex, thisSection, seriesToAdd);
     end % if-elseif
 end % if-notNewSection
+
+end % function
+
+function movingSeries = findMovingSeries(index, thisSection, curSeries)
+%FINDSECTION finds the sections pertaining to each element of curSeries
+
+% Preallocate cell and size
+nCurSeries = length(curSeries);
+sectionList = cell(1, nCurSeries);
+
+% Loop over each element, store section if found, store empty if not found
+for i = 1:length(curSeries)
+    if isKey(index, curSeries{i})
+        sectionList{i} = index(curSeries{i});
+    else
+        sectionList{i} = '';
+    end
+end % for-i
+
+moveCheck = @(x) ~isequal(thisSection, x) & ~isempty(x);
+moveIndex = cellfun(moveCheck, sectionList);
+movingSeries = curSeries(moveIndex);
 
 end % function
 
 function updatedIndex = addToIndex(index, thisSection, seriesNames)
 %ADDTOINDEX adds the variables specified to a given section
 
-newSeries = [keys(index), seriesNames];
+curSeries = [keys(index), seriesNames];
 repThisSection = repmat({thisSection}, 1, length(seriesNames));
 newSections = [values(index), repThisSection];
-updatedIndex = containers.Map(newSeries, newSections);
+updatedIndex = containers.Map(curSeries, newSections);
 
 end % function
