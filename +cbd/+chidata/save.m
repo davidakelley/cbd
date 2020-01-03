@@ -1,4 +1,4 @@
-function saved = save(section, data, props, varargin)
+function saved = save(sectionIn, dataIn, propsIn, varargin)
 %SAVE stores data and props to a section of the CHIDATA directory
 %
 % DESCRIPTION
@@ -64,9 +64,8 @@ function saved = save(section, data, props, varargin)
 
 %% Setup
 % Handle inputs
-dynamicFields = {'Name', 'DateTimeMod', 'UsernameMod', 'FileMod'};
-checkInputs(section, data, props, dynamicFields);
-[tolerance, prompt] = parseInputs(varargin);
+[section, data, props] = checkInputs(sectionIn, dataIn, propsIn);
+[tolerance, prompt] = parseVarargin(varargin);
 
 % Load the chidata directory
 chidataDir = cbd.chidata.dir();
@@ -90,7 +89,7 @@ if ~isNewSection
     [oldData, dataFname] = cbd.chidata.loadData(section);
     cbd.chidata.compareData(data, oldData, tolerance, prompt);
     [oldProps, propsFname] = cbd.chidata.loadProps(section);
-    cbd.chidata.compareProps(props, oldProps, dynamicFields, prompt);
+    cbd.chidata.compareProps(props, oldProps, prompt);
 else
     % If it is a new section, store the names of the new files
     dataFname = fullfile(chidataDir, [section '_data.csv']);
@@ -98,7 +97,7 @@ else
 end % if-else
 
 % Write the dynamic properties to the structure
-props = addDynamicFields(props);
+props = cbd.chidata.dynamicFields(props, 'add');
 
 % Make the properties table
 propTable = prop_struct2table(props, data);
@@ -119,37 +118,37 @@ saved = true;
 
 end
 
-function checkInputs(section, data, props, dynamicFields)
+function [section, data, props] = checkInputs(sectionIn, dataIn, propsIn)
 %CHECKINPUTS checks the inputs to the cbd.chidata.save function
 %
 % Santiago Sordo-Palacios, 2019
 
 % Check section validity
-assert(ischar(section) && ~isempty(section), ...
+assert(ischar(sectionIn) && ~isempty(sectionIn), ...
     'chidata:save:invalidSection', ...
     'Section is not a character or is empty');
+section = upper(sectionIn);
 
 % Check data validity
-assert(istable(data) && ~isempty(data), ...
+assert(istable(dataIn) && ~isempty(dataIn), ...
     'chidata:save:invalidData', ...
     'Data is not a table or is empty');
 
+% Pass to cbd.private.cbdTable to make a cbd-style table
+values = dataIn{:, :};
+dates = cbd.private.mdatenum(dataIn.Properties.RowNames);
+varNames = upper(dataIn.Properties.VariableNames);
+data = cbd.private.cbdTable(values, dates, varNames);
+
 % Check properties validity
-assert(isstruct(props) && ~isempty(props), ...
+assert(isstruct(propsIn) && ~isempty(propsIn), ...
     'chidata:save:invalidProps', ...
     'Props is not a structure or is empty');
-
-% Check for invalid fields in props
-% These are fields created in the save function
-hasDynamicFields = any(ismember(dynamicFields, fieldnames(props)));
-assert(~hasDynamicFields, ...
-    'chidata:save:invalidProps', ...
-    'Incoming properties structure contains a dynamic field');
-% TODO: List dynamic fields
+props = cbd.chidata.dynamicFields(propsIn, 'remove');
 
 % Check that the size of data and props are equal
-dataSize = size(data, 2);
-propSize = size(props, 2);
+dataSize = size(dataIn, 2);
+propSize = size(propsIn, 2);
 assert(isequal(dataSize, propSize), ...
     'chidata:save:dataPropMismatch', ...
     'Data contains "%s" series while properties has %s"', ...
@@ -157,7 +156,7 @@ assert(isequal(dataSize, propSize), ...
 
 end % function
 
-function [tolerance, prompt] = parseInputs(inVarargin)
+function [tolerance, prompt] = parseVarargin(vararginIn)
 %PARSEINPUTS parses the varargin inputs to the main function call
 %
 % Santiago Sordo-Palacios, 2019
@@ -166,7 +165,7 @@ function [tolerance, prompt] = parseInputs(inVarargin)
 inP = inputParser;
 inP.addParameter('tolerance', 1e-12, @isnumeric);
 inP.addParameter('userInput', '', @ischar);
-inP.parse(inVarargin{:});
+inP.parse(vararginIn{:});
 tolerance = inP.Results.tolerance;
 userInput = inP.Results.userInput;
 
@@ -184,30 +183,7 @@ function props = addDynamicFields(props)
 %
 % Santiago Sordo-Palacios, 2019
 
-% Find the current date and username
-thisDT = datestr(now);
-thisUser = getenv('username');
 
-% Find the file that calls chidata.save
-thisStack = dbstack('-completenames');
-[~, loc] = ismember(mfilename(), {thisStack.name});
-
-% Shift up two positions to get calling file
-loc = loc + 2;
-if size(thisStack, 1) < loc
-    callFile = 'N/A';
-else
-    callFile = thisStack(loc).file;
-end
-
-nProps = length(props);
-DateTimeMod = cellstr(repmat(thisDT, nProps, 1));
-UsernameMod = cellstr(repmat(thisUser, nProps, 1));
-FileMod = cellstr(repmat(callFile, nProps, 1));
-
-[props.DateTimeMod] = DateTimeMod{:};
-[props.UsernameMod] = UsernameMod{:};
-[props.FileMod] = FileMod{:};
 
 end % function
 
