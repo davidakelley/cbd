@@ -70,9 +70,6 @@ function saved = save(sectionIn, dataIn, propsIn, varargin)
 % Load the chidata directory
 chidataDir = cbd.chidata.dir();
 
-% Replace variable names with UPPER versions
-data.Properties.VariableNames = upper(data.Properties.VariableNames);
-
 %% Index
 % Load the index
 [index, indexFname] = cbd.chidata.loadIndex();
@@ -138,7 +135,7 @@ assert(istable(dataIn) && ~isempty(dataIn), ...
 values = dataIn{:, :};
 dates = cbd.private.mdatenum(dataIn.Properties.RowNames);
 varNames = upper(dataIn.Properties.VariableNames);
-data = cbd.private.cbdTable(values, dates, varNames);
+data = cbd.private.cbdTable(values, dates, varNames, true);
 
 % Check properties validity
 assert(isstruct(propsIn) && ~isempty(propsIn), ...
@@ -175,15 +172,6 @@ if isempty(userInput)
 else
     prompt = @(id, msg) cbd.chidata.prompt(id, msg, userInput);
 end % if-isempty
-
-end % function
-
-function props = addDynamicFields(props)
-%ADDDYNAMICFIELDS adds the dynamic fields created by the save function
-%
-% Santiago Sordo-Palacios, 2019
-
-
 
 end % function
 

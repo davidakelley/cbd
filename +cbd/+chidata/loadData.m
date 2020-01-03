@@ -31,7 +31,7 @@ assert(found, ...
     'Data file "%s" could not be found', fname);
 
 % Open the data file
-data = readtable(fname, ...
+dataIn = readtable(fname, ...
     'Delimiter', ',', ...
     'HeaderLines', 0, ...
     'ReadVariableNames', true, ...
@@ -39,13 +39,11 @@ data = readtable(fname, ...
     'EndOfLine', '\n', ...
     'DatetimeType', 'text');
 
-% Replace variables with uppercase version
-data.Properties.VariableNames = upper(data.Properties.VariableNames);
-
-% Check that the rownames are correct
-% TODO: Should this be a prompt?
-formattedRowNames = datestr(data.Properties.RowNames, 'dd-mmm-yyyy');
-data.Properties.RowNames = cellstr(formattedRowNames);
+% Pass to cbd.private.cbdTable to ensure a cbd-style table
+values = dataIn{:, :};
+dates = cbd.private.mdatenum(dataIn.Properties.RowNames);
+varNames = upper(dataIn.Properties.VariableNames);
+data = cbd.private.cbdTable(values, dates, varNames, true);
 
 % Return only one series if requested
 if nargin == 2

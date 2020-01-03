@@ -1,10 +1,11 @@
-function data = cbdTable(values, dates, varNames)
+function data = cbdTable(values, dates, varNames, sortVars)
 %CBDTABLE creates CBD data table from values, dates, and variable names
 %
 % INPUTS:
 %   values      ~ double, an array of the values in the table
 %   dates       ~ double, the datenums for each observations as an array
 %   varNames    ~ cell, the names of the series in the table
+%   sortVars    ~ logical, whether to sorted the variables at the end
 %
 % OUTPUTS:
 %   data    ~ table, the cbd-style table of the data
@@ -14,7 +15,7 @@ function data = cbdTable(values, dates, varNames)
 
 % Check the names of the series are a cell array
 assert(iscell(varNames), ...
-    'cbdTable:seriesNamesNotCell', ...
+    'cbdTable:varNamesNotCell', ...
     'The varNames argument is not a cell array');
 
 % Return an empty table if values are empty
@@ -31,6 +32,9 @@ assert(isnumeric(values), ...
 assert(isnumeric(dates), ...
     'cbdTable:datesNotNumeric', ...
     'The dates argument is not an array of datenums');
+assert(issorted(dates), ...
+    'cbdTable:datesNotSorted', ...
+    'The date array argument are not sorted');
 
 % Check the sizes of series names and values
 seriesFromValues = size(values, 2);
@@ -53,6 +57,12 @@ rowNames = cellstr(cbd.private.mdatestr(dates));
 data = array2table(values, ...
     'VariableNames', varNames, ...
     'RowNames', rowNames);
+
+% Sort the variables
+if nargin == 4 && sortVars
+    sortedNames = sort(data.Properties.VariableNames);
+    data = data(:, sortedNames);
+end % if-nargin
 
 % Save the datenum's to UserData
 data.Properties.UserData.dates = dates;
