@@ -21,7 +21,7 @@ classdef (Sealed) saveTest < parentChidata
     end % methods-TestClassSetup
 
     methods (Test)
-        %% Test the handle inputs step
+        %% Test the input handling
         function invalidSectionErr(tc)
             % Test for invalid section input
             expectedErr = 'chidata:save:invalidSection';
@@ -38,7 +38,7 @@ classdef (Sealed) saveTest < parentChidata
             tc.verifyError(actualErr, expectedErr);
         end % function
 
-        function invalidPropsCase1(tc)
+        function invalidProps(tc)
             % Test for invalid properties inputs
             expectedErr = 'chidata:save:invalidProps';
             actualErr = @() cbd.chidata.save( ...
@@ -48,6 +48,7 @@ classdef (Sealed) saveTest < parentChidata
         end % function
 
         function dataPropMismatchCase1(tc)
+            % Test when the series in data are more than props
             expectedErr = 'chidata:save:dataPropMismatch';
             tc.data.seriesB = tc.data.SERIES1;
             actualErr = @() ...
@@ -56,26 +57,15 @@ classdef (Sealed) saveTest < parentChidata
         end % function
 
         function dataPropMismatchCase2(tc)
+            % Test when the series in props are more than data
             expectedErr = 'chidata:save:dataPropMismatch';
             tc.props(2) = tc.props(1);
             actualErr = @() ...
                 cbd.chidata.save(tc.section, tc.data, tc.props);
             tc.verifyError(actualErr, expectedErr);
         end % function
-
-        function invalidPropsCase2(tc)
-            % Test invalid fields in properties structure
-            expectedErr = 'chidata:save:invalidProps';
-            nFields = length(tc.dynamicFields);
-            for iField = 1:nFields
-                thisStruct = struct((tc.dynamicFields{iField}), '');
-                actualErr = @() ...
-                    cbd.chidata.save(tc.section, tc.data, thisStruct);
-                tc.verifyError(actualErr, expectedErr)
-            end % for-iField
-        end % function
         
-        %% Test the index step
+        %% Test updating a CHIDATA directory
         function updateExisting(tc)
             % Set-up the environemnt
             tc.initializeTestDir(tc);
@@ -86,14 +76,13 @@ classdef (Sealed) saveTest < parentChidata
             tc.verifyTrue(saved);
         end % function
         
-        
         function addNewSection(tc)
             % Set-up the environemnt
             tc.initializeTestDir(tc);
             expectedWarn = 'chidata:updateIndex:addSection';
             
             % Create the new section, data, and props
-            expSection = 'newSection';
+            expSection = 'NEWSECTION';
             expSeries = 'NEWSERIES';
             tc.data.Properties.VariableNames = {expSeries};
             expData = tc.data;

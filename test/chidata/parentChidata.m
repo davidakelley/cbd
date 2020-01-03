@@ -36,23 +36,20 @@ classdef (Abstract) parentChidata < matlab.unittest.TestCase
             Series = {'BBSDEMAND'; 'BBSOUTLOOK'; ...
                 'SERIES1'; 'SERIES2'; 'SERIES3'; 'SERIES4'; ...
                 'TESTSERIES'; 'MLU67G'};
-            Section = {'disagg'; 'disagg'; ...
-                'sectionA'; 'sectionB'; 'sectionB'; 'sectionB'; ...
-                'testSection'; 'agg'};
+            Section = {'DISAGG'; 'DISAGG'; ...
+                'SECTIONA'; 'SECTIONB'; 'SECTIONB'; 'SECTIONB'; ...
+                'TESTSECTION'; 'AGG'};
             tc.expectedIndex = containers.Map(Series, Section);
         end % function
 
         function getExpectedSectionAData(tc)
             % Create the expected table of data for sectionA
             startDate = 737426;
-            dates = startDate:1:startDate + 6;
-            rowNames = cellstr(datestr(dates, 'dd-mmm-yyyy'));
+            dates = transpose(startDate:1:startDate + 6);
             series1 = transpose(1:1:7);
             varNames = {'SERIES1'};
-            tc.expectedSectionAData = table( ...
-                series1, ...
-                'VariableNames', varNames, ...
-                'RowNames', rowNames);
+            tc.expectedSectionAData = cbd.private.cbdTable( ...
+                series1, dates, varNames);
         end % function
 
         function getExpectedSectionAProp(tc)
@@ -72,16 +69,13 @@ classdef (Abstract) parentChidata < matlab.unittest.TestCase
         function getExpectedSectionBData(tc)
             % Create the expected table of data for sectionAB
             startDate = 737426;
-            dates = startDate:7:startDate + 28;
-            rowNames = cellstr(datestr(dates, 'dd-mmm-yyyy'));
+            dates = transpose(startDate:7:startDate + 28);
             series2 = transpose(1:1:5);
             series3 = [-10; NaN; 10; NaN; -10];
             series4 = [123.456; -321.879; 231.234; -232.234; 801.234];
             varNames = {'SERIES2', 'SERIES3', 'SERIES4'};
-            tc.expectedSectionBData = table( ...
-                series2, series3, series4, ...
-                'VariableNames', varNames, ...
-                'RowNames', rowNames);
+            tc.expectedSectionBData = cbd.private.cbdTable( ...
+                [series2, series3, series4], dates, varNames);
         end % function
 
         function getExpectedSectionBProp(tc)

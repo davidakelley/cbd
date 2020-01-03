@@ -35,7 +35,16 @@ classdef (Sealed) loadIndexTest < parentChidata
         function emptySeries(tc)
             % Test the error when there is an empty series
             tc.initializeTestDir(tc);
-            modifyIndex(tc, 'Series, Section\n"", sectionA');
+            modifyIndex(tc, 'Series, Section\n"", SECTIONA');
+            actualErr = @() cbd.chidata.loadIndex();
+            expectedErr = 'chidata:loadIndex:emptySeries';
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        function emptySeriesMultiple(tc)
+            % Test the error when there are multiple empty series
+            tc.initializeTestDir(tc);
+            modifyIndex(tc, 'Series, Section\nSERIESA, SECTIONA\n"", SECTIONB\n"", SECTIONC');
             actualErr = @() cbd.chidata.loadIndex();
             expectedErr = 'chidata:loadIndex:emptySeries';
             tc.verifyError(actualErr, expectedErr);
@@ -44,27 +53,36 @@ classdef (Sealed) loadIndexTest < parentChidata
         function emptySections(tc)
             % Test the error when there is an empty section
             tc.initializeTestDir(tc);
-            modifyIndex(tc, 'Series, Section\nseriesA, ""');
+            modifyIndex(tc, 'Series, Section\nSERIESA, ""');
+            actualErr = @() cbd.chidata.loadIndex();
+            expectedErr = 'chidata:loadIndex:emptySections';
+            tc.verifyError(actualErr, expectedErr);
+        end % function
+        
+        function emptySectionsMultiple(tc)
+            % Test the error when there is an empty section
+            tc.initializeTestDir(tc);
+            modifyIndex(tc, 'Series, Section\nSERIES1, SECTIONA\nSERIES2, ""\nSERIES3, ""');
             actualErr = @() cbd.chidata.loadIndex();
             expectedErr = 'chidata:loadIndex:emptySections';
             tc.verifyError(actualErr, expectedErr);
         end % function
 
-        function duplicateSeriesCase1(tc)
+        function duplicateSeriesSameSection(tc)
             % Test the error when there are duplicate series in a section
             tc.initializeTestDir(tc);
-            newIndexStr = 'Series, Section\nseriesA, sectionA\nseriesA, sectionA';
+            newIndexStr = 'Series, Section\nSERIESA, SECTIONA\nSERIESA, SECTIONA';
             modifyIndex(tc, newIndexStr);
             actualErr = @() cbd.chidata.loadIndex();
             expectedErr = 'chidata:loadIndex:duplicateSeries';
             tc.verifyError(actualErr, expectedErr);
         end % function
 
-        function duplicateSeriesCase2(tc)
+        function duplicateSeriesDiffSection(tc)
             % Test the error when there are duplicate series in different
             % sections
             tc.initializeTestDir(tc);
-            newIndexStr = 'Series, Section\nseriesA, sectionA\nseriesA, sectionB';
+            newIndexStr = 'Series, Section\nSERIESA, SECTIONA\nSERIESA, SECTIONB';
             modifyIndex(tc, newIndexStr);
             actualErr = @() cbd.chidata.loadIndex();
             expectedErr = 'chidata:loadIndex:duplicateSeries';
@@ -76,6 +94,16 @@ classdef (Sealed) loadIndexTest < parentChidata
             tc.initializeTestDir(tc);
             actualIndex = cbd.chidata.loadIndex();
             tc.verifyEqual(actualIndex, tc.expectedIndex);
+        end % function
+        
+        function testIndexReadLower(tc)
+            % Test that an index that is lower case reads in correctly
+            tc.initializeTestDir(tc);
+            newIndexStr = 'Series, Section\nseriesa, sectiona';
+            modifyIndex(tc, newIndexStr);
+            actualIndex = cbd.chidata.loadIndex();
+            tc.verifyEqual(keys(actualIndex), {'SERIESA'});
+            tc.verifyEqual(values(actualIndex), {'SECTIONA'});
         end % function
 
     end % methods
