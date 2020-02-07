@@ -20,7 +20,7 @@ for iSer = 1:size(outData, 2)
   if startInd == 1
     startInd = 2;
   end
-  logLvl = log(lvlData(startInd:end));
+  logLvl = reallog(lvlData(startInd:end));
   logDiff = logLvl(2:end) - logLvl(1:end-1);
   
   logDiffFull = nan(size(lvlData));

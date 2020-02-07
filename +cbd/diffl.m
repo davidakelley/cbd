@@ -27,7 +27,7 @@ end
 validateattributes(nPer, {'numeric'}, {'scalar', 'integer'}); 
 
 %% Diff
-lDiffed = 100 * (log(data) - cbd.lag(log(data), nPer));
+lDiffed = 100 * (reallog(data) - cbd.lag(reallog(data), nPer));
 
 if returnTab
     varNames = cellfun(@horzcat, repmat({['diffl' num2str(nPer)]}, 1, nVar), vName, 'UniformOutput', false);

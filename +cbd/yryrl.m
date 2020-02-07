@@ -35,7 +35,7 @@ end
 
 [~, freq] = cbd.private.getFreq(dates);
 
-yChange = 100 * (log(data) - cbd.lag(log(data), freq));
+yChange = 100 * (reallog(data) - cbd.lag(reallog(data), freq));
 
 if returnTab
     varNames = cellfun(@horzcat, repmat({'yryrPct'}, 1, nVar), vName, 'UniformOutput', false);
