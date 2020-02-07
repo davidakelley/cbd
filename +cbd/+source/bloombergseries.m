@@ -58,20 +58,22 @@ end % if-noPull
 %% Format to cbd-style
 % Create the table
 dataCol = fetch_data(:,2);
-timeCol = fetch_data(:,1);
+timeCol = cbd.private.endOfPer(fetch_data(:,1), frequency(1), true);
 seriesName = {upper(matlab.lang.makeValidName(seriesID))};
-dataRaw = cbd.private.cbdTable(dataCol, timeCol, seriesName);
-
-% Disaggregate the data
-warning off cbd:getFreq:oddDates
-data = cbd.disagg(dataRaw, frequency(1), 'NAN');
-warning on cbd:getFreq:oddDates
+data = cbd.private.cbdTable(dataCol, timeCol, seriesName);
 
 % Trim out the extraneous dates before startDate
 % NOTE: This a fix for the @blp/history bug
 actualStartDate = datenum(data.Properties.RowNames{1});
 if actualStartDate < startDate
     data = cbd.trim(data, 'startDate', startDate);
+end % if-startDate 
+
+% Trim out the extraneous dates after endDate
+% NOTE: This a fix for Bloomberg having observations for current month
+actualEndDate = datenum(data.Properties.RowNames{end});
+if actualEndDate > endDate
+    data = cbd.trim(data, 'endDate', endDate);
 end % if-startDate 
 
 % create the properties
