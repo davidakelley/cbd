@@ -56,7 +56,7 @@ classdef (Sealed) bloombergseriesTest < parentSource
         end % function
 
         function invalidFreq(tc)
-            expectedErr = 'bloombergseries:invalidFrequency';
+            expectedErr = 'bloombergseries:invalidfrequency';
             invalidFreqCell = {'INVALID', 'I'};
             nInv = length(invalidFreqCell);
             for iInv = 1:nInv
@@ -71,12 +71,7 @@ classdef (Sealed) bloombergseriesTest < parentSource
             nShortFreqs = length(tc.XshortFreq);
             for jFreq = 1:nShortFreqs
                 tc.opts.frequency = tc.XshortFreq{jFreq};
-                try
-                    [~, props] = tc.testfun(tc.seriesID, tc.opts);
-                catch
-                    props = struct();
-                    props.frequency = '';
-                end % try-catch
+                [~, props] = tc.testfun(tc.seriesID, tc.opts);
                 expectedFreq = tc.XlongFreq{jFreq};
                 tc.verifyEqual(props.frequency, expectedFreq);
             end % for-iFreq
@@ -87,12 +82,7 @@ classdef (Sealed) bloombergseriesTest < parentSource
             nLongFreqs = length(tc.XlongFreq);
             for iFreq = 1:nLongFreqs
                 tc.opts.frequency = tc.XlongFreq{iFreq};
-                try
-                    [~, props] = tc.testfun(tc.seriesID, tc.opts);
-                catch
-                    props = struct();
-                    props.frequency = '';
-                end % try-catch
+                [~, props] = tc.testfun(tc.seriesID, tc.opts);
                 expectedFreq = tc.XlongFreq{iFreq};
                 tc.verifyEqual(props.frequency, expectedFreq);
             end % for-iFreq
@@ -108,7 +98,7 @@ classdef (Sealed) bloombergseriesTest < parentSource
         end % function
 
         function nullBbfield(tc)
-            % Test pull with a blank field
+            % Test pull with a blank bbfield
             tc.opts.bbfield = '';
             expectedBbfield = 'LAST_PRICE';
             [data, prop] = tc.testfun(tc.seriesID, tc.opts);
@@ -118,18 +108,16 @@ classdef (Sealed) bloombergseriesTest < parentSource
         end % function
 
         function invalidBbfield(tc)
-            % Test pull with invalid field
+            % Test pull with an invalid bbfield
+            % Note: This field should not be defined at all in Bloomberg
             tc.opts.bbfield = 'INVALIDBBFIELD';
             actualErr = @() tc.testfun(tc.seriesID, tc.opts);
-            % note that the following error is NOT 'invalidBbfield' 
-            % because there is no difference between a noPull and a bad 
-            % field when it comes to history()
-            expectedErr = 'bloombergseries:noPull'; 
+            expectedErr = 'bloombergseries:invalidbbfield'; 
             tc.verifyError(actualErr, expectedErr);
         end % function
 
         function expectedBbfield(tc)
-            % Test pull with the expected Bbfield
+            % Test pull with the expected bbfield
             tc.opts.bbfield = 'LAST_PRICE';
             [data, prop] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyGreaterThan(size(data, 1), 100);
@@ -138,12 +126,32 @@ classdef (Sealed) bloombergseriesTest < parentSource
         end % function
 
         function otherBbfield(tc)
-            % Test pull with different field
+            % Test pull with different bbfield than the default
             tc.opts.bbfield = 'PX_BID';
             [data, prop] = tc.testfun(tc.seriesID, tc.opts);
             tc.verifyGreaterThan(size(data, 1), 100);
             tc.verifyEqual(size(data, 2), 1);
             tc.verifyEqual(prop.bbfield, tc.opts.bbfield);
+        end % function
+        
+        %% Test error when pulling undefined fields and time ranges
+        function nanPullField(tc)
+            % Test a field that exists but is undefined for a security
+            tc.seriesID = 'GDP_CQOQ_Index';
+            tc.opts.bbfield = 'ASK_SIZE';
+            expectedWarn = 'bloombergseries:nanPull';
+            actualWarn = @() tc.testfun(tc.seriesID, tc.opts);
+            tc.verifyWarning(actualWarn, expectedWarn);
+        end % function
+        
+        function nanPullTimeRange(tc)
+            % Test a security that is undefined between a time range
+            tc.seriesID = 'USB8WAM_Index';
+            tc.opts.startDate = '01-Jan-2016';
+            tc.opts.endDate = '31-Dec-2017';
+            expectedWarn = 'bloombergseries:nanPull';
+            actualWarn = @() tc.testfun(tc.seriesID, tc.opts);
+            tc.verifyWarning(actualWarn, expectedWarn);
         end % function
 
     end % methods-test
