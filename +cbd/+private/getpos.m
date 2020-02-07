@@ -1,6 +1,6 @@
-function [pos,unit]=getpos(h,fmt,href,opt)
+function [pos, unit] = getpos(h, fmt, href, opt)
 % GETPOS Get graphics object position in a flexible way.
-%   GETPOS(H,FMT) gets the position property of graphics object 
+%   GETPOS(H,FMT) gets the position property of graphics object
 %   with handle H, according to FMT that can be expressed using different
 %   units. H must have a "Position" property.
 %
@@ -18,21 +18,21 @@ function [pos,unit]=getpos(h,fmt,href,opt)
 %   expressed using this unit.
 %
 %   Any string value of FMT can be replaced by a single '#' to not retrieve the
-%   corresponding value. The returned value is NaN except if the optional last 
+%   corresponding value. The returned value is NaN except if the optional last
 %   argument OPT is set to "compact" in GETPOS(H,FMT,[HREF],OPT).
 %
-%   Note that GETPOS(H) works as get(H,'Position') and return the position 
+%   Note that GETPOS(H) works as get(H,'Position') and return the position
 %   vector in the current unit of the graphics object H.
 %
-%   GETPOS(H,FMT,HREF,['compact']) gets the position of the graphics object H according 
-%   to FMT, but using the position of the graphics object HREF as reference instead 
-%   of the parent of H. HREF must be a valid handle and must have a "Position" 
+%   GETPOS(H,FMT,HREF,['compact']) gets the position of the graphics object H according
+%   to FMT, but using the position of the graphics object HREF as reference instead
+%   of the parent of H. HREF must be a valid handle and must have a "Position"
 %   property (except for the Root object). Returned values may be negative or 0.
 %
-%   [POS,UNIT]=GETPOS(H,...) returns an additional output argument UNIT that 
-%   contained the unit list of the output vector position POS. It may be safer 
+%   [POS,UNIT]=GETPOS(H,...) returns an additional output argument UNIT that
+%   contained the unit list of the output vector position POS. It may be safer
 %   when different units are used.
-% 
+%
 %   See also SETPOS, SET, GET.
 
 %   Author: Jérôme Briot, Matlab 6.1.0.450 (R12.1)
@@ -47,8 +47,7 @@ function [pos,unit]=getpos(h,fmt,href,opt)
 
 % Check the number of input arguments
 
-narginchk(1,4);
-
+narginchk(1, 4);
 
 % Check if H is a graphics object handle
 if ~ishandle(h)
@@ -56,127 +55,127 @@ if ~ishandle(h)
 end
 
 % Store the current unit of the graphics object H
-current_unit=get(h,'units');
+current_unit = get(h, 'units');
 
 % Init variables
-unit={current_unit current_unit current_unit current_unit};
-pos=[nan nan nan nan];
+unit = {current_unit, current_unit, current_unit, current_unit};
+pos = [nan, nan, nan, nan];
 
 % If FMT input argument is not specified, works as GET(H,'Position')
-if nargin==1
-    pos=get(h,'position');
+if nargin == 1
+    pos = get(h, 'position');
     return
 end
 
 % Check if FMT is a char string
 if ~ischar(fmt)
-	error('Second argument must be a string in GETPOS(H,FMT)')
-end  
-
-if nargin==2 % GETPOS(H,FMT)
-    
-    href=get(h,'parent');
-    opt='full';
-    
-elseif nargin==3
-    
-    if ishandle(href) % GETPOS(H,FMT,HREF)
-        
-        opt='full';
-        
-    elseif strcmpi(href,'compact') % GETPOS(H,FMT,"compact")
-        
-        href=get(h,'parent');
-        opt='compact';
-        
-    else % GETPOS(H,FMT,???)
-        error('Wrong third argument in GETPOS(H,FMT,???). Must be a valid handle or "compact"');
-        
-    end
-    
-elseif nargin==4 % GETPOS(H,FMT,HREF,OPT)
-    
-    if ~ishandle(href) 
-        error('Third argument must be a valid handle in GETPOS(H,FMT,HREF,OPT)');
-    end
-        
-    if ~strcmpi(opt,'compact') 
-        error('Last argument must be "compact" in GETPOS(H,FMT,HREF,OPT)'); 
-    end
-    
+    error('Second argument must be a string in GETPOS(H,FMT)')
 end
 
-flag_href=0;
-% Don't use HREF position if it is the parent of H        
-if href~=get(h,'parent')
-    href=h;
-    flag_href=1;
+if nargin == 2 % GETPOS(H,FMT)
+
+    href = get(h, 'parent');
+    opt = 'full';
+
+elseif nargin == 3
+
+    if ishandle(href) % GETPOS(H,FMT,HREF)
+
+        opt = 'full';
+
+    elseif strcmpi(href, 'compact') % GETPOS(H,FMT,"compact")
+
+        href = get(h, 'parent');
+        opt = 'compact';
+
+    else % GETPOS(H,FMT,???)
+        error('Wrong third argument in GETPOS(H,FMT,???). Must be a valid handle or "compact"');
+
+    end
+
+elseif nargin == 4 % GETPOS(H,FMT,HREF,OPT)
+
+    if ~ishandle(href)
+        error('Third argument must be a valid handle in GETPOS(H,FMT,HREF,OPT)');
+    end
+
+    if ~strcmpi(opt, 'compact')
+        error('Last argument must be "compact" in GETPOS(H,FMT,HREF,OPT)');
+    end
+
+end
+
+flag_href = 0;
+% Don't use HREF position if it is the parent of H
+if href ~= get(h, 'parent')
+    href = h;
+    flag_href = 1;
 end
 
 % Store the current unit of the reference object HREF
-current_ref_unit=get(href,'units');
+current_ref_unit = get(href, 'units');
 
 % Extract 4 char strings from FMT
-M=strread(fmt,'%s','delimiter',' ,');
+M = strread(fmt, '%s', 'delimiter', ' ,');
 
 % Only one FMT requested for output
-if numel(M)==1
-    [M{2:4}]=deal(M{1});    
+if numel(M) == 1
+    [M{2:4}] = deal(M{1});
 end
 
 % List available units
-available_units={'inches' 'centimeters' 'normalized' 'points' 'pixels' 'characters'};
+available_units = {'inches', 'centimeters', 'normalized', 'points', 'pixels', 'characters'};
 
 % Decode elements of FMT
-for n=1:numel(M) 
-    
+for n = 1:numel(M)
+
     % If FMT(n) is not a "#"
-    if ~strcmp(M{n},'#')
-        
+    if ~strcmp(M{n}, '#')
+
         % Check if the units paramter is valid
-        idx=strcmpi(M{n},{'in' 'cm' 'nz' 'pt' 'px' 'ch'});
-        
+        idx = strcmpi(M{n}, {'in', 'cm', 'nz', 'pt', 'px', 'ch'});
+
         if ~any(idx)
             error('Units must be one of "in", "cm", "nz", "pt", "px" or "ch"')
         end
-        
-        unit{n}=available_units{idx}; % Set the units to one from the list 
-            
+
+        unit{n} = available_units{idx}; % Set the units to one from the list
+
     end
-    
+
 end
 
-% Get position of H using decoded FMT 
-for n=1:numel(M)    
+% Get position of H using decoded FMT
+for n = 1:numel(M)
 
     % If FMT(n) is not a "#" => get the value
-    if ~strcmp(M{n},'#')
-       
-        % Modify the "Units" property of H 
-        set(h,'units',unit{n});
+    if ~strcmp(M{n}, '#')
+
+        % Modify the "Units" property of H
+        set(h, 'units', unit{n});
         % Modify the "Units" property of HREF
-        set(href,'units',unit{n});
+        set(href, 'units', unit{n});
         % Get the current "Position" vector of H
-        temp=get(h,'position');
+        temp = get(h, 'position');
         % Get the current "Position" vector of HREF
         if strcmp(get(href, 'type'), 'root') % HREF is the Root object (no 'Position' property)
-            temp_href=get(href,'screensize'); %%% Should be safe here !
-        else temp_href=get(href,'position');
+            temp_href = get(href, 'screensize'); %%% Should be safe here !
+        else temp_href = get(href, 'position');
         end
         % Get and store the specified field from the "Position" vector
         % If HREF is specified and is not the parent of H, flag_href=1 else flag_href=0
-        pos(n)=temp(n)-temp_href(n)*flag_href;
-        
+        pos(n) = temp(n) - temp_href(n) * flag_href;
+
     end
-    
+
 end
 
-% Check for compact output format 
-if strcmpi(opt,'compact')
-    pos(isnan(pos))=[];
+% Check for compact output format
+if strcmpi(opt, 'compact')
+    pos(isnan(pos)) = [];
 end
 
 % Restore the unit of the graphics object H
-set(h,'units',current_unit);
+set(h, 'units', current_unit);
 % Restore the unit of the reference object HREF
-set(href,'units',current_ref_unit);
+set(href, 'units', current_ref_unit);

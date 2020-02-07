@@ -1,0 +1,9 @@
+Row,SERIES2,SERIES3,SERIES4
+Frequency,freq2,freq3,freq4
+Magnitude,2,3,4
+AggType,agg2,agg3,agg4
+DataType,type2,type3,type4
+Source,source2,source3,source4
+DateTimeMod,time2,time3,time4
+UsernameMod,name2,name3,name4
+FileMod,file2,file3,file4
