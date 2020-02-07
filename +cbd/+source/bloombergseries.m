@@ -27,7 +27,7 @@ reqFields = {'dbID', 'startDate', 'endDate', 'frequency', 'bbfield'};
 cbd.source.assertOpts(opts, reqFields, mfilename());
 
 % Set defaults
-defaultStartDate = datenum('1/1/1900');
+defaultStartDate = datenum('01-Jan-1900');
 defaultEndDate = floor(now);
 
 % Parse the inputs
@@ -40,27 +40,37 @@ endDate = cbd.private.parseDates(opts.endDate, ...
     'defaultDate', defaultEndDate, ...
     'formatOut', 'datenum');
 frequency = parseFrequency(opts.frequency);
-bbfield = parseBbfield(opts.bbfield);
+bbfield = parseBbfield(c, opts.bbfield);
 
-% Get the data
+%% Get the data
 fetch_data = history(c, sec, {bbfield}, startDate, endDate, frequency);
 
-% Check the fetch
-noPull = ~isnumeric(fetch_data) || isempty(fetch_data);
-if noPull
+%If the security was invalid, then Bloomberg returns a character
+if ischar(fetch_data)
     id = 'bloombergseries:noPull';
-    msg = sprintf('Pull failed for "%s@%s" with bbfield "%s"', ...
-        seriesID, opts.dbID, bbfield);
+    msg = sprintf('Invalid Bloomberg security "%s@%s"', ...
+        seriesID, opts.dbID);
     ME = MException(id, msg);
     throw(ME);
-end % if-noPull
+end % if-notisnumeric
 
-%% Format to cbd-style
-% Create the table
-dataCol = fetch_data(:,2);
-timeCol = cbd.private.endOfPer(fetch_data(:,1), frequency(1), true);
-seriesName = {upper(matlab.lang.makeValidName(seriesID))};
-data = cbd.private.cbdTable(dataCol, timeCol, seriesName);
+if isempty(fetch_data)
+    % If the security is empty, manually return a NaN table
+    warning('bloombergseries:nanPull', ...
+        ['Bloomberg request returned empty for valid "%s@%s" \n' ...
+        'Using valid bbfield "%s", startDate "%s", and endDate "%s"\n' ...
+        'Returning a NaN table of frequency "%s" instead'], ...
+        seriesID, opts.dbID, bbfield, ...
+        cbd.private.mdatestr(startDate), ...
+        cbd.private.mdatestr(endDate), frequency);
+    data = getNanTable(frequency(1));
+else
+    % Otherwise format the fetched data as a cbd table
+    dataCol = fetch_data(:,2);
+    timeCol = cbd.private.endOfPer(fetch_data(:,1), frequency(1), true);
+    seriesName = {upper(matlab.lang.makeValidName(seriesID))};
+    data = cbd.private.cbdTable(dataCol, timeCol, seriesName);
+end % if-isempty
 
 % Trim out the extraneous dates before startDate
 % NOTE: This a fix for the @blp/history bug
@@ -76,7 +86,7 @@ if actualEndDate > endDate
     data = cbd.trim(data, 'endDate', endDate);
 end % if-startDate 
 
-% create the properties
+%% create the properties
 if nargout == 2
     props = struct;
     props.ID = [seriesID '@' opts.dbID];
@@ -134,7 +144,7 @@ else
 end
 
 if isequal(loc, 0)
-    id = 'bloombergseries:invalidFrequency';
+    id = 'bloombergseries:invalidfrequency';
     msg = sprintf('Invalid frequency "%s"', freqIn);
     ME = MException(id, msg);
     throw(ME);
@@ -144,8 +154,8 @@ freqOut = longFreqs{loc};
 
 end % function-parseFreq
 
-function bbfield = parseBbfield(bbfield)
-%PARSEFIELD parses the field input for bloomberg
+function bbfield = parseBbfield(c, bbfield)
+%PARSEFIELD parses the field input for bloomberg and checks if valid
 %
 % INPUTS:
 %   bbfield         ~ char, the input field
@@ -155,6 +165,45 @@ function bbfield = parseBbfield(bbfield)
 
 if isempty(bbfield)
     bbfield = 'LAST_PRICE';
+else 
+    % Check if the field is defined in Bloomberg
+    fieldResults = fieldinfo(c, bbfield);
+    validField = ~strcmpi(fieldResults{5}, 'Unknown Field Id/Mnemonic');
+    if ~validField
+        id = 'bloombergseries:invalidbbfield';
+        msg = sprintf('Invalid bbfield "%s"', bbfield);
+        ME = MException(id, msg);
+        throw(ME);
+    end % if-notvalidField
 end
 
 end % function-parseBbfield
+
+function data = getNanTable(freq)
+%GETNANTABLE downlaods a NaN filler table for an empty Bloomberg pull
+%
+% This is done by going to Haver and downloading a series of the same
+% frequency with the given start and end dates. We then convert
+% the zero's into NaN's
+%
+% INPUTS:
+%   freq        ~ char, the frequency of the data requested
+% 
+% OUTPUTS:
+%   data        ~ table, the NaN table 
+
+switch freq
+    case 'D'
+        ticker = 'C00@DAILY';
+    case 'W'
+        ticker = 'C00@WEEKLY';
+    case 'M'
+        ticker = 'C0@USECON';
+    case 'Q'
+        ticker = 'AGG(C0@USECON, "Q", "EOP")';
+end 
+
+tickerAsNaN = ['ZERO2NAN(' ticker ')'];
+data = cbd.data(tickerAsNaN);
+
+end % function-getNanTable
