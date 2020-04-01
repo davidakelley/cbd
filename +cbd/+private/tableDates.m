@@ -1,14 +1,22 @@
 function dates = tableDates(tabIn)
-% Return the observation dates as Matlab datenum integers
-
+%TABLEDATES returns the observation dates as datenum integers
+%
 % David Kelley, 2015
 
-if isfield(tabIn.Properties.UserData, 'dates') && ...
-    ~isempty(tabIn.Properties.UserData.dates)
-  dates = tabIn.Properties.UserData.dates;
-  if size(dates, 1) ~= size(tabIn,1)
-    dates = cbd.private.mdatenum(tabIn.Properties.RowNames);
-  end
+% Check if the User Dates already exist
+hasUserDates = ...
+    isfield(tabIn.Properties.UserData, 'dates') && ...
+    ~isempty(tabIn.Properties.UserData.dates);
+
+if hasUserDates
+    dates = tabIn.Properties.UserData.dates;
+    % Check that the size of the dates match those of the table 
+    datesMatch = size(dates, 1) == size(tabIn, 1);
+    if ~datesMatch
+        dates = cbd.private.mdatenum(tabIn.Properties.RowNames);
+    end
 else
-  dates = cbd.private.mdatenum(tabIn.Properties.RowNames);
+    dates = cbd.private.mdatenum(tabIn.Properties.RowNames);
 end
+
+end % function

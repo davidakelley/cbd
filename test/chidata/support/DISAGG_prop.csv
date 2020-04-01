@@ -1,0 +1,9 @@
+Row,BBSDEMAND,BBSOUTLOOK
+Frequency,FOMC,FOMC
+Magnitude,0,0
+DecPrecision,3,3
+AggType,Average,Average
+DataType,index,index
+Source,FRBCHI,FRBCHI
+Description,Outlook for next 6 to 12 months,Current Activity
+DateTimeMod,06-Dec-2019 16:19:25,06-Dec-2019 16:19:25

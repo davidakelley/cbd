@@ -22,7 +22,7 @@ outData = mergeData(:,1:end-1);
 for iSer = 1:size(outData, 2)
     grData = mergeData{:,iSer};
     level = nan(size(grData));
-    level(startInd-1) = log(mergeData{startInd-1, end});
+    level(startInd-1) = reallog(mergeData{startInd-1, end});
     level(startInd:end) = cumsum(grData(startInd:end)) + level(startInd-1);
     outData{:,iSer} = exp(level);
 end

@@ -19,7 +19,7 @@ end
 nVar = size(data, 2);
 
 %% Log
-logged = log(data);
+logged = reallog(data);
 
 if returnTab
     varNames = cellfun(@horzcat, repmat({'ln'}, 1, nVar), vName, 'UniformOutput', false);

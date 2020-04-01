@@ -4,12 +4,12 @@ function varargout = legendflex(varargin)
 % legendflex(M, param1, val1, ...)
 % legendflex(h, M, param1, val1, ...)
 % [legend_h,object_h,plot_h,text_str] = legendflex(...)
-% 
+%
 % This offers a more flexible version of the legend command.  It offers a
 % different method of positioning the legend, as well as options to:
 %
 %   - organize legend text and symbols in a grid with a specified number of
-%     rows and/or columns 
+%     rows and/or columns
 %   - rescale the horizontal space used by each legend symbol
 %   - create multiple legends for the same axis
 %   - add a title to the legend within the legend box
@@ -26,12 +26,12 @@ function varargout = legendflex(varargin)
 % position of the legend is determined by these two points and the distance
 % between them, defined in the 'buffer' variable, which by default is
 % measured in pixels.  So the combination of
-% 
+%
 %  (..., 'ref', gca, 'anchor', [3 3], 'buffer', [-10 -10])
 %
 % means that you want the northeast corner of the current axis to be
 % aligned with the northeast corner of the legend, but with the legend
-% shifted 10 pixels to the left and down. 
+% shifted 10 pixels to the left and down.
 %
 % This method of positioning can be particularly useful when labeling a
 % figure that includes many subplots that share a common color scheme,
@@ -46,7 +46,7 @@ function varargout = legendflex(varargin)
 % typical legend locations:
 %
 % Specifier              Anchor    Buffer
-% 
+%
 % north                  [2 2]     [  0 -10]
 % south                  [6 6]     [  0  10]
 % east                   [4 4]     [-10   0]
@@ -105,7 +105,7 @@ function varargout = legendflex(varargin)
 %
 %   ncol:       number of columns, or 0 to indicate as many as necessary
 %               given the # of labeled objects [1 if nrow is 0, 0
-%               otherwise] 
+%               otherwise]
 %
 %   nrow:       number of rows, or 0 to indicate as many as necessary
 %               given the # of labeled objects [0]
@@ -131,7 +131,7 @@ function varargout = legendflex(varargin)
 %               5:  'se'    bottom right corner
 %               6:  's'     center of bottom edge
 %               7:  'sw'    bottom left corner
-%               8:  'w'     center of left edge         
+%               8:  'w'     center of left edge
 %
 %               [[3 3], i.e. {'ne' 'ne'}]
 %
@@ -139,13 +139,13 @@ function varargout = legendflex(varargin)
 %               respectively, from the reference anchor point to the legend
 %               anchor point. Distance is measured in units specified by
 %               bufferunit. [[-10 -10]]
-%               
+%
 %   bufferunit: unit for buffer distance.  Note that this property only
 %               affects the units used to position the legend, not the
 %               units for the legend itself (which is always a fixed size,
 %               based on the space needed to encapsulate the specified
 %               symbols and text).  The 'normalized' units are normalized
-%               to size of the figure. ['pixels']   
+%               to size of the figure. ['pixels']
 %
 %   box:        'on' or 'off', specifies whether to enclose legend objects
 %               in a box ['on']
@@ -166,7 +166,7 @@ function varargout = legendflex(varargin)
 %               spacing typical of a regular legend, but occassionally the
 %               extent properties wrap a little too close to text, making
 %               things look crowded; in these cases you can try unsquishing
-%               things via this parameter. [2 1 1]  
+%               things via this parameter. [2 1 1]
 %
 %   nolisten:   logical scalar.  If true, don't add the event listeners.
 %               The event listeners update the legend objects when you
@@ -194,13 +194,13 @@ function varargout = legendflex(varargin)
 %               objects are checked for changes, so adjusting the figure
 %               size can re-link the legend to the labeled objects after
 %               you have made changes to those objects.
-% 
+%
 %   object_h:   handles of the line, patch, and text graphics objects
-%               created in the legend 
-% 
+%               created in the legend
+%
 %   plot_h:     handles of the lines and other objects labeled in this
 %               legend
-% 
+%
 %   text_str:   cell array of the text strings used in the legend
 %
 %
@@ -234,21 +234,21 @@ r2016aflag = ~verLessThan('matlab', '9.0.0');
 %-------------------
 % Parse input
 %-------------------
-% 
+%
 % allinput = varargin; % Save for callback later
-% 
+%
 % islegin = false(size(varargin));
 
 % First inputs must be either:
 % (M, ...)
 % (h, M, ...)
 
-narginchk(1,Inf);
+narginchk(1, Inf);
 
 % Split input into the variables that will be passed to legend (handles and
 % labels) and everything else
 
-handlepassed = all(ishandle(varargin{1})); % for HG1/HG2 
+handlepassed = all(ishandle(varargin{1})); % for HG1/HG2
 
 if handlepassed
     legin = varargin(1:2);
@@ -277,17 +277,17 @@ else
 end
 
 p = inputParser;
-p.addParameter('xscale',     1,         @(x) validateattributes(x, {'numeric'}, {'nonnegative','scalar'}));
-p.addParameter('ncol',       0,         @(x) validateattributes(x, {'numeric'}, {'scalar', 'integer'}));
-p.addParameter('nrow',       0,         @(x) validateattributes(x, {'numeric'}, {'scalar', 'integer'}));
-p.addParameter('ref',        defref,    @(x) validateattributes(x, {'numeric','handle'}, {'scalar'}));
-p.addParameter('anchor',     [3 3],     @(x) validateattributes(x, {'numeric','cell'}, {'size', [1 2]}));
-p.addParameter('buffer',     [-10 -10], @(x) validateattributes(x, {'numeric'}, {'size', [1 2]}));
-p.addParameter('bufferunit', 'pixels',  @(x) validateattributes(x, {'char'}, {}));
-p.addParameter('box',        'on',      @(x) validateattributes(x, {'char'}, {}));
-p.addParameter('title',      '',        @(x) validateattributes(x, {'char','cell'}, {}));
-p.addParameter('padding',    [2 1 1],   @(x) validateattributes(x, {'numeric'}, {'nonnegative', 'size', [1 3]}));
-p.addParameter('nolisten',   false,     @(x) validateattributes(x, {'logical'}, {'scalar'}));
+p.addParameter('xscale', 1, @(x) validateattributes(x, {'numeric'}, {'nonnegative', 'scalar'}));
+p.addParameter('ncol', 0, @(x) validateattributes(x, {'numeric'}, {'scalar', 'integer'}));
+p.addParameter('nrow', 0, @(x) validateattributes(x, {'numeric'}, {'scalar', 'integer'}));
+p.addParameter('ref', defref, @(x) validateattributes(x, {'numeric', 'handle'}, {'scalar'}));
+p.addParameter('anchor', [3, 3], @(x) validateattributes(x, {'numeric', 'cell'}, {'size', [1, 2]}));
+p.addParameter('buffer', [-10, -10], @(x) validateattributes(x, {'numeric'}, {'size', [1, 2]}));
+p.addParameter('bufferunit', 'pixels', @(x) validateattributes(x, {'char'}, {}));
+p.addParameter('box', 'on', @(x) validateattributes(x, {'char'}, {}));
+p.addParameter('title', '', @(x) validateattributes(x, {'char', 'cell'}, {}));
+p.addParameter('padding', [2, 1, 1], @(x) validateattributes(x, {'numeric'}, {'nonnegative', 'size', [1, 3]}));
+p.addParameter('nolisten', false, @(x) validateattributes(x, {'logical'}, {'scalar'}));
 
 p.KeepUnmatched = true;
 
@@ -298,18 +298,18 @@ Opt = p.Results;
 %  If not, legend will handle the error when I call it.
 
 Extra = p.Unmatched;
-extra = [fieldnames(Extra) struct2cell(Extra)];
+extra = [fieldnames(Extra), struct2cell(Extra)];
 extra = extra';
 
 % Validate that units and box inputs are correct
 
-validatestring(Opt.bufferunit, {'pixels','normalized','inches','centimeters','points','characters'}, 'legendflex', 'bufferunit');
+validatestring(Opt.bufferunit, {'pixels', 'normalized', 'inches', 'centimeters', 'points', 'characters'}, 'legendflex', 'bufferunit');
 validatestring(Opt.box, {'on', 'off'}, 'legendflex', 'box');
 
 % Translate anchor strings to numbers, if necessary
 
 if iscell(Opt.anchor)
-    [blah, Opt.anchor] = ismember(Opt.anchor, {'nw','n','ne','e','se','s','sw','w'});
+    [blah, Opt.anchor] = ismember(Opt.anchor, {'nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'});
     if ~all(blah)
         error('Anchor must be 1 x 2 cell array of strings: n, e, s, w, ne, nw, se, sw');
     end
@@ -321,16 +321,16 @@ end
 
 S = warning('off', 'MATLAB:legend:PlotEmpty');
 if r2016aflag
-    % The new legend objects are pretty opaque... even diving into the 
-    % undocumented properties, I haven't been able to find the handles of 
-    % the legend sub-components (lines, text, etc).  So I need to stick to 
-    % the legacy version, which creates an axis object rather than legend 
-    % object. Legacy version has bug in text properties parsing, though, so 
+    % The new legend objects are pretty opaque... even diving into the
+    % undocumented properties, I haven't been able to find the handles of
+    % the legend sub-components (lines, text, etc).  So I need to stick to
+    % the legacy version, which creates an axis object rather than legend
+    % object. Legacy version has bug in text properties parsing, though, so
     % need to work around that too: use the new-style legend object to get
     % proper text properties, then use those to alter the buggy old-style
     % legend.
     tmp = legend(legin{:}, extra{:}, 'location', 'northeast');
-    textProps = {'FontAngle','FontName','FontSize','FontUnits','FontWeight','Interpreter'};
+    textProps = {'FontAngle', 'FontName', 'FontSize', 'FontUnits', 'FontWeight', 'Interpreter'};
     tprop = get(tmp, textProps);
     delete(tmp);
     wtmp = warning('off', 'MATLAB:handle_graphics:exceptions:SceneNode'); % silence Latex interpreter thing
@@ -362,17 +362,17 @@ iscont = strcmp(get(h.labeledobj, 'type'), 'contour');
 cbugflag = ~verLessThan('matlab', '8.4.0') && verLessThan('matlab', '8.6.0') && any(iscont);
 
 if cbugflag
-    
+
     if length(legin) == 1
-        legin = {h.labeledobj legin{1}};
+        legin = {h.labeledobj, legin{1}};
     end
-        
+
     delete(h.leg);
-    
+
     [srt, isrt] = sort(iscont);
     legin{1} = legin{1}(isrt);
     legin{2} = legin{2}(isrt);
-    
+
     [h.leg, h.obj, h.labeledobj, h.textstr] = legend(legin{:}, extra{:}, 'location', 'northeast');
 
 end
@@ -387,7 +387,7 @@ elseif (Opt.ncol == 0)
 elseif (Opt.nrow == 0)
     Opt.nrow = ceil(nobj./Opt.ncol);
 end
-if Opt.ncol*Opt.nrow < nobj
+if Opt.ncol * Opt.nrow < nobj
     error('Number of legend entries greater than specified grid allows; change ncol and/or nrow');
 end
 
@@ -396,11 +396,11 @@ end
 if hg2flag
 
     if isempty(Opt.ref)
-    
+
         if all(ishandle(legin{1}))
             tmp = ancestor(legin{1}, 'axes');
             if iscell(tmp)
-                Opt.ref = tmp{1}; 
+                Opt.ref = tmp{1};
             else
                 Opt.ref = tmp(1);
             end
@@ -412,7 +412,7 @@ if hg2flag
 else
     if isnan(Opt.ref)
         tmp = get(h.leg, 'UserData');
-        Opt.ref = tmp.PlotHandle; 
+        Opt.ref = tmp.PlotHandle;
     end
 end
 if ~ishandle(Opt.ref)
@@ -425,14 +425,14 @@ Opt.box = strcmpi('on', Opt.box);
 
 % Convert units to getpos abbreviations
 
-unittable = {...
-    'px'  'Pixels'
-    'nz'  'Normalized'
-    'in'  'Inches'
-    'cm'  'Centimeters'
-    'pt'  'Points'
-    'ch'  'Characters'};
-Opt.bufunit = unittable{strcmpi(unittable(:,2),Opt.bufferunit),1};
+unittable = { ...
+    'px', 'Pixels'; ...
+    'nz', 'Normalized'; ...
+    'in', 'Inches'; ...
+    'cm', 'Centimeters'; ...
+    'pt', 'Points'; ...
+    'ch', 'Characters'};
+Opt.bufunit = unittable{strcmpi(unittable(:, 2), Opt.bufferunit), 1};
 
 % Check for title
 
@@ -440,24 +440,24 @@ addtitle = ~isempty(Opt.title);
 
 %-------------------
 % New placement of
-% everything in 
+% everything in
 % legend
 %-------------------
 
 % Determine parent figure
 
 figh = ancestor(Opt.ref, 'figure');
-currax = get(figh, 'currentaxes'); 
+currax = get(figh, 'currentaxes');
 
 % Calculate row height
 
 legpospx = cbd.private.getpos(h.leg, 'px');
 
 % rowHeight = legpospx(4)/nobj;
-vmarginNm =  0.275/nobj;
+vmarginNm = 0.275 / nobj;
 vmarginPx = legpospx(4) * vmarginNm;
 
-rowHeightNm = (1 - vmarginNm)/nobj;
+rowHeightNm = (1 - vmarginNm) / nobj;
 rowHeight = rowHeightNm .* legpospx(4);
 
 % Determine width needed for each text string
@@ -467,70 +467,70 @@ if nobj == 1
 else
     textExtent = cell2mat(get(h.obj(1:nobj), 'Extent'));
 end
-textWidthPx  = textExtent(:,3) .* legpospx(3);
-textHeightPx = textExtent(:,4) .* legpospx(4);
-textWidthNm = textExtent(:,3);
+textWidthPx = textExtent(:, 3) .* legpospx(3);
+textHeightPx = textExtent(:, 4) .* legpospx(4);
+textWidthNm = textExtent(:, 3);
 
 % Calculate horizontal space needed for symbols
 
-symbolWidthPx = textExtent(1,1) .* legpospx(3) * Opt.xscale;
-symbolWidthNm = textExtent(1,1);
+symbolWidthPx = textExtent(1, 1) .* legpospx(3) * Opt.xscale;
+symbolWidthNm = textExtent(1, 1);
 
 % Calculate column width needed for 2px-symbol-1px-text-1px
 
-colWidth = zeros(Opt.ncol*Opt.nrow,1);
+colWidth = zeros(Opt.ncol*Opt.nrow, 1);
 colWidth(1:nobj) = textWidthPx + symbolWidthPx + sum(Opt.padding);
 colWidth = reshape(colWidth, Opt.nrow, Opt.ncol);
-colWidth = max(colWidth,[],1);
+colWidth = max(colWidth, [], 1);
 
 % If title is added, figure out how much space it will need
 
 if addtitle
-    textProps = {'FontAngle','FontName','FontSize','FontUnits','FontWeight','Interpreter'};
+    textProps = {'FontAngle', 'FontName', 'FontSize', 'FontUnits', 'FontWeight', 'Interpreter'};
     textVals = get(h.obj(1), textProps);
     ttlprops = [textProps; textVals];
-    
+
     fpos = cbd.private.getpos(figh, 'px');
-    figtmp = figure('units','pixels','position',[0 0 fpos(3:4)],'visible','off');
-    axes('parent',figtmp,'position',[0 0 1 1],'xlim',[0 fpos(3)],'ylim',[0 fpos(4)]);
-    tmp = text(0,0,Opt.title, ttlprops{:}, 'horiz', 'left', 'vert', 'bottom');
+    figtmp = figure('units', 'pixels', 'position', [0, 0, fpos(3:4)], 'visible', 'off');
+    axes('parent', figtmp, 'position', [0, 0, 1, 1], 'xlim', [0, fpos(3)], 'ylim', [0, fpos(4)]);
+    tmp = text(0, 0, Opt.title, ttlprops{:}, 'horiz', 'left', 'vert', 'bottom');
     ttlex = get(tmp, 'extent');
     ttlwidth = ceil(ttlex(3)) + 4; % Add a little padding
     ttlheight = ceil(ttlex(4));
-    
+
     if ttlwidth > sum(colWidth)
-        colWidth(end) = colWidth(end) + (ttlwidth-sum(colWidth));
+        colWidth(end) = colWidth(end) + (ttlwidth - sum(colWidth));
     end
     close(figtmp);
 end
 
 % Locate bottom left corner of each legend symbol, text box, and title
 
-xsymbnew = [0 cumsum(colWidth(1:end-1))]+Opt.padding(1);
-ysymbnew = (rowHeight*Opt.nrow + vmarginPx)-(1:Opt.nrow)*rowHeight;
+xsymbnew = [0, cumsum(colWidth(1:end-1))] + Opt.padding(1);
+ysymbnew = (rowHeight * Opt.nrow + vmarginPx) - (1:Opt.nrow) * rowHeight;
 [xsymbnew, ysymbnew] = meshgrid(xsymbnew, ysymbnew);
 xsymbnew = xsymbnew(1:nobj);
 ysymbnew = ysymbnew(1:nobj);
 
 xtext = xsymbnew + Opt.padding(2) + symbolWidthPx;
-ytext = ysymbnew;% + 1;
+ytext = ysymbnew; % + 1;
 
-xsymbold = zeros(nobj,1);
-ysymbold = 1 - (1/nobj)*(1:nobj);
+xsymbold = zeros(nobj, 1);
+ysymbold = 1 - (1 / nobj) * (1:nobj);
 
 wnewleg = sum(colWidth);
-hnewleg = rowHeight*Opt.nrow + vmarginPx;
+hnewleg = rowHeight * Opt.nrow + vmarginPx;
 
 if addtitle
-    xttl = wnewleg/2;
+    xttl = wnewleg / 2;
     yttl = hnewleg;
     hnewleg = hnewleg + ttlheight;
 end
-    
+
 % Get legend position in bufferunit and translate to pixels
 
 legpos = positionleg(Opt.ref, wnewleg, hnewleg, Opt.anchor, Opt.buffer, Opt.bufunit);
-tmpax = axes('units', Opt.bufferunit, 'position', legpos,'visible','off');
+tmpax = axes('units', Opt.bufferunit, 'position', legpos, 'visible', 'off');
 legpos = cbd.private.getpos(tmpax, 'px');
 delete(tmpax);
 
@@ -541,17 +541,17 @@ delete(tmpax);
 % Create the legend axis
 
 hnew.leg = axes('units', 'pixels', ...
-               'position', legpos, ...
-               'xlim', [0 legpos(3)], ...
-               'ylim', [0 legpos(4)], ...
-               'xtick', [], ...
-               'ytick', [], ...
-               'box', 'on', ...
-               'parent', figh);
+    'position', legpos, ...
+    'xlim', [0, legpos(3)], ...
+    'ylim', [0, legpos(4)], ...
+    'xtick', [], ...
+    'ytick', [], ...
+    'box', 'on', ...
+    'parent', figh);
 
 % Copy the text strings to the new legend
-           
-textProps = {'FontAngle','FontName','FontSize','FontUnits','FontWeight','Interpreter','HorizontalAlignment','VerticalAlignment'};
+
+textProps = {'FontAngle', 'FontName', 'FontSize', 'FontUnits', 'FontWeight', 'Interpreter', 'HorizontalAlignment', 'VerticalAlignment'};
 textVals = get(h.obj(1:nobj), textProps);
 
 if hg2flag
@@ -560,10 +560,10 @@ else
     hnew.obj = zeros(size(h.obj));
 end
 for it = 1:nobj
-    props = [textProps; textVals(it,:)];
+    props = [textProps; textVals(it, :)];
     hnew.obj(it) = text(xtext(it), ytext(it), h.textstr{it}, props{:}, ...
-                        'horizontalalignment', 'left', ...
-                        'verticalalignment', 'bottom');
+        'horizontalalignment', 'left', ...
+        'verticalalignment', 'bottom');
 end
 
 % Copy the symbols to the new legend
@@ -571,50 +571,50 @@ end
 nsymbol = length(h.obj) - nobj;
 
 for ii = 1:nsymbol
-    
+
     if strcmp(get(h.obj(nobj+ii), 'type'), 'hggroup')
-        
-        tag = get(h.obj(nobj+ii),'Tag');
+
+        tag = get(h.obj(nobj+ii), 'Tag');
         if ~isempty(tag)
-            [blah, idx] = ismember(tag,h.textstr);
+            [blah, idx] = ismember(tag, h.textstr);
         end
-        
-        chld = findall(h.obj(nobj+ii), 'type', 'line', '-or', 'type', 'patch');       
+
+        chld = findall(h.obj(nobj+ii), 'type', 'line', '-or', 'type', 'patch');
         for ic = 1:length(chld)
             xy = get(chld(ic), {'xdata', 'ydata'});
-            
-            xnorm = xy{1}./symbolWidthNm;
-            ynorm = (xy{2}- (1-idx*rowHeightNm))./rowHeightNm;
+
+            xnorm = xy{1} ./ symbolWidthNm;
+            ynorm = (xy{2} - (1 - idx * rowHeightNm)) ./ rowHeightNm;
 
             xnew = xnorm * symbolWidthPx + xsymbnew(idx);
-            ynew = ynorm * rowHeight     + ysymbnew(idx);
-            
+            ynew = ynorm * rowHeight + ysymbnew(idx);
+
             set(chld(ic), 'xdata', xnew, 'ydata', ynew);
         end
-        
+
         hnew.obj(nobj+ii) = copyobj(h.obj(nobj+ii), hnew.leg);
-        
-    else   
-        
+
+    else
+
         hnew.obj(nobj+ii) = copyobj(h.obj(nobj+ii), hnew.leg);
-        
-        tag = get(h.obj(nobj+ii),'Tag');
+
+        tag = get(h.obj(nobj+ii), 'Tag');
         if ~isempty(tag) % assumes empty tags indicate repetition of previous tag (true pre-2014b)
-            [blah, idx] = ismember(tag,h.textstr);
+            [blah, idx] = ismember(tag, h.textstr);
         end
-        
+
         xy = get(h.obj(nobj+ii), {'xdata', 'ydata'});
 
-        xnorm = xy{1}./symbolWidthNm;
-        ynorm = (xy{2}- (1-idx*rowHeightNm))./rowHeightNm;
+        xnorm = xy{1} ./ symbolWidthNm;
+        ynorm = (xy{2} - (1 - idx * rowHeightNm)) ./ rowHeightNm;
 
         xnew = xnorm * symbolWidthPx + xsymbnew(idx);
-        ynew = ynorm * rowHeight     + ysymbnew(idx);
+        ynew = ynorm * rowHeight + ysymbnew(idx);
 
         set(hnew.obj(nobj+ii), 'xdata', xnew, 'ydata', ynew);
- 
+
     end
-    
+
 end
 
 % Add title
@@ -658,52 +658,52 @@ if ~addtitle
         ylo = get(textobj(Opt.nrow), 'extent');
         ylo = ylo(2);
         yhi = get(textobj(1), 'extent');
-        yhi = sum(yhi([2 4]));
-        dy = yheight/2 - 0.5*(ylo + yhi);
+        yhi = sum(yhi([2, 4]));
+        dy = yheight / 2 - 0.5 * (ylo + yhi);
         for ii = 1:length(textobj)
             pos = get(textobj(ii), 'position');
-            set(textobj(ii), 'position', pos + [0 dy 0]);
+            set(textobj(ii), 'position', pos+[0, dy, 0]);
         end
     end
 end
 
 %-------------------
-% Callbacks and 
+% Callbacks and
 % listeners
 %-------------------
 
 % Save some relevant variables in the new legend axis's application data
 
-Lf.ref        = Opt.ref;
-Lf.w          = wnewleg;
-Lf.h          = hnewleg;
-Lf.anchor     = Opt.anchor;
-Lf.buffer     = Opt.buffer;
-Lf.bufunit    = Opt.bufunit;
+Lf.ref = Opt.ref;
+Lf.w = wnewleg;
+Lf.h = hnewleg;
+Lf.anchor = Opt.anchor;
+Lf.buffer = Opt.buffer;
+Lf.bufunit = Opt.bufunit;
 Lf.bufferunit = Opt.bufferunit;
-Lf.plotobj    = h.labeledobj;
-Lf.legobj     = hnew.obj;
+Lf.plotobj = h.labeledobj;
+Lf.legobj = hnew.obj;
 
 setappdata(hnew.leg, 'legflex', Lf);
 
 % Resize listeners
 
-addlistener(hnew.leg, 'Position', 'PostSet', @(src,evt) updatelegappdata(src,evt,hnew.leg));
+addlistener(hnew.leg, 'Position', 'PostSet', @(src, evt) updatelegappdata(src, evt, hnew.leg));
 if hg2flag && strcmp(Lf.ref.Type, 'figure')
-    addlistener(Lf.ref, 'SizeChanged', @(src,evt) updatelegpos(src,evt,hnew.leg));
+    addlistener(Lf.ref, 'SizeChanged', @(src, evt) updatelegpos(src, evt, hnew.leg));
 else
-    addlistener(Lf.ref, 'Position', 'PostSet', @(src,evt) updatelegpos(src,evt,hnew.leg));
+    addlistener(Lf.ref, 'Position', 'PostSet', @(src, evt) updatelegpos(src, evt, hnew.leg));
 end
-rsz = get(figh, 'ResizeFcn'); 
+rsz = get(figh, 'ResizeFcn');
 if isempty(rsz) % No previous resize function
     set(figh, 'ResizeFcn', @updatelegfigresize);
-else 
+else
     if ~iscell(rsz)
         rsz = {rsz};
     end
     hasprev = cellfun(@(x) isequal(x, @updatelegfigresize), rsz);
     if ~hasprev
-        rsz = {rsz{:} @updatelegfigresize};
+        rsz = {rsz{:}, @updatelegfigresize};
         set(figh, 'ResizeFcn', {@wrapper, rsz});
     end
 end
@@ -717,24 +717,22 @@ if ~Opt.nolisten
     for ii = 1:length(objwatch)
         switch lower(get(objwatch(ii), 'type'))
             case 'line'
-                triggerprops = {'Color','LineStyle','LineWidth','Marker','MarkerSize','MarkerEdgeColor','MarkerFaceColor'};
-                addlistener(objwatch(ii), triggerprops, 'PostSet', @(h,ed) resyncprops(h,ed,hnew.leg));
+                triggerprops = {'Color', 'LineStyle', 'LineWidth', 'Marker', 'MarkerSize', 'MarkerEdgeColor', 'MarkerFaceColor'};
+                addlistener(objwatch(ii), triggerprops, 'PostSet', @(h, ed) resyncprops(h, ed, hnew.leg));
             case 'patch'
-                triggerprops = {'CData','CDataMapping','EdgeAlpha','EdgeColor','FaceAlpha','FaceColor','LineStyle','LineWidth','Marker','MarkerEdgeColor','MarkerFaceColor','MarkerSize'};
-                addlistener(objwatch(ii), triggerprops, 'PostSet', @(h,ed) resyncprops(h,ed,hnew.leg));
+                triggerprops = {'CData', 'CDataMapping', 'EdgeAlpha', 'EdgeColor', 'FaceAlpha', 'FaceColor', 'LineStyle', 'LineWidth', 'Marker', 'MarkerEdgeColor', 'MarkerFaceColor', 'MarkerSize'};
+                addlistener(objwatch(ii), triggerprops, 'PostSet', @(h, ed) resyncprops(h, ed, hnew.leg));
         end
     end
 
 end
 
-    
 %-------------------
 % Output
 %-------------------
 
 out = {hnew.leg, hnew.obj, h.labeledobj, h.textstr};
 varargout = out(1:nargout);
-
 
 %***** Subfunctions *****
 
@@ -747,14 +745,14 @@ function legpos = positionleg(href, w, h, anchor, buffer, bufunit)
 % lp: position vector for legend
 
 if strcmp(get(href, 'type'), 'figure')
-    tmp = axes('parent', href,'position', [0 0 1 1],'visible','off');
+    tmp = axes('parent', href, 'position', [0, 0, 1, 1], 'visible', 'off');
     pos = cbd.private.getpos(tmp, bufunit);
     delete(tmp);
 else
     pos = cbd.private.getpos(href, bufunit);
 end
 
-htmp = axes('units', 'pixels', 'position', [0 0 w h], 'visible','off');
+htmp = axes('units', 'pixels', 'position', [0, 0, w, h], 'visible', 'off');
 lpos = cbd.private.getpos(htmp, bufunit);
 delete(htmp);
 w = lpos(3);
@@ -762,32 +760,32 @@ h = lpos(4);
 
 % Find anchor locations on reference object
 
-refxy = [...
-    pos(1)          pos(2)+pos(4)
-    pos(1)+pos(3)/2 pos(2)+pos(4)
-    pos(1)+pos(3)   pos(2)+pos(4)
-    pos(1)+pos(3)   pos(2)+pos(4)/2
-    pos(1)+pos(3)   pos(2)
-    pos(1)+pos(3)/2 pos(2)
-    pos(1)          pos(2)
-    pos(1)          pos(2)+pos(4)/2];
+refxy = [ ...
+    pos(1), pos(2) + pos(4); ...
+    pos(1) + pos(3) / 2, pos(2) + pos(4); ...
+    pos(1) + pos(3), pos(2) + pos(4); ...
+    pos(1) + pos(3), pos(2) + pos(4) / 2; ...
+    pos(1) + pos(3), pos(2); ...
+    pos(1) + pos(3) / 2, pos(2); ...
+    pos(1), pos(2); ...
+    pos(1), pos(2) + pos(4) / 2];
 
 % How bottom left relates to each anchor point
 
-shift = [...
-    0       -h
-    -w/2    -h
-    -w      -h
-    -w      -h/2
-    -w      0
-    -w/2    0
-    0       0
-    0       -h/2];
+shift = [ ...
+    0, -h; ...
+    -w / 2, -h; ...
+    -w, -h; ...
+    -w, -h / 2; ...
+    -w, 0; ...
+    -w / 2, 0; ...
+    0, 0; ...
+    0, -h / 2];
 
 % Legend location
 
-corner = refxy(anchor(1),:) + buffer + shift(anchor(2),:);
-legpos = [corner w h];
+corner = refxy(anchor(1), :) + buffer + shift(anchor(2), :);
+legpos = [corner, w, h];
 
 %------------------------
 % Listener functions
@@ -806,7 +804,7 @@ end
 % If reference object moves or resizes, reposition the legend appropriately
 
 function updatelegpos(src, evt, legax)
-if ishandle(legax) 
+if ishandle(legax)
     Lf = getappdata(legax, 'legflex');
     legpos = positionleg(Lf.ref, Lf.w, Lf.h, Lf.anchor, Lf.buffer, Lf.bufunit);
     set(legax, 'Units', Lf.bufferunit, 'Position', legpos);
@@ -831,7 +829,7 @@ end
 function resyncprops(src, evt, legax)
 
 if ishandle(legax) % In case it's been deleted
-    
+
     Lf = getappdata(legax, 'legflex');
 
     str = cellstr(num2str((1:length(Lf.plotobj))'));
@@ -843,36 +841,36 @@ if ishandle(legax) % In case it's been deleted
     ishg = strcmp(objtype, 'hggroup');
     hgidx = find(ishg);
 
-    lobj = [Lf.legobj(isline) htmp.obj(isline)];
-    pobj = [Lf.legobj(ispatch) htmp.obj(ispatch)];
+    lobj = [Lf.legobj(isline), htmp.obj(isline)];
+    pobj = [Lf.legobj(ispatch), htmp.obj(ispatch)];
 
     if ~isempty(hgidx)
         for ih = hgidx
             chldln1 = findall(Lf.legobj(ih), 'type', 'line');
-            chldln2 = findall(htmp.obj(ih), 'type', 'line'); 
+            chldln2 = findall(htmp.obj(ih), 'type', 'line');
 
-            lobj = [lobj; [chldln1 chldln2]];
+            lobj = [lobj; [chldln1, chldln2]];
 
             chldpa1 = findall(Lf.legobj(ih), 'type', 'patch');
-            chldpa2 = findall(htmp.obj(ih), 'type', 'patch'); 
+            chldpa2 = findall(htmp.obj(ih), 'type', 'patch');
 
-            pobj = [pobj; [chldpa1 chldpa2]];
+            pobj = [pobj; [chldpa1, chldpa2]];
 
         end
     end
 
-    lprops = {'color','linestyle','linewidth','marker','markersize','markeredgecolor','markerfacecolor'};
-    for il = 1:size(lobj,1)
-        lvals = get(lobj(il,2), lprops);
+    lprops = {'color', 'linestyle', 'linewidth', 'marker', 'markersize', 'markeredgecolor', 'markerfacecolor'};
+    for il = 1:size(lobj, 1)
+        lvals = get(lobj(il, 2), lprops);
         pv = [lprops; lvals];
-        set(lobj(il,1), pv{:});
+        set(lobj(il, 1), pv{:});
     end
 
-    pprops = {'cdata','cdatamapping','edgealpha','edgecolor','facealpha','facecolor','linestyle','linewidth','marker','markeredgecolor','markerfacecolor','markersize'};
-    for ip = 1:size(pobj,1)
-        pvals = get(pobj(ip,2), pprops);
+    pprops = {'cdata', 'cdatamapping', 'edgealpha', 'edgecolor', 'facealpha', 'facecolor', 'linestyle', 'linewidth', 'marker', 'markeredgecolor', 'markerfacecolor', 'markersize'};
+    for ip = 1:size(pobj, 1)
+        pvals = get(pobj(ip, 2), pprops);
         pv = [pprops; pvals];
-        set(pobj(ip,1), pv{:});
+        set(pobj(ip, 1), pv{:});
     end
 
     cmap = colormap(htmp.leg);
@@ -887,11 +885,3 @@ function wrapper(ObjH, EventData, fcnList)
 for ii = 1:length(fcnList)
     feval(fcnList{ii}, ObjH, EventData);
 end
-
-
-
-
-
-
-    
-
